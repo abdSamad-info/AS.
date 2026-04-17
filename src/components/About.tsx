@@ -13,7 +13,7 @@ export default function About() {
           >
             <div className="aspect-square rounded-3xl overflow-hidden glass border-white/10 p-4">
                <img 
-                 src="https://picsum.photos/seed/portrait/800/800" 
+                 src="/1760253286109.jpg" 
                  alt="Abdul Samad" 
                  className="w-full h-full object-cover rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
                  referrerPolicy="no-referrer"

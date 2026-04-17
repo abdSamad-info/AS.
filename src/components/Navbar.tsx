@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Github, Linkedin, Mail, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -72,24 +72,62 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <motion.div
-        initial={false}
-        animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-        className="md:hidden overflow-hidden glass-dark"
-      >
-        <div className="px-6 py-8 space-y-4">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className="block text-xl font-medium text-slate-300 hover:text-white"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[60] md:hidden bg-bg/95 backdrop-blur-2xl flex flex-col p-10"
+          >
+            <div className="flex justify-between items-center mb-16">
+              <span className="text-2xl font-black tracking-tighter text-accent">AS.</span>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="w-12 h-12 rounded-full border border-glass-border flex items-center justify-center text-white"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-8 mb-auto">
+              {navLinks.map((link, i) => (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.1 }}
+                  className="text-4xl font-black uppercase tracking-tighter hover:text-accent transition-colors"
+                >
+                  {link.name}
+                </motion.a>
+              ))}
+            </nav>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="pt-10 border-t border-glass-border flex flex-col gap-6"
             >
-              {link.name}
-            </a>
-          ))}
-        </div>
-      </motion.div>
+              <div className="flex gap-8">
+                <a href="https://github.com/ABDLSamaD" target="_blank" className="text-white hover:text-accent transition-colors">
+                  <Github size={24} />
+                </a>
+                <a href="https://www.linkedin.com/in/abdul-samad-421793309" target="_blank" className="text-white hover:text-accent transition-colors">
+                  <Linkedin size={24} />
+                </a>
+              </div>
+              <p className="text-[10px] uppercase tracking-widest font-black text-text-dim">
+                © 2026 ABDUL SAMAD. ALL RIGHTS RESERVED.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

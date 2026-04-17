@@ -120,13 +120,36 @@ export default function Contact() {
                 </div>
               )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-5 bg-accent text-white text-xs font-black tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "SENDING..." : "SEND MESSAGE"}
-              </button>
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-5 bg-accent text-white text-xs font-black tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-[0.98]"
+                >
+                  {loading ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full"
+                      />
+                      <span>SENDING...</span>
+                    </>
+                  ) : (
+                    "SEND MESSAGE"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormState({ name: "", email: "", message: "" });
+                    setStatus({ type: null, msg: null });
+                  }}
+                  className="px-8 py-5 border border-glass-border text-text-dim text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 hover:text-white transition-all"
+                >
+                  RESET
+                </button>
+              </div>
             </form>
           </motion.div>
         </div>
