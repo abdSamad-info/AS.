@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import profileImg from "../assets/profile.jpg";
 
 export default function About() {
   return (
@@ -14,7 +13,7 @@ export default function About() {
           >
             <div className="aspect-square rounded-3xl overflow-hidden glass border-white/10 p-4">
                <img 
-                 src={profileImg} 
+                 src="/profile.jpg" 
                  alt="Abdul Samad" 
                  className="w-full h-full object-cover rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
                  referrerPolicy="no-referrer"
