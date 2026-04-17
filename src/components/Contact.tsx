@@ -61,7 +61,7 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="meta-label mb-4 block">Get In Touch</span>
+            <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] COMMUNICATION PORTAL</span>
             <h3 className="text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
               START A <br />
               <span className="text-accent">PROJECT</span>.

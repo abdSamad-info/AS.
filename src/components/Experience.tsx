@@ -9,8 +9,8 @@ export default function Experience() {
 
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
-            Stops on the way
+          <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
+            [ 03 ] Career Trajectory
           </h2>
           <h3 className="text-4xl md:text-5xl font-bold">Experience</h3>
         </div>

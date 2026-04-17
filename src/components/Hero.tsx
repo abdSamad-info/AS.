@@ -15,15 +15,16 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
         >
           <span className="meta-label mb-8 block">
-            Crafting Digital Solutions 2026
+            [ BUILDING SCALABLE DIGITAL ARCHITECTURES ]
           </span>
           <h1 className="massive-title mb-10">
             Abdul <br />
             <span className="text-accent text-glow">Samad</span>
           </h1>
-          <p className="max-w-xl mx-auto text-sm text-text-dim mb-12 leading-relaxed tracking-wide">
-            AT THE INTERSECTION OF HIGH-FIDELITY AESTHETICS AND FUNCTIONAL PRECISION.
-            BUILDING SCALABLE, USER-FOCUSED WEB APPLICATIONS.
+          <p className="max-w-2xl mx-auto text-[11px] md:text-sm text-text-dim mb-12 leading-relaxed tracking-[0.2em] uppercase font-bold px-4">
+            Pushing the boundaries of digital innovation through high-performance 
+            full-stack engineering. Crafting seamless, accessible, and 
+            architecturally sound ecosystems for the modern web.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">

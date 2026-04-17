@@ -2,24 +2,24 @@ import { motion } from "motion/react";
 
 const skillCategories = [
   {
-    title: "Languages",
-    skills: ["JavaScript (ES6+)", "TypeScript", "HTML5", "CSS3"],
+    title: "Frontend Mastery",
+    skills: ["React 19", "Next.js 14", "TypeScript", "Tailwind CSS 4", "Redux Toolkit", "Framer Motion"],
   },
   {
-    title: "Frontend",
-    skills: ["React", "Redux", "Tailwind CSS", "Next.js", "Angular"],
+    title: "Backend Architecture",
+    skills: ["Node.js", "Express.js", "Socket.io", "JWT Auth", "RESTful APIs", "Mongoose"],
   },
   {
-    title: "Backend",
-    skills: ["Node.js", "Express.js", "REST APIs", "JWT", "Socket.io"],
+    title: "Data Systems",
+    skills: ["MongoDB", "PostgreSQL", "Redis", "Cloudinary", "Firebase"],
   },
   {
-    title: "Database",
-    skills: ["MongoDB", "PostgreSQL",],
+    title: "Platforms & DevOps",
+    skills: ["Docker", "AWS S3", "Vercel", "Git/GitHub", "GitHub Actions", "Google Cloud"],
   },
   {
-    title: "Tools & DevOps",
-    skills: ["Git", "GitHub Actions", "Vercel", "Netlify", "GCS"],
+    title: "UI/UX & Design",
+    skills: ["Figma", "Responsive Design", "Micro-interactions", "A11y", "Glassmorphism"],
   },
 ];
 
@@ -28,8 +28,8 @@ export default function Skills() {
     <section id="skills" className="py-24 bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
-            Abilities
+          <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
+            [ 02 ] Technical Arsenal
           </h2>
           <h3 className="text-4xl md:text-5xl font-bold">Tech Stack</h3>
         </div>

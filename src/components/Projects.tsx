@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Github, Filter, X, ChevronRight } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const projects = [
   {
@@ -29,10 +29,34 @@ const projects = [
   },
   {
     id: 3,
+    title: "Cinet",
+    subtitle: "Cinema Ticket Management",
+    desc: "A full-stack cinema ticket booking system with movie scheduling, seat selection, and user authentication. Built for high-volume ticket sales.",
+    longDesc: "Cinet is a robust cinema management platform. It features an admin dashboard for theatre owners to manage movies, showtimes, and pricing, alongside a client-facing booking interface with real-time seat selection and availability tracking.",
+    tech: ["MongoDB", "Express", "React", "Node.js", "JWT"],
+    image: "https://picsum.photos/seed/cinema/1920/1080",
+    link: null,
+    github: "#",
+    achievements: ["Real-time seat reservation system", "Admin revenue dashboard", "Secure role-based access control"],
+  },
+  {
+    id: 4,
+    title: "Live Chat App",
+    subtitle: "Full-Stack Messaging System",
+    desc: "Real-time communication platform with group chats, private messaging, and instant notification system using Socket.io.",
+    longDesc: "A complete messaging ecosystem designed for scalability. Implemented persistent message history, user presence indicators, and image sharing capabilities. The backend manages thousands of concurrent WebSocket connections efficiently.",
+    tech: ["React", "Socket.io", "Express", "MongoDB", "Redux"],
+    image: "https://picsum.photos/seed/chat/1920/1080",
+    link: null,
+    github: "#",
+    achievements: ["Sub-50ms message delivery latency", "Group chat management features", "File upload & sharing integration"],
+  },
+  {
+    id: 5,
     title: "Full-Stack Portfolio",
     subtitle: "Personal Portfolio Showcase",
-    desc: "A high-fidelity minimalist showcase built with React 19 and Express. Achieved 95+ Lighthouse scores through modern UI patterns and optimized server-side asset delivery.",
-    longDesc: "This portfolio was designed as an 'Experience-First' platform. It utilizes the latest React 19 features, including improved server-side integration via the custom Express/Vite bridge. Styled with Tailwind CSS 4, it leverages the new JIT engine for high-performance class generation.",
+    desc: "A high-fidelity minimalist showcase built with React 19 and Express. Achieved 95+ Lighthouse scores through modern UI patterns.",
+    longDesc: "This portfolio was designed as an 'Experience-First' platform. It utilizes the latest React 19 features and is styled with Tailwind CSS 4, leveraging the new JIT engine for high-performance class generation.",
     tech: ["React", "Express", "PostgreSQL", "Tailwind CSS", "Motion"],
     image: "/abdfolio.png",
     link: "https://abdfolio.vercel.app/",
@@ -44,6 +68,17 @@ const projects = [
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
+
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [selectedProject]);
 
   const categories = useMemo(() => {
     const techs = new Set<string>();
@@ -62,7 +97,7 @@ export default function Projects() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
           <div>
             <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
-              [ 01 ] Featured Work
+              [ 04 ] Featured Work
             </h2>
             <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Latest Projects</h3>
           </div>
@@ -131,6 +166,7 @@ export default function Projects() {
                     alt={project.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                   />
                 </div>
 
@@ -171,7 +207,7 @@ export default function Projects() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[95%] md:max-w-5xl h-fit max-h-[90vh] glass rounded-3xl z-[70] overflow-hidden flex flex-col md:flex-row shadow-2xl border-white/10"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[95%] md:max-w-5xl h-[85vh] md:h-fit max-h-[90vh] glass rounded-3xl z-[70] overflow-hidden flex flex-col md:flex-row shadow-2xl border-white/10"
             >
               <button 
                 onClick={() => setSelectedProject(null)}
@@ -186,11 +222,12 @@ export default function Projects() {
                   alt={selectedProject.title} 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent md:hidden" />
               </div>
 
-              <div className="w-full md:w-1/2 p-8 md:p-14 overflow-y-auto">
+              <div className="w-full md:w-1/2 p-8 md:p-14 overflow-y-auto flex-1">
                 <span className="meta-label mb-4 block">{selectedProject.subtitle}</span>
                 <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-8 leading-none">{selectedProject.title}</h3>
                 

@@ -17,6 +17,7 @@ export default function About() {
                  alt="Abdul Samad" 
                  className="w-full h-full object-cover rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
                  referrerPolicy="no-referrer"
+                 loading="lazy"
                />
             </div>
             {/* Decors */}
@@ -29,7 +30,7 @@ export default function About() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <span className="meta-label mb-4 block">About Me</span>
+            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] BIOGRAPHY</span>
             <h3 className="text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
               Aesthetics <br />
               <span className="text-accent underline decoration-glass-border underline-offset-8">Precision.</span>
