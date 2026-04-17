@@ -7,8 +7,27 @@ export default function Contact() {
   const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string | null }>({ type: null, msg: null });
   const [loading, setLoading] = useState(false);
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+    if (!formState.name.trim()) newErrors.name = "Name is required";
+    if (!formState.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formState.email)) {
+      newErrors.email = "Email is invalid";
+    }
+    if (!formState.message.trim()) newErrors.message = "Message is required";
+    else if (formState.message.length < 10) newErrors.message = "Message must be at least 10 characters";
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
+    
     setLoading(true);
     setStatus({ type: null, msg: null });
 
@@ -86,10 +105,14 @@ export default function Contact() {
                   type="text"
                   required
                   value={formState.name}
-                  onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                  onChange={(e) => {
+                    setFormState({ ...formState, name: e.target.value });
+                    if (errors.name) setErrors({ ...errors, name: "" });
+                  }}
                   placeholder="JOHN DOE"
-                  className="w-full bg-transparent border-b border-glass-border py-4 focus:outline-none focus:border-accent transition-all text-white uppercase text-sm tracking-wide"
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide ${errors.name ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
+                {errors.name && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.name}</p>}
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-widest font-black text-text-dim ml-1">Email Address</label>
@@ -97,10 +120,14 @@ export default function Contact() {
                   type="email"
                   required
                   value={formState.email}
-                  onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormState({ ...formState, email: e.target.value });
+                    if (errors.email) setErrors({ ...errors, email: "" });
+                  }}
                   placeholder="YOUR@EMAIL.COM"
-                  className="w-full bg-transparent border-b border-glass-border py-4 focus:outline-none focus:border-accent transition-all text-white uppercase text-sm tracking-wide"
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide ${errors.email ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
+                {errors.email && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.email}</p>}
               </div>
               <div className="space-y-4">
                 <label className="text-[10px] uppercase tracking-widest font-black text-text-dim ml-1">Message</label>
@@ -108,10 +135,14 @@ export default function Contact() {
                   required
                   rows={4}
                   value={formState.message}
-                  onChange={(e) => setFormState({ ...formState, message: e.target.value })}
+                  onChange={(e) => {
+                    setFormState({ ...formState, message: e.target.value });
+                    if (errors.message) setErrors({ ...errors, message: "" });
+                  }}
                   placeholder="TELL ME ABOUT YOUR PROJECT"
-                  className="w-full bg-transparent border-b border-glass-border py-4 focus:outline-none focus:border-accent transition-all text-white uppercase text-sm tracking-wide resize-none"
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide resize-none ${errors.message ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
+                {errors.message && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.message}</p>}
               </div>
 
               {status.msg && (
@@ -144,6 +175,7 @@ export default function Contact() {
                   onClick={() => {
                     setFormState({ name: "", email: "", message: "" });
                     setStatus({ type: null, msg: null });
+                    setErrors({});
                   }}
                   className="px-8 py-5 border border-glass-border text-text-dim text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 hover:text-white transition-all"
                 >

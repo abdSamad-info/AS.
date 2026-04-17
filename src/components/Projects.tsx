@@ -175,7 +175,7 @@ export default function Projects() {
             >
               <button 
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-accent transition-colors z-10"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 rounded-full bg-slate-900/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-accent transition-colors z-[100]"
               >
                 <X size={20} />
               </button>
