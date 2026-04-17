@@ -10,7 +10,7 @@ const projects = [
     desc: "Architected a high-performance custom Shopify interface. Streamlined product management for 500+ items using Storefront API and GCS, reducing sync latency by 40%.",
     longDesc: "Presia required a highly customized storefront that Shopify's standard themes couldn't provide. I built a custom frontend using React that communicates with the Shopify Storefront API. To handle the massive volume of high-resolution image assets for contact lenses, I integrated Google Cloud Storage, implementing a custom middleware for secure, optimized image delivery.",
     tech: ["Node.js", "Express", "PostgreSQL", "React", "Shopify API"],
-    image: "/Presia.png",
+    image: "/presia.png",
     link: null,
     github: "#",
     achievements: ["40% reduction in sync latency", "Integrated 10+ custom Shopify hooks", "Automated image optimization pipeline"],
