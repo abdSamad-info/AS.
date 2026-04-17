@@ -79,7 +79,7 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] md:hidden bg-bg/95 backdrop-blur-2xl flex flex-col p-10"
+            className="fixed inset-0 z-[60] md:hidden bg-[#050505] flex flex-col p-10"
           >
             <div className="flex justify-between items-center mb-16">
               <span className="text-2xl font-black tracking-tighter text-accent">AS.</span>

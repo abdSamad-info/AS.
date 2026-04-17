@@ -171,7 +171,7 @@ export default function Projects() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl max-h-[90vh] glass rounded-3xl z-[70] overflow-hidden flex flex-col md:flex-row shadow-2xl border-white/10"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[95%] md:max-w-5xl h-fit max-h-[90vh] glass rounded-3xl z-[70] overflow-hidden flex flex-col md:flex-row shadow-2xl border-white/10"
             >
               <button 
                 onClick={() => setSelectedProject(null)}
@@ -180,7 +180,7 @@ export default function Projects() {
                 <X size={20} />
               </button>
 
-              <div className="w-full md:w-1/2 h-64 md:h-auto relative">
+              <div className="w-full md:w-1/2 h-48 md:h-auto relative shrink-0">
                 <img 
                   src={selectedProject.image} 
                   alt={selectedProject.title} 
@@ -190,7 +190,7 @@ export default function Projects() {
                 <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent md:hidden" />
               </div>
 
-              <div className="w-full md:w-1/2 p-10 md:p-14 overflow-y-auto">
+              <div className="w-full md:w-1/2 p-8 md:p-14 overflow-y-auto">
                 <span className="meta-label mb-4 block">{selectedProject.subtitle}</span>
                 <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-8 leading-none">{selectedProject.title}</h3>
                 

@@ -17,10 +17,6 @@ export default function Footer() {
              <a href="#" className="hover:text-white transition-colors"><Twitter size={20} /></a>
              <a href="mailto:samadpakhtoon09@gmail.com" className="hover:text-white transition-colors"><Mail size={20} /></a>
           </div>
-
-          <div className="text-slate-500 text-sm">
-             Designed & Built with <span className="text-rose-500">♥</span>
-          </div>
         </div>
       </div>
     </footer>
