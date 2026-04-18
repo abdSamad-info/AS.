@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Github, Filter, X, ChevronRight } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
-import presiaImg from "../assets/presia_v2.png";
-import electricaImg from "../assets/electrica_v2.png";
-import abdfolioImg from "../assets/abdfolio_v2.png";
+import presiaImg from "../assets/presia.png";
+import electricaImg from "../assets/electrica.png";
+import abdfolioImg from "../assets/abdfolio.png";
 
 const projects = [
   {

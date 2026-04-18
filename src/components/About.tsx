@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import profileImg from "../assets/profile_v2.jpg";
+import profileImg from "../assets/profile.jpg";
 
 export default function About() {
   return (
