@@ -1,11 +1,9 @@
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Github, Filter, X, ChevronRight } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
-
-// Direct Google Drive links for project images
-const presiaImg = "https://drive.google.com/uc?export=view&id=1OPLPCfWX22Mx2HNkHI1Mo1qf22Tz8Nmr";
-const electricaImg = "https://drive.google.com/uc?export=view&id=1rxhMk2VMLZtwivBnVumSBlxRfUUWNgT4";
-const abdfolioImg = "https://drive.google.com/uc?export=view&id=17vFwf2Vfs9ZfpmHdpPKNw47Vd09LDVi6";
+import presiaImg from "../assets/presia.png";
+import electricaImg from "../assets/electrica.png";
+import abdfolioImg from "../assets/abdfolio.png";
 
 const projects = [
   {

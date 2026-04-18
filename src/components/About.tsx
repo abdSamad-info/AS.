@@ -1,7 +1,5 @@
 import { motion } from "motion/react";
-
-// Use direct Google Drive link for the profile image
-const profileImg = "https://drive.google.com/uc?export=view&id=1bnt1ry51PbqlgjGdvjEfN1UvhlWJT2Xw";
+import profileImg from "../assets/profile.jpg";
 
 export default function About() {
   return (
