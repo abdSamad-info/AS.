@@ -1,10 +1,8 @@
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Github, Filter, X, ChevronRight } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
-import presiaImg from "../assets/presia.png";
-import electricaImg from "../assets/electrica.png";
-import abdfolioImg from "../assets/abdfolio.png";
-
+ 
+// Using public folder paths instead of imports - works on Vercel!
 const projects = [
   {
     id: 1,
@@ -13,7 +11,7 @@ const projects = [
     desc: "Architected a high-performance custom Shopify interface. Streamlined product management for 500+ items using Storefront API and GCS, reducing sync latency by 40%.",
     longDesc: "Presia required a highly customized storefront that Shopify's standard themes couldn't provide. I built a custom frontend using React that communicates with the Shopify Storefront API. To handle the massive volume of high-resolution image assets for contact lenses, I integrated Google Cloud Storage, implementing a custom middleware for secure, optimized image delivery.",
     tech: ["Node.js", "Express", "PostgreSQL", "React", "Shopify API"],
-    image: presiaImg,
+    image: "/images/presia.png",
     link: null,
     github: "#",
     achievements: ["40% reduction in sync latency", "Integrated 10+ custom Shopify hooks", "Automated image optimization pipeline"],
@@ -25,7 +23,7 @@ const projects = [
     desc: "Engineered a secure multi-user MERN platform for contractor workflow. Implemented real-time tracking and encrypted messaging, boosting operational efficiency by 25%.",
     longDesc: "Electrica is a comprehensive management tool for electrical contractors. It handles the entirely lifecycle of a project from initial lead to final inspection. I implemented a complex state machine for project stages and used Socket.io for real-time updates across the contractor and client dashboards.",
     tech: ["React", "Node.js", "Express", "MongoDB", "Socket.io"],
-    image: electricaImg,
+    image: "/images/electrica.png",
     link: "https://electricaapp.vercel.app",
     github: "#",
     achievements: ["25% boost in contractor efficiency", "Real-time PWA support", "Biometric OTP authentication"],
@@ -37,7 +35,7 @@ const projects = [
     desc: "A full-stack cinema ticket booking system with movie scheduling, seat selection, and user authentication. Built for high-volume ticket sales.",
     longDesc: "Cinet is a robust cinema management platform. It features an admin dashboard for theatre owners to manage movies, showtimes, and pricing, alongside a client-facing booking interface with real-time seat selection and availability tracking.",
     tech: ["MongoDB", "Express", "React", "Node.js", "JWT"],
-    image: "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80",
+    image: "/images/cinet.png",
     link: null,
     github: "#",
     achievements: ["Real-time seat reservation system", "Admin revenue dashboard", "Secure role-based access control"],
@@ -49,7 +47,7 @@ const projects = [
     desc: "Real-time communication platform with group chats, private messaging, and instant notification system using Socket.io.",
     longDesc: "A complete messaging ecosystem designed for scalability. Implemented persistent message history, user presence indicators, and image sharing capabilities. The backend manages thousands of concurrent WebSocket connections efficiently.",
     tech: ["React", "Socket.io", "Express", "MongoDB", "Redux"],
-    image: "https://images.unsplash.com/photo-1577563908292-8eb142519c6f?w=800&q=80",
+    image: "/images/chat.png",
     link: null,
     github: "#",
     achievements: ["Sub-50ms message delivery latency", "Group chat management features", "File upload & sharing integration"],
@@ -61,7 +59,7 @@ const projects = [
     desc: "A high-fidelity minimalist showcase built with React 19 and Express. Achieved 95+ Lighthouse scores through modern UI patterns.",
     longDesc: "This portfolio was designed as an 'Experience-First' platform. It utilizes the latest React 19 features and is styled with Tailwind CSS 4, leveraging the new JIT engine for high-performance class generation.",
     tech: ["React", "Express", "PostgreSQL", "Tailwind CSS", "Motion"],
-    image: abdfolioImg,
+    image: "/images/abdfolio.png",
     link: "https://abdfolio.vercel.app/",
     github: "https://github.com/ABDLSamaD",
     achievements: ["95+ Lighthouse score", "Custom Glassmorphic engine", "Express API contact integration"],
