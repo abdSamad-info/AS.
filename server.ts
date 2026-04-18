@@ -16,6 +16,9 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Serve static files from public folder (for images, etc)
+  app.use(express.static(path.join(__dirname, 'public')));
+
   // Database setup (Optional - only if PG_CONNECTION_STRING is provided)
   let pool: pg.Pool | null = null;
   if (process.env.PG_CONNECTION_STRING) {

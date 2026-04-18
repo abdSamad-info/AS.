@@ -1,14 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": "dist/**"
-      }
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "public": true,
   "routes": [
     {
       "src": "/api/(.*)",
@@ -16,17 +10,11 @@
     },
     {
       "src": "/images/(.*)",
-      "dest": "/dist/images/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "dest": "/public/images/$1"
     },
     {
-      "src": "/(.*\\.(js|css|json|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot))",
-      "dest": "/dist/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/(.*\\.(js|css|json|woff|woff2|ttf|eot|ico))",
+      "dest": "/dist/$1"
     },
     {
       "src": "/(.*)",
