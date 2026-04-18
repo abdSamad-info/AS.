@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from "motion/react";
 import { ExternalLink, Github, Filter, X, ChevronRight } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
+import presiaImg from "../assets/presia.png";
+import electricaImg from "../assets/electrica.png";
+import abdfolioImg from "../assets/abdfolio.png";
 
 const projects = [
   {
@@ -10,7 +13,7 @@ const projects = [
     desc: "Architected a high-performance custom Shopify interface. Streamlined product management for 500+ items using Storefront API and GCS, reducing sync latency by 40%.",
     longDesc: "Presia required a highly customized storefront that Shopify's standard themes couldn't provide. I built a custom frontend using React that communicates with the Shopify Storefront API. To handle the massive volume of high-resolution image assets for contact lenses, I integrated Google Cloud Storage, implementing a custom middleware for secure, optimized image delivery.",
     tech: ["Node.js", "Express", "PostgreSQL", "React", "Shopify API"],
-    image: "/presia.png",
+    image: presiaImg,
     link: null,
     github: "#",
     achievements: ["40% reduction in sync latency", "Integrated 10+ custom Shopify hooks", "Automated image optimization pipeline"],
@@ -22,7 +25,7 @@ const projects = [
     desc: "Engineered a secure multi-user MERN platform for contractor workflow. Implemented real-time tracking and encrypted messaging, boosting operational efficiency by 25%.",
     longDesc: "Electrica is a comprehensive management tool for electrical contractors. It handles the entirely lifecycle of a project from initial lead to final inspection. I implemented a complex state machine for project stages and used Socket.io for real-time updates across the contractor and client dashboards.",
     tech: ["React", "Node.js", "Express", "MongoDB", "Socket.io"],
-    image: "/electrica.png",
+    image: electricaImg,
     link: "https://electricaapp.vercel.app",
     github: "#",
     achievements: ["25% boost in contractor efficiency", "Real-time PWA support", "Biometric OTP authentication"],
@@ -58,7 +61,7 @@ const projects = [
     desc: "A high-fidelity minimalist showcase built with React 19 and Express. Achieved 95+ Lighthouse scores through modern UI patterns.",
     longDesc: "This portfolio was designed as an 'Experience-First' platform. It utilizes the latest React 19 features and is styled with Tailwind CSS 4, leveraging the new JIT engine for high-performance class generation.",
     tech: ["React", "Express", "PostgreSQL", "Tailwind CSS", "Motion"],
-    image: "/abdfolio.png",
+    image: abdfolioImg,
     link: "https://abdfolio.vercel.app/",
     github: "https://github.com/ABDLSamaD",
     achievements: ["95+ Lighthouse score", "Custom Glassmorphic engine", "Express API contact integration"],
