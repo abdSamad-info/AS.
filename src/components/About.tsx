@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 
-// Use external image URL to prevent build failures from missing local assets
-const profileImg = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80";
+// Use direct Google Drive link for the profile image
+const profileImg = "https://drive.google.com/uc?export=view&id=1bnt1ry51PbqlgjGdvjEfN1UvhlWJT2Xw";
 
 export default function About() {
   return (
