@@ -16,7 +16,20 @@ async function startServer() {
 
   app.use(express.json());
 
-  // 1. Serve static files from public folder (IMPORTANT: This must be high priority for images)
+  // 1. Explicitly serve images with locked headers to prevent 206 issues on Vercel
+  app.get('/images/:filename', (req, res) => {
+    const filepath = path.join(__dirname, 'public', 'images', req.params.filename);
+    res.set({
+      'Content-Type': req.params.filename.endsWith('.jpg') ? 'image/jpeg' : 'image/png',
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Accept-Ranges': 'none'
+    });
+    res.sendFile(filepath, (err) => {
+      if (err) res.status(404).send('Image not found');
+    });
+  });
+
+  // 2. Serve static files from public folder
   app.use(express.static(path.join(__dirname, 'public')));
 
   // 2. Database setup
