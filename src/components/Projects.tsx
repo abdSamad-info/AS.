@@ -162,13 +162,34 @@ export default function Projects() {
                 <h4 className="text-3xl font-black uppercase tracking-tight mb-8 group-hover:text-accent transition-colors">{project.title}</h4>
                 
                 <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-8 grayscale group-hover:grayscale-0 transition-all duration-700 border border-glass-border">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
+                  {project.title === "Presia" ? (
+                    <div className="w-full h-full bg-slate-900 flex items-center justify-center p-12 overflow-hidden relative group-hover:bg-accent/5 transition-colors duration-700">
+                      {/* Logo Decor */}
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                      <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                      
+                      <motion.div 
+                        initial={{ opacity: 0.8 }}
+                        animate={{ opacity: [0.8, 1, 0.8] }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        className="relative z-10 flex flex-col items-center"
+                      >
+                        <span className="text-6xl md:text-7xl font-black tracking-tighter text-white uppercase italic select-none">
+                          PRESIA
+                        </span>
+                        <div className="h-0.5 w-full bg-accent mt-2 shadow-[0_0_15px_rgba(61,90,254,0.8)]" />
+                        <span className="text-[10px] tracking-[0.4em] font-black text-accent mt-4 uppercase">Architecture & Precision</span>
+                      </motion.div>
+                    </div>
+                  ) : (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                    />
+                  )}
                 </div>
 
                 <p className="text-text-dim text-sm mb-8 leading-relaxed max-w-sm uppercase tracking-wide font-medium">{project.desc}</p>
