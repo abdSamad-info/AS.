@@ -38,12 +38,27 @@ export default function Experience() {
                    </div>
                 </div>
 
-                <ul className="space-y-4 text-slate-400 list-disc list-inside">
-                   <li>Expertly building full-stack applications using the **PERN stack (Postgres, Express, React, Node.js)** and **TypeScript**.</li>
-                   <li>Successfully delivering numerous full-stack projects on time, maintaining high detail and performance standards.</li>
-                   <li>Utilizing **Git** for efficient version control and collaborative workflows across complex web architectures.</li>
-                   <li>Developing custom **Shopify backend integrations** and managing **Storefront deployments** for optimized e-commerce.</li>
-                   <li>Integrating **Google Cloud** and advanced cloud services for hosting, file management, and secure data delivery.</li>
+                <ul className="space-y-4 text-slate-400">
+                   <li className="flex gap-3">
+                     <span className="text-accent mt-1">•</span>
+                     <span>Developing full-stack applications using the PERN stack (Postgres, Express, React, Node.js) with TypeScript.</span>
+                   </li>
+                   <li className="flex gap-3">
+                     <span className="text-accent mt-1">•</span>
+                     <span>Delivering high-performance web solutions with a focus on detailed system architecture and clean code.</span>
+                   </li>
+                   <li className="flex gap-3">
+                     <span className="text-accent mt-1">•</span>
+                     <span>Managing Git version control and collaborative workflows for complex organizational projects.</span>
+                   </li>
+                   <li className="flex gap-3">
+                     <span className="text-accent mt-1">•</span>
+                     <span>Implementing custom Shopify backend integrations and optimizing e-commerce storefront deployments.</span>
+                   </li>
+                   <li className="flex gap-3">
+                     <span className="text-accent mt-1">•</span>
+                     <span>Leveraging Google Cloud services for secure data hosting, storage, and server-side management.</span>
+                   </li>
                 </ul>
              </div>
           </motion.div>

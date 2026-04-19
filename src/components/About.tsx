@@ -13,7 +13,7 @@ export default function About() {
           >
             <div className="aspect-square rounded-3xl overflow-hidden glass border-white/10 p-4">
                <img 
-                 src="https://res.cloudinary.com/dkoqsgewf/image/upload/v1776602242/profiles_yx9geb.jpg"
+                 src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL}
                  alt="Abdul Samad" 
                  className="w-full h-full object-cover rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
                  referrerPolicy="no-referrer"

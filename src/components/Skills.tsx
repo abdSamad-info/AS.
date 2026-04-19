@@ -3,23 +3,23 @@ import { motion } from "motion/react";
 const skillCategories = [
   {
     title: "Frontend Mastery",
-    skills: ["React 19", "Next.js 14", "TypeScript", "Tailwind CSS 4", "Redux Toolkit", "Framer Motion"],
+    skills: ["React 19", "Next.js 15", "TypeScript", "Tailwind CSS 4", "Framer Motion"],
   },
   {
-    title: "Backend Architecture",
-    skills: ["Node.js", "Express.js", "Socket.io", "JWT Auth", "RESTful APIs", "Mongoose"],
+    title: "Backend & Languages",
+    skills: ["Node.js", "Python", "Express.js", "Socket.io", "FastAPI", "RESTful APIs"],
   },
   {
-    title: "Data Systems",
-    skills: ["MongoDB", "PostgreSQL", "Redis", "Cloudinary", "Firebase"],
+    title: "Data & Systems",
+    skills: ["PostgreSQL", "MongoDB", "Redis", "Firebase", "System Design"],
   },
   {
-    title: "Platforms & DevOps",
-    skills: ["Docker", "AWS S3", "Vercel", "Git/GitHub", "GitHub Actions", "Google Cloud"],
+    title: "Cloud & DevOps",
+    skills: ["Google Cloud (GCP)", "Docker", "Vercel", "Git/GitHub", "GitHub Actions"],
   },
   {
-    title: "UI/UX & Design",
-    skills: ["Figma", "Responsive Design", "Micro-interactions", "A11y", "Glassmorphism"],
+    title: "Specialized Tools",
+    skills: ["Shopify Storefront", "Cloudinary", "JWT Auth", "System Architecture"],
   },
 ];
 
