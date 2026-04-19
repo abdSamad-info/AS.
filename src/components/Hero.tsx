@@ -42,9 +42,9 @@ export default function Hero() {
         {/* Feature Cards Minimal */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
           {[
-            { icon: Layout, title: "Frontend", desc: "React, Next.js, Redux" },
-            { icon: Server, title: "Backend", desc: "Node.js, Express, SQL" },
-            { icon: Code, title: "Clean Code", desc: "TypeScript & Best Practices" },
+            { icon: Layout, title: "Frontend", desc: "React, Next.js, TS/JS" },
+            { icon: Server, title: "Backend", desc: "Node.js, Python, SQL" },
+            { icon: Code, title: "Core Languages", desc: "JavaScript, TypeScript, Python" },
           ].map((item, i) => (
             <motion.div
               key={item.title}

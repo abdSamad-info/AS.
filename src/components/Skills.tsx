@@ -2,12 +2,16 @@ import { motion } from "motion/react";
 
 const skillCategories = [
   {
-    title: "Frontend Mastery",
-    skills: ["React 19", "Next.js 15", "TypeScript", "Tailwind CSS 4", "Framer Motion"],
+    title: "Programming Languages",
+    skills: ["JavaScript (ES6+)", "TypeScript", "Python"],
   },
   {
-    title: "Backend & Languages",
-    skills: ["Node.js", "Python", "Express.js", "Socket.io", "FastAPI", "RESTful APIs"],
+    title: "Frontend Mastery",
+    skills: ["React 19", "Next.js 15", "Tailwind CSS 4", "Framer Motion"],
+  },
+  {
+    title: "Backend & Frameworks",
+    skills: ["Node.js", "Express.js", "Python FastAPI", "Socket.io", "RESTful APIs"],
   },
   {
     title: "Data & Systems",
@@ -16,10 +20,6 @@ const skillCategories = [
   {
     title: "Cloud & DevOps",
     skills: ["Google Cloud (GCP)", "Docker", "Vercel", "Git/GitHub", "GitHub Actions"],
-  },
-  {
-    title: "Specialized Tools",
-    skills: ["Shopify Storefront", "Cloudinary", "JWT Auth", "System Architecture"],
   },
 ];
 

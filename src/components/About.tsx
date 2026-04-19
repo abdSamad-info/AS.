@@ -37,7 +37,7 @@ export default function About() {
             </h3>
             <div className="space-y-6 text-text-dim leading-relaxed text-sm uppercase tracking-wide font-medium">
               <p>
-                As a MERN Stack Developer with over 1.5 years of experience, I blend technical 
+                As a Full Stack Developer with over 1+ years of experience, I blend technical 
                 excellence with a keen eye for UI/UX. My mission is to build digital products 
                 that are not only robust and scalable but also a joy to use.
               </p>
