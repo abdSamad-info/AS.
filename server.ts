@@ -16,30 +16,36 @@ async function startServer() {
 
   app.use(express.json());
 
-  // 1. Explicitly serve images with locked headers to prevent 206 issues on Vercel
+  // 🔥 1. Specific route for images must be FIRST to prevent catch-all conflicts
   app.get('/images/:filename', (req, res) => {
-    const filepath = path.join(__dirname, 'public', 'images', req.params.filename);
+    const filename = req.params.filename;
+    const filepath = path.join(__dirname, 'public', 'images', filename);
+    
+    // Set explicit headers to resolve 206 status issues on Vercel
     res.set({
-      'Content-Type': req.params.filename.endsWith('.jpg') ? 'image/jpeg' : 'image/png',
+      'Content-Type': filename.endsWith('.jpg') || filename.endsWith('.jpeg') ? 'image/jpeg' : 'image/png',
       'Cache-Control': 'public, max-age=31536000, immutable',
       'Accept-Ranges': 'none'
     });
+
     res.sendFile(filepath, (err) => {
-      if (err) res.status(404).send('Image not found');
+      if (err) {
+        console.error(`[ERROR] Image not found: ${filename} at ${filepath}`);
+        res.status(404).send('Image not found');
+      }
     });
   });
 
   // 2. Serve static files from public folder
   app.use(express.static(path.join(__dirname, 'public')));
 
-  // 2. Database setup
+  // 3. Database setup (Optional)
   let pool: pg.Pool | null = null;
   if (process.env.PG_CONNECTION_STRING) {
     pool = new pg.Pool({
       connectionString: process.env.PG_CONNECTION_STRING,
     });
     
-    // Initialize table if it doesn't exist (only if connection works)
     pool.query(`
       CREATE TABLE IF NOT EXISTS contacts (
         id SERIAL PRIMARY KEY,
@@ -51,7 +57,7 @@ async function startServer() {
     `).catch(err => console.error("Postgres init error:", err.message));
   }
 
-  // API Routes
+  // 4. API Routes
   app.post("/api/contact", async (req, res) => {
     const { name, email, message } = req.body;
     
@@ -67,20 +73,19 @@ async function startServer() {
         );
         res.json({ success: true, message: "Message sent successfully!" });
       } else {
-        // Mock success if no DB is connected for demo purposes
         console.log("Mock contact submission:", { name, email, message });
         res.json({ 
           success: true, 
-          message: "Message received! (Demo mode: Submission logged to server console as PG_CONNECTION_STRING is missing)" 
+          message: "Message received! (Demo mode)" 
         });
       }
     } catch (error: any) {
       console.error("Contact API error:", error);
-      res.status(500).json({ error: "Failed to save message. Please try again later." });
+      res.status(500).json({ error: "Failed to save message." });
     }
   });
 
-  // Vite middleware for development
+  // 5. Development vs Production middleware
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -89,14 +94,34 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    // Serve production assets from dist
+    app.use(express.static(distPath, {
+      maxAge: '31536000',
+      setHeaders: (res, path) => {
+        if (path.endsWith('.html')) {
+          res.set('Cache-Control', 'no-cache');
+        }
+      }
+    }));
   }
 
+  // 6. Catch-all route MUST be LAST
+  app.get("*", (req, res) => {
+    const indexPath = path.join(
+      process.cwd(), 
+      process.env.NODE_ENV === "production" ? "dist" : ".",
+      "index.html"
+    );
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        res.status(404).send('Application root not found');
+      }
+    });
+  });
+
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[SUCCESS] Server running on http://localhost:${PORT}`);
+    console.log(`[INFO] Environment: ${process.env.NODE_ENV || 'development'}`);
   });
 }
 
