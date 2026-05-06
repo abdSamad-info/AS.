@@ -34,7 +34,11 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ${
-        scrolled || isOpen ? "bg-[#050505]/95 backdrop-blur-xl border-b border-glass-border py-4" : "bg-transparent py-6"
+        isOpen 
+          ? "bg-[#050505] py-4" 
+          : scrolled 
+            ? "bg-[#050505]/90 backdrop-blur-xl border-b border-glass-border py-4" 
+            : "bg-transparent py-6"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -77,8 +81,11 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Toggle */}
-        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-white">
-          {isOpen ? <X /> : <Menu />}
+        <button 
+          onClick={() => setIsOpen(!isOpen)} 
+          className="md:hidden text-white w-10 h-10 flex items-center justify-center border border-glass-border rounded-full"
+        >
+          {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
@@ -86,31 +93,21 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] md:hidden bg-[#050505] flex flex-col p-10"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: "circOut" }}
+            className="fixed inset-0 z-[90] md:hidden bg-[#050505] flex flex-col p-10 pt-32"
           >
-            <div className="flex justify-between items-center mb-16">
-              <span className="text-2xl font-black tracking-tighter text-accent">AS.</span>
-              <button 
-                onClick={() => setIsOpen(false)}
-                className="w-12 h-12 rounded-full border border-glass-border flex items-center justify-center text-white"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            <nav className="flex flex-col gap-8 mb-auto">
+            <nav className="flex flex-col gap-8 mb-auto overflow-y-auto">
               {navLinks.map((link, i) => (
                 <motion.a
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + i * 0.1 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
                   className="text-4xl font-black uppercase tracking-tighter hover:text-accent transition-colors"
                 >
                   {link.name}
