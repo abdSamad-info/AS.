@@ -11,6 +11,8 @@
   --color-glass: rgba(255, 255, 255, 0.03);
   --color-glass-border: rgba(255, 255, 255, 0.08);
   --color-text-dim: #888888;
+  
+  --animate-spin-slow: spin 15s linear infinite;
 }
 
 @layer base {
