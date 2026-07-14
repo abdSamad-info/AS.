@@ -6,9 +6,10 @@ export default function About() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
             className="relative"
           >
             <div className="aspect-square rounded-3xl overflow-hidden glass border-white/10 p-4">
@@ -26,42 +27,49 @@ export default function About() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
           >
-            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] BIOGRAPHY</span>
-            <h3 className="text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
-              Aesthetics <br />
-              <span className="text-accent underline decoration-glass-border underline-offset-8">Precision.</span>
+            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] About Me</span>
+            <h3 className="text-4xl md:text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
+              Crafting experiences, <br />
+              <span className="text-accent underline decoration-glass-border underline-offset-8">Not just code.</span>
             </h3>
-            <div className="space-y-6 text-text-dim leading-relaxed text-sm uppercase tracking-wide font-medium">
+            <div className="space-y-6 text-slate-300 leading-relaxed text-sm font-normal">
               <p>
-                As a Full Stack Developer with over 1+ years of experience, I blend technical 
-                excellence with a keen eye for UI/UX. My mission is to build digital products 
-                that are not only robust and scalable but also a joy to use.
+                Hi, I'm Abdul Samad. I am a Full Stack Developer and Software Engineer with over 1.3+ years 
+                of dedicated experience building and maintaining real-world production systems. I specialize in 
+                engineering robust backend APIs, secure database structures, and high-performance user interfaces.
               </p>
               <p>
-                I thrive on solving complex problems and turning abstract ideas into 
-                production-ready solutions. Whether it's optimizing database queries 
-                or crafting pixel-perfect interfaces, I approach every challenge 
-                with dedication and a focus on clean, maintainable code.
+                My professional journey has enabled me to deliver complex applications, including full-stack Shopify 
+                applications with Zero/Sessionless Authentication, highly custom user affiliate platforms, and mobile apps 
+                deployed directly to the Google Play Store. 
+              </p>
+              <p>
+                I thrive on optimizing system design, building scalable logic on Google Cloud Platform (GCP), 
+                and continuously refining codebases for peak performance. I believe in writing clean, readable, 
+                and highly maintainable code that drives business value and offers an exceptional user experience.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-8 mt-12">
               <div>
-                <h4 className="text-white font-bold text-3xl mb-1">1+</h4>
+                <h4 className="text-white font-bold text-3xl mb-1">1.3+</h4>
                 <p className="text-slate-500 text-sm">Years Experience</p>
               </div>
               <div>
-                <h4 className="text-white font-bold text-3xl mb-1">6+</h4>
+                <h4 className="text-white font-bold text-3xl mb-1">10+</h4>
                 <p className="text-slate-500 text-sm">Projects Completed</p>
               </div>
             </div>
+
           </motion.div>
         </div>
       </div>
     </section>
+
   );
 }

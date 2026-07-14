@@ -57,17 +57,19 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] COMMUNICATION PORTAL</span>
-            <h3 className="text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
-              START A <br />
-              <span className="text-accent">PROJECT</span>.
+            <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] Contact</span>
+            <h3 className="text-4xl md:text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
+              Let's work <br />
+              <span className="text-accent">together.</span>
             </h3>
-            <p className="text-text-dim text-sm uppercase tracking-wide font-medium leading-relaxed mb-12 max-w-sm">
-              I am currently available for new projects. Let's build something exceptional together.
+            <p className="text-slate-300 text-sm leading-relaxed mb-12 max-w-sm">
+              I am currently available for contract work and full-time positions. 
+              If you have a project in mind or just want to chat, feel free to reach out!
             </p>
 
             <div className="space-y-8">
@@ -76,8 +78,8 @@ export default function Contact() {
                   <Mail size={24} />
                 </div>
                 <div>
-                  <p className="text-slate-500 text-sm uppercase tracking-widest font-bold">Email</p>
-                  <p className="text-xl font-medium">samadpakhtoon09@gmail.com</p>
+                  <p className="text-slate-500 text-xs uppercase tracking-widest font-bold">Email</p>
+                  <p className="text-lg md:text-xl font-medium text-slate-200">samadpakhtoon09@gmail.com</p>
                 </div>
               </div>
               <div className="flex items-center gap-6 group">
@@ -85,17 +87,18 @@ export default function Contact() {
                   <Phone size={24} />
                 </div>
                 <div>
-                  <p className="text-slate-500 text-sm uppercase tracking-widest font-bold">Phone</p>
-                  <p className="text-xl font-medium">0330-5786110</p>
+                  <p className="text-slate-500 text-xs uppercase tracking-widest font-bold">Phone</p>
+                  <p className="text-lg md:text-xl font-medium text-slate-200">0330-5786110</p>
                 </div>
               </div>
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
             className="border border-glass-border bg-glass p-10 rounded-2xl"
           >
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -109,8 +112,8 @@ export default function Contact() {
                     setFormState({ ...formState, name: e.target.value });
                     if (errors.name) setErrors({ ...errors, name: "" });
                   }}
-                  placeholder="JOHN DOE"
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide ${errors.name ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  placeholder="John Doe"
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide ${errors.name ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
                 {errors.name && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.name}</p>}
               </div>
@@ -124,8 +127,8 @@ export default function Contact() {
                     setFormState({ ...formState, email: e.target.value });
                     if (errors.email) setErrors({ ...errors, email: "" });
                   }}
-                  placeholder="YOUR@EMAIL.COM"
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide ${errors.email ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  placeholder="john@example.com"
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide ${errors.email ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
                 {errors.email && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.email}</p>}
               </div>
@@ -139,8 +142,8 @@ export default function Contact() {
                     setFormState({ ...formState, message: e.target.value });
                     if (errors.message) setErrors({ ...errors, message: "" });
                   }}
-                  placeholder="TELL ME ABOUT YOUR PROJECT"
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white uppercase text-sm tracking-wide resize-none ${errors.message ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  placeholder="Tell me about your project..."
+                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide resize-none ${errors.message ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
                 />
                 {errors.message && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.message}</p>}
               </div>
@@ -155,7 +158,7 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-5 bg-accent text-white text-xs font-black tracking-[0.2em] uppercase transition-all shadow-[0_0_30px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-[0.98]"
+                  className="flex-1 py-5 bg-accent text-white text-xs font-black tracking-[0.2em] uppercase hover:bg-accent/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-[0_0_30px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 rounded-xl"
                 >
                   {loading ? (
                     <>
@@ -177,7 +180,7 @@ export default function Contact() {
                     setStatus({ type: null, msg: null });
                     setErrors({});
                   }}
-                  className="px-8 py-5 border border-glass-border text-text-dim text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 hover:text-white transition-all"
+                  className="px-8 py-5 border border-glass-border text-text-dim text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 hover:text-white transition-all rounded-xl"
                 >
                   RESET
                 </button>
@@ -187,5 +190,6 @@ export default function Contact() {
         </div>
       </div>
     </section>
+
   );
 }

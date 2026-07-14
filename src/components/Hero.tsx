@@ -10,32 +10,29 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <span className="meta-label mb-8 block">
-            [ BUILDING SCALABLE DIGITAL ARCHITECTURES ]
+            [ CRAFTING MEMORABLE DIGITAL EXPERIENCES ]
           </span>
           <h1 className="massive-title mb-10">
             Abdul <br />
-            <span className="text-accent text-glow">Samad</span>
+            <span className="text-glow text-accent">Samad</span>
           </h1>
-          <p className="max-w-2xl mx-auto text-[11px] md:text-sm text-text-dim mb-12 leading-relaxed tracking-[0.2em] uppercase font-bold px-4">
-            Pushing the boundaries of digital innovation through high-performance 
-            full-stack engineering. Crafting seamless, accessible, and 
-            architecturally sound ecosystems for the modern web.
+          <p className="max-w-2xl mx-auto text-sm text-text-dim mb-12 leading-relaxed tracking-wide font-normal px-4">
+            A passionate Full-Stack Developer specializing in building high-performance web applications. 
+            I design clean interfaces, write robust server-side code, and focus on delivering smooth user experiences.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-            <motion.a
+            <a
               href="#projects"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-10 py-4 bg-accent text-white text-xs font-bold tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(61,90,254,0.3)]"
+              className="px-10 py-4 bg-accent text-white text-xs font-bold tracking-widest uppercase hover:bg-accent/90 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 shadow-[0_0_30px_rgba(61,90,254,0.3)] rounded-full"
             >
-              Get Started
-            </motion.a>
+              View My Work
+            </a>
           </div>
         </motion.div>
 
@@ -48,10 +45,10 @@ export default function Hero() {
           ].map((item, i) => (
             <motion.div
               key={item.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 + i * 0.1 }}
-              className="glass p-8 rounded-3xl text-left border-white/5"
+              transition={{ duration: 0.4, delay: 0.2 + i * 0.08, ease: "easeOut" }}
+              className="glass p-8 rounded-3xl text-left border-white/5 hover:border-accent/20 hover:-translate-y-1 transition-all duration-300"
             >
               <div className="w-12 h-12 bg-indigo-600/20 rounded-2xl flex items-center justify-center text-indigo-400 mb-6">
                 <item.icon size={24} />
@@ -62,6 +59,7 @@ export default function Hero() {
           ))}
         </div>
       </div>
+
     </section>
   );
 }

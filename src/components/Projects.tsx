@@ -102,9 +102,9 @@ export default function Projects() {
             </h2>
             <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Latest Projects</h3>
           </div>
-          <p className="max-w-md text-text-dim text-xs uppercase tracking-widest font-bold leading-relaxed">
-            A selection of my most recent work, ranging from complex e-commerce integrations
-            to real-time collaborative applications.
+          <p className="max-w-md text-slate-400 text-sm leading-relaxed">
+            A handpicked selection of my recent full-stack projects, focusing on responsive design, 
+            robust API structures, and optimal database performance.
           </p>
         </div>
 
@@ -128,7 +128,7 @@ export default function Projects() {
                   <motion.div
                     layoutId="filter-pill"
                     className="absolute inset-0 bg-accent shadow-[0_0_20px_rgba(61,90,254,0.3)] rounded-full"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
                   />
                 )}
                 <div className="absolute inset-0 border border-glass-border rounded-full" />
@@ -137,22 +137,17 @@ export default function Projects() {
           </div>
         </div>
 
-        <motion.div 
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 gap-10"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           <AnimatePresence mode="popLayout">
             {filteredProjects.map((project, index) => (
               <motion.div
                 key={project.title}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4, ease: "circOut" }}
-                whileHover={{ y: -8 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 15 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
                 onClick={() => setSelectedProject(project)}
-                className="group border border-glass-border bg-glass p-8 rounded-2xl hover:bg-white/[0.05] transition-all duration-500 overflow-hidden cursor-pointer"
+                className="group border border-glass-border bg-glass p-8 rounded-2xl hover:bg-white/[0.05] hover:-translate-y-2 hover:shadow-2xl hover:border-accent/30 transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <div className="text-[10px] uppercase tracking-widest text-text-dim mb-4 flex justify-between items-center font-bold font-mono">
                    <span>0{index + 1} / {project.subtitle.split(" ").slice(-2).join(" ")}</span>
@@ -210,7 +205,7 @@ export default function Projects() {
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
 
       {/* Project Detail Modal */}
@@ -225,10 +220,10 @@ export default function Projects() {
               className="fixed inset-0 bg-bg/80 backdrop-blur-xl z-[60] flex items-center justify-center p-6"
             />
             <motion.div
-              layoutId={selectedProject.title}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[95%] md:max-w-5xl h-[85vh] md:h-fit max-h-[90vh] glass rounded-3xl z-[70] overflow-hidden flex flex-col md:flex-row shadow-2xl border-white/10"
             >
               <button 
