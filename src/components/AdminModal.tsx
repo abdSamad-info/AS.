@@ -116,6 +116,19 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     }
   }, [isOpen, token]);
 
+  // Escape key handler for closing modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -191,6 +204,9 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
 
                 {/* Modal Window */}
                 <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="admin-modal-title"
                   initial={{ opacity: 0, scale: 0.95, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -205,7 +221,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                         <ShieldCheck size={18} />
                       </div>
                       <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                        <h3 id="admin-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
                           Security & Admin Manager
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-semibold">
                             Protected

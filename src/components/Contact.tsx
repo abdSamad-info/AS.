@@ -61,10 +61,10 @@ export default function Contact() {
           
           {/* Left Contact Information */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5"
           >
             <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] Contact & Inquiries</span>
@@ -140,10 +140,10 @@ export default function Contact() {
 
           {/* Right Direct Message Form */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             className="lg:col-span-7 glass p-8 sm:p-10 rounded-3xl border-white/10"
           >
             <h4 className="text-xl font-bold text-white mb-2">Send a Message</h4>

@@ -8,7 +8,13 @@ export default function Experience() {
       <div className="absolute top-1/2 left-0 w-72 h-72 bg-accent/5 rounded-full blur-[120px] -z-10" />
 
       <div className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-16"
+        >
           <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
             [ 03 ] Professional Track
           </h2>
@@ -19,15 +25,15 @@ export default function Experience() {
             Delivering production-level backend logic, cloud infrastructure, and live Shopify integrations 
             for international clients and commercial applications.
           </p>
-        </div>
+        </motion.div>
 
         <div className="space-y-12">
           {/* Glacier Agency - Full Stack Developer */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="relative pl-8 sm:pl-12 border-l border-white/10"
           >
             <div className="absolute -left-3.5 top-0 w-7 h-7 bg-accent rounded-full border-4 border-[#08090e] flex items-center justify-center shadow-lg shadow-accent/40">
@@ -97,10 +103,10 @@ export default function Experience() {
 
           {/* Academic & Professional Foundation */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
             className="relative pl-8 sm:pl-12 border-l border-white/10"
           >
             <div className="absolute -left-3.5 top-0 w-7 h-7 bg-white/10 rounded-full border-4 border-[#08090e] flex items-center justify-center">

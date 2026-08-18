@@ -114,7 +114,13 @@ export default function Skills() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-16"
+        >
           <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
             [ 02 ] Technical Arsenal
           </h2>
@@ -125,7 +131,7 @@ export default function Skills() {
             A comprehensive overview of the languages, server-side frameworks, cloud platforms, and e-commerce APIs 
             I leverage to architect and ship production software.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {skillCategories.map((category, index) => {
@@ -133,10 +139,10 @@ export default function Skills() {
             return (
               <motion.div
                 key={category.title}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 className="glass p-7 sm:p-8 rounded-3xl border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all duration-300 group flex flex-col justify-between"
               >
                 <div>

@@ -173,7 +173,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
     <section id="projects" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
+        >
           <div>
             <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
               [ 04 ] Production & Engineering Work
@@ -186,7 +192,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
             Real-world production applications, Shopify apps with live merchant stores, 
             and scalable PERN/MERN systems built with TypeScript and GCP.
           </p>
-        </div>
+        </motion.div>
 
         {/* Filter Bar */}
         <div className="flex flex-wrap items-center gap-3 mb-12 border-b border-white/10 pb-6">
@@ -328,6 +334,9 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
 
                 {/* Modal Box */}
                 <motion.div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="project-modal-title"
                   initial={{ opacity: 0, scale: 0.95, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -342,7 +351,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         <Layers size={18} />
                       </div>
                       <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">{selectedProject.title}</h3>
+                        <h3 id="project-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">{selectedProject.title}</h3>
                         <p className="text-[11px] sm:text-xs font-mono text-text-dim">{selectedProject.subtitle}</p>
                       </div>
                     </div>

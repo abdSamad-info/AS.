@@ -1,4 +1,4 @@
-import { useState, useRef, ChangeEvent } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -40,6 +40,28 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
   });
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Keyboard navigation - Escape closes modal & focus trapping
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    // Focus close button on mount for accessibility
+    setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,6 +125,10 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
 
                 {/* Modal Container */}
                 <motion.div
+                  ref={modalRef}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="resume-modal-title"
                   initial={{ opacity: 0, scale: 0.95, y: 15 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
@@ -117,7 +143,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                         <FileText size={18} />
                       </div>
                       <div>
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">Curriculum Vitae</h3>
+                        <h3 id="resume-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">Curriculum Vitae</h3>
                         <p className="text-xs text-text-dim">Abdul Samad · Full Stack Developer</p>
                       </div>
                     </div>
@@ -169,8 +195,9 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                       </button>
 
                       <button
+                        ref={closeButtonRef}
                         onClick={onClose}
-                        className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-colors"
+                        className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
                         aria-label="Close modal"
                       >
                         <X size={18} />

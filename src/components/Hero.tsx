@@ -14,9 +14,9 @@ export default function Hero({ onOpenResume }: HeroProps) {
 
       <div className="max-w-5xl mx-auto px-6 w-full text-center">
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto"
         >
           {/* Eyebrow badge */}
