@@ -1,75 +1,150 @@
 import { motion } from "motion/react";
- 
-export default function About() {
+import { Server, Database, Cloud, Code2, GraduationCap, Award, CheckCircle } from "lucide-react";
+
+interface AboutProps {
+  onOpenResume?: () => void;
+}
+
+export default function About({ onOpenResume }: AboutProps) {
   return (
-    <section id="about" className="py-24 relative">
+    <section id="about" className="py-24 relative overflow-hidden">
+      {/* Subtle Background Glows */}
+      <div className="absolute top-1/3 left-0 w-80 h-80 bg-accent/5 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="absolute bottom-10 right-0 w-80 h-80 bg-indigo-600/5 rounded-full blur-[140px] pointer-events-none -z-10" />
+
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          
+          {/* Visual Profile Column */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="relative"
+            className="lg:col-span-5 relative"
           >
-            <div className="aspect-square rounded-3xl overflow-hidden glass border-white/10 p-4">
-               <img 
-                 src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL}
-                 alt="Abdul Samad" 
-                 className="w-full h-full object-cover rounded-2xl grayscale hover:grayscale-0 transition-all duration-700"
-                 referrerPolicy="no-referrer"
-                 loading="lazy"
-               />
+            <div className="relative mx-auto max-w-sm lg:max-w-none">
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden glass border-white/10 p-3 shadow-2xl relative group">
+                <img 
+                  src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800"}
+                  alt="Abdul Samad" 
+                  className="w-full h-full object-cover rounded-2xl grayscale group-hover:grayscale-0 transition-all duration-700"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                />
+                
+                {/* Overlay Badge */}
+                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#0a0b12]/90 backdrop-blur-xl border border-white/10 shadow-xl">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-bold text-sm tracking-tight">Abdul Samad</p>
+                      <p className="text-[11px] text-accent font-mono font-medium">Full Stack Engineer</p>
+                    </div>
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Background Accent Decors */}
+              <div className="absolute -bottom-6 -right-6 w-36 h-36 bg-accent/20 rounded-full blur-3xl -z-10" />
+              <div className="absolute -top-6 -left-6 w-36 h-36 bg-indigo-600/20 rounded-full blur-3xl -z-10" />
             </div>
-            {/* Decors */}
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-indigo-600/40 rounded-full blur-[60px] -z-10" />
-            <div className="absolute -top-6 -left-6 w-32 h-32 bg-cyan-600/40 rounded-full blur-[60px] -z-10" />
+
+            {/* Quick Metrics */}
+            <div className="grid grid-cols-3 gap-3 mt-6">
+              <div className="glass p-4 rounded-2xl border-white/5 text-center">
+                <span className="text-2xl font-black text-white block">1+</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Years Prod Exp</span>
+              </div>
+              <div className="glass p-4 rounded-2xl border-white/5 text-center">
+                <span className="text-2xl font-black text-accent block">3+</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Live Shopify Stores</span>
+              </div>
+              <div className="glass p-4 rounded-2xl border-white/5 text-center">
+                <span className="text-2xl font-black text-white block">PERN</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Core Stack</span>
+              </div>
+            </div>
           </motion.div>
 
+          {/* Narrative & Details Column */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            className="lg:col-span-7"
           >
-            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] About Me</span>
-            <h3 className="text-4xl md:text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
-              Crafting experiences, <br />
-              <span className="text-accent underline decoration-glass-border underline-offset-8">Not just code.</span>
+            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] Professional Profile</span>
+            <h3 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight uppercase tracking-tighter text-white">
+              Engineering Scalable Systems <br />
+              <span className="text-accent">With Backend Precision.</span>
             </h3>
-            <div className="space-y-6 text-slate-300 leading-relaxed text-sm font-normal">
+
+            <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal">
               <p>
-                Hi, I'm Abdul Samad. I am a Full Stack Developer and Software Engineer with over 1.3+ years 
-                of dedicated experience building and maintaining real-world production systems. I specialize in 
-                engineering robust backend APIs, secure database structures, and high-performance user interfaces.
+                I am a <strong className="text-white">Full Stack Developer</strong> with over 1+ year of dedicated experience building, maintaining, and deploying production-grade web applications. While proficient across the full stack, my primary engineering focus and deep passion lie in <strong className="text-white">backend architecture, RESTful & GraphQL API design, system modeling, and database optimization</strong>.
               </p>
               <p>
-                My professional journey has enabled me to deliver complex applications, including full-stack Shopify 
-                applications with Zero/Sessionless Authentication, highly custom user affiliate platforms, and mobile apps 
-                deployed directly to the Google Play Store. 
+                At <span className="text-white font-medium">Glacier Agency (Toronto, Canada)</span>, I architect and maintain mission-critical backend modules, custom pricing logic, secure file upload pipelines via Google Cloud Storage, and Shopify App Bridge integrations supporting live merchant stores with high transaction volume.
               </p>
               <p>
-                I thrive on optimizing system design, building scalable logic on Google Cloud Platform (GCP), 
-                and continuously refining codebases for peak performance. I believe in writing clean, readable, 
-                and highly maintainable code that drives business value and offers an exceptional user experience.
+                I prioritize clean architecture, robust session management (OAuth 2.0, JWT, secure HttpOnly cookies), and cloud deployment workflows (GCP App Engine, Cloud SQL, Secret Manager). At the same time, I ensure frontend interfaces built with React, Vite, and Tailwind CSS provide intuitive, responsive user experiences that connect effortlessly with complex server APIs.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 mt-12">
-              <div>
-                <h4 className="text-white font-bold text-3xl mb-1">1.3+</h4>
-                <p className="text-slate-500 text-sm">Years Experience</p>
+            {/* Core Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+                  <Server size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white mb-1">API & System Design</h4>
+                  <p className="text-xs text-text-dim leading-relaxed">
+                    Specialized in REST APIs, GraphQL Admin APIs, WebSocket concurrency, and secure OAuth flows.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h4 className="text-white font-bold text-3xl mb-1">10+</h4>
-                <p className="text-slate-500 text-sm">Projects Completed</p>
+
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+                  <Database size={18} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white mb-1">Databases & Cloud</h4>
+                  <p className="text-xs text-text-dim leading-relaxed">
+                    PostgreSQL on Cloud SQL, MongoDB aggregation pipelines, Firestore, and GCP serverless hosting.
+                  </p>
+                </div>
               </div>
+            </div>
+
+            {/* Education & Credentials Summary */}
+            <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0">
+                  <GraduationCap size={20} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white">BS in Computer Science (2020 – 2023)</p>
+                  <p className="text-[11px] text-slate-400">University of Sindh Jamshoro · CGPA: 3.1 / 4.0</p>
+                </div>
+              </div>
+
+              {onOpenResume && (
+                <button
+                  onClick={onOpenResume}
+                  className="px-5 py-2.5 rounded-full bg-accent/10 border border-accent/30 text-accent hover:bg-accent hover:text-white text-xs font-bold uppercase tracking-wider transition-all self-start sm:self-auto"
+                >
+                  View Full CV
+                </button>
+              )}
             </div>
 
           </motion.div>
         </div>
       </div>
     </section>
-
   );
 }

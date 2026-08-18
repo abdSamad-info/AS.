@@ -1,48 +1,109 @@
 import { motion } from "motion/react";
-import { Code2, Server, ShoppingBag, Cloud, Database, Monitor } from "lucide-react";
+import { 
+  Server, 
+  ShoppingBag, 
+  Cloud, 
+  Database, 
+  Monitor, 
+  Code2, 
+  Wrench,
+  ShieldCheck
+} from "lucide-react";
 
 const skillCategories = [
   {
-    title: "Backend Architecture",
-    tag: "[ CORE ENGINE ]",
+    title: "Backend Engineering",
+    tag: "[ CORE ARCHITECTURE ]",
     icon: Server,
-    commentary: "Engineering high-throughput, low-latency APIs with clean request patterns and absolute reliability.",
-    skills: ["Node.js", "Express.js", "RESTful APIs", "WebSockets (Socket.io)", "System Design", "JWT"],
+    commentary: "Designing scalable RESTful & GraphQL APIs, secure authentication pipelines, and real-time event streams.",
+    skills: [
+      "Node.js", 
+      "Express.js", 
+      "REST APIs", 
+      "JWT Authentication", 
+      "OAuth 2.0", 
+      "Session Authentication", 
+      "Socket.io", 
+      "Mongoose"
+    ],
   },
   {
-    title: "Specialized Shopify",
-    tag: "[ E-COMMERCE INTEGRATIONS ]",
+    title: "Shopify Ecosystem",
+    tag: "[ LIVE COMMERCE ]",
     icon: ShoppingBag,
-    commentary: "Building robust Shopify Apps utilizing sessionless Zero-Authentication, webhooks, and secure transaction syncs.",
-    skills: ["Shopify Sessionless Auth", "Shopify App API", "Webhooks", "Billing APIs", "Secure Proxies"],
-  },
-  {
-    title: "Cloud & Infrastructure",
-    tag: "[ SCALABLE INFRASTRUCTURE ]",
-    icon: Cloud,
-    commentary: "Provisioning high-availability infrastructure on GCP, utilizing containerized environments and CI/CD pipelines.",
-    skills: ["Google Cloud (GCP)", "Docker", "CI/CD Pipelines", "Git/GitHub"],
+    commentary: "Building embedded merchant apps, prescription customization engines, and Shopify GraphQL integrations.",
+    skills: [
+      "GraphQL Admin API", 
+      "Storefront API", 
+      "Billing API", 
+      "App Bridge", 
+      "OAuth 2.0", 
+      "Theme App Extensions", 
+      "Embedded Apps"
+    ],
   },
   {
     title: "Database Systems",
-    tag: "[ PERSISTENCE & CACHING ]",
+    tag: "[ STORAGE & OPTIMIZATION ]",
     icon: Database,
-    commentary: "Designing highly optimized, relational and non-relational database schemas, migrations, and caching layers.",
-    skills: ["PostgreSQL", "MongoDB", "Redis Caching", "Firebase Firestore", "SQL Optimization"],
+    commentary: "Relational and document database schema design, aggregation pipelines, and query latency reduction.",
+    skills: [
+      "PostgreSQL", 
+      "MongoDB", 
+      "Cloud SQL", 
+      "Firestore", 
+      "Aggregation Pipelines", 
+      "Query Optimization"
+    ],
   },
   {
-    title: "Programming Languages",
-    tag: "[ LANGUAGE SYNTAX ]",
-    icon: Code2,
-    commentary: "Writing clean, type-safe, and self-documenting code across diverse environments and execution runners.",
-    skills: ["TypeScript", "JavaScript (ES6+)", "Python"],
+    title: "Cloud & DevOps",
+    tag: "[ GCP & CI/CD INFRASTRUCTURE ]",
+    icon: Cloud,
+    commentary: "Deploying and managing production cloud infrastructure, secrets, and automated build pipelines.",
+    skills: [
+      "Google Cloud Platform", 
+      "App Engine", 
+      "Cloud Run", 
+      "Cloud SQL", 
+      "Cloud Storage (GCS)", 
+      "Secret Manager", 
+      "GitHub Actions", 
+      "Vercel", 
+      "Render"
+    ],
   },
   {
-    title: "Frontend Mastery",
-    tag: "[ INTUITIVE INTERFACES ]",
+    title: "Frontend Engineering",
+    tag: "[ RESPONSIVE UI ]",
     icon: Monitor,
-    commentary: "Crafting fluid, pixel-perfect user journeys with native responsive layouts and cinematic micro-animations.",
-    skills: ["React 19", "Next.js 15", "Tailwind CSS v4", "Framer Motion", "State Management", "HTML5 & CSS3"],
+    commentary: "Crafting modern, responsive user interfaces and dashboards that communicate seamlessly with backend APIs.",
+    skills: [
+      "React.js", 
+      "Vite", 
+      "TypeScript", 
+      "Redux", 
+      "Tailwind CSS", 
+      "Material UI", 
+      "Component Architecture", 
+      "Responsive UI"
+    ],
+  },
+  {
+    title: "Languages & Tools",
+    tag: "[ CODE & WORKFLOW ]",
+    icon: Code2,
+    commentary: "Writing clean, type-safe code with robust testing and version control workflows.",
+    skills: [
+      "JavaScript (ES6+)", 
+      "TypeScript", 
+      "Python", 
+      "HTML5 / CSS3", 
+      "Git & GitHub", 
+      "Postman", 
+      "Figma", 
+      "Jest & Cypress"
+    ],
   },
 ];
 
@@ -58,15 +119,15 @@ export default function Skills() {
             [ 02 ] Technical Arsenal
           </h2>
           <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
-            Technologies & Tools
+            Skills & Specializations
           </h3>
-          <p className="max-w-xl mx-auto text-slate-400 text-sm mt-4 leading-relaxed">
-            A comprehensive catalog of languages, server-side frameworks, and e-commerce systems 
-            leveraged to build resilient, enterprise-grade applications.
+          <p className="max-w-2xl mx-auto text-slate-400 text-sm mt-4 leading-relaxed">
+            A comprehensive overview of the languages, server-side frameworks, cloud platforms, and e-commerce APIs 
+            I leverage to architect and ship production software.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {skillCategories.map((category, index) => {
             const Icon = category.icon;
             return (
@@ -76,7 +137,7 @@ export default function Skills() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
-                className="glass p-8 rounded-3xl border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all duration-300 group flex flex-col justify-between"
+                className="glass p-7 sm:p-8 rounded-3xl border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all duration-300 group flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -88,7 +149,7 @@ export default function Skills() {
                     </div>
                   </div>
 
-                  <h4 className="text-xl font-bold mb-3 text-white">
+                  <h4 className="text-xl font-bold mb-2.5 text-white">
                     {category.title}
                   </h4>
                   
@@ -97,7 +158,7 @@ export default function Skills() {
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-white/5">
                   {category.skills.map((skill) => (
                     <span
                       key={skill}

@@ -39,6 +39,17 @@ async function startServer() {
   // 2. Serve static files from public folder
   app.use(express.static(path.join(__dirname, 'public')));
 
+  // Resume download route
+  app.get(['/api/resume/download', '/Abdul-Samad-Resume.pdf', '/resume.pdf'], (req, res) => {
+    const resumePath = path.join(__dirname, 'public', 'Abdul-Samad-Resume.pdf');
+    res.download(resumePath, 'Abdul-Samad-Resume.pdf', (err) => {
+      if (err) {
+        // If download failed, try sending file directly
+        res.sendFile(resumePath);
+      }
+    });
+  });
+
   // 3. Database setup (Optional)
   let pool: pg.Pool | null = null;
   if (process.env.PG_CONNECTION_STRING) {

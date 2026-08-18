@@ -1,12 +1,11 @@
 import { motion } from "motion/react";
-import { Mail, MessageSquare, Phone, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Github, Linkedin, MessageSquare, CheckCircle2 } from "lucide-react";
 import { useState, FormEvent } from "react";
 
 export default function Contact() {
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string | null }>({ type: null, msg: null });
   const [loading, setLoading] = useState(false);
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validate = () => {
@@ -40,70 +39,123 @@ export default function Contact() {
       const data = await res.json();
       
       if (res.ok) {
-        setStatus({ type: "success", msg: data.message });
+        setStatus({ type: "success", msg: data.message || "Thank you! Your message has been received." });
         setFormState({ name: "", email: "", message: "" });
       } else {
-        setStatus({ type: "error", msg: data.error });
+        setStatus({ type: "error", msg: data.error || "Failed to submit message." });
       }
     } catch (err) {
-      setStatus({ type: "error", msg: "Something went wrong. Please try again later." });
+      setStatus({ type: "error", msg: "Something went wrong. Please try again or reach out directly via email." });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section id="contact" className="py-24 bg-slate-900/50">
+    <section id="contact" className="py-24 relative overflow-hidden bg-[#06070b]/60">
+      {/* Background Glow */}
+      <div className="absolute top-1/2 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[160px] pointer-events-none -z-10" />
+
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          
+          {/* Left Contact Information */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut" }}
+            className="lg:col-span-5"
           >
-            <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] Contact</span>
-            <h3 className="text-4xl md:text-5xl font-black mb-8 leading-none uppercase tracking-tighter">
-              Let's work <br />
-              <span className="text-accent">together.</span>
+            <span className="meta-label mb-4 block text-accent font-mono">[ 05 ] Contact & Inquiries</span>
+            <h3 className="text-4xl md:text-5xl font-black mb-6 leading-none uppercase tracking-tighter text-white">
+              Let's Build <br />
+              <span className="text-accent">Together.</span>
             </h3>
-            <p className="text-slate-300 text-sm leading-relaxed mb-12 max-w-sm">
-              I am currently available for contract work and full-time positions. 
-              If you have a project in mind or just want to chat, feel free to reach out!
+            <p className="text-slate-300 text-sm leading-relaxed mb-10">
+              Available for full-stack engineering roles, backend consulting, custom Shopify integrations, 
+              and database performance optimization. Get in touch directly:
             </p>
 
-            <div className="space-y-8">
-              <div className="flex items-center gap-6 group">
-                <div className="w-14 h-14 bg-indigo-600/10 rounded-2xl flex items-center justify-center text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                  <Mail size={24} />
+            <div className="space-y-4">
+              <a 
+                href="mailto:samadpakhtoon09@gmail.com"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all group"
+              >
+                <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all shrink-0">
+                  <Mail size={20} />
                 </div>
                 <div>
-                  <p className="text-slate-500 text-xs uppercase tracking-widest font-bold">Email</p>
-                  <p className="text-lg md:text-xl font-medium text-slate-200">samadpakhtoon09@gmail.com</p>
+                  <p className="text-[10px] text-text-dim uppercase tracking-widest font-mono font-bold">Email Address</p>
+                  <p className="text-sm font-semibold text-white">samadpakhtoon09@gmail.com</p>
                 </div>
-              </div>
-              <div className="flex items-center gap-6 group">
-                <div className="w-14 h-14 bg-cyan-600/10 rounded-2xl flex items-center justify-center text-cyan-400 group-hover:bg-cyan-600 group-hover:text-white transition-all">
-                  <Phone size={24} />
+              </a>
+
+              <a 
+                href="tel:03305786110"
+                className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-accent/30 hover:bg-white/[0.04] transition-all group"
+              >
+                <div className="w-12 h-12 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-center text-accent group-hover:bg-accent group-hover:text-white transition-all shrink-0">
+                  <Phone size={20} />
                 </div>
                 <div>
-                  <p className="text-slate-500 text-xs uppercase tracking-widest font-bold">Phone</p>
-                  <p className="text-lg md:text-xl font-medium text-slate-200">0330-5786110</p>
+                  <p className="text-[10px] text-text-dim uppercase tracking-widest font-mono font-bold">Phone Number</p>
+                  <p className="text-sm font-semibold text-white">0330-5786110</p>
+                </div>
+              </a>
+
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-accent shrink-0">
+                  <MapPin size={20} />
+                </div>
+                <div>
+                  <p className="text-[10px] text-text-dim uppercase tracking-widest font-mono font-bold">Location</p>
+                  <p className="text-sm font-semibold text-white">Karachi, Pakistan</p>
                 </div>
               </div>
             </div>
+
+            {/* Social Links */}
+            <div className="flex gap-4 mt-8">
+              <a
+                href="https://github.com/ABDLSamaD"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-accent/40 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-2 transition-all"
+              >
+                <Github size={16} />
+                <span>GitHub Profile</span>
+              </a>
+              <a
+                href="https://linkedin.com/in/abdul-samad-421793309"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-accent/40 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-2 transition-all"
+              >
+                <Linkedin size={16} />
+                <span>LinkedIn Profile</span>
+              </a>
+            </div>
           </motion.div>
 
+          {/* Right Direct Message Form */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-            className="border border-glass-border bg-glass p-10 rounded-2xl"
+            className="lg:col-span-7 glass p-8 sm:p-10 rounded-3xl border-white/10"
           >
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest font-black text-text-dim ml-1">Your Name</label>
+            <h4 className="text-xl font-bold text-white mb-2">Send a Message</h4>
+            <p className="text-xs text-text-dim mb-8">
+              Have a project, job opportunity, or technical inquiry? Fill out the form below.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400">
+                  Your Name
+                </label>
                 <input
                   type="text"
                   required
@@ -112,13 +164,18 @@ export default function Contact() {
                     setFormState({ ...formState, name: e.target.value });
                     if (errors.name) setErrors({ ...errors, name: "" });
                   }}
-                  placeholder="John Doe"
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide ${errors.name ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  placeholder="e.g. John Doe"
+                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm ${
+                    errors.name ? "border-rose-500" : "border-white/10 focus:border-accent"
+                  }`}
                 />
-                {errors.name && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-xs text-rose-400 mt-1">{errors.name}</p>}
               </div>
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest font-black text-text-dim ml-1">Email Address</label>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400">
+                  Email Address
+                </label>
                 <input
                   type="email"
                   required
@@ -128,12 +185,17 @@ export default function Contact() {
                     if (errors.email) setErrors({ ...errors, email: "" });
                   }}
                   placeholder="john@example.com"
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide ${errors.email ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm ${
+                    errors.email ? "border-rose-500" : "border-white/10 focus:border-accent"
+                  }`}
                 />
-                {errors.email && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-rose-400 mt-1">{errors.email}</p>}
               </div>
-              <div className="space-y-4">
-                <label className="text-[10px] uppercase tracking-widest font-black text-text-dim ml-1">Message</label>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400">
+                  Message / Project Details
+                </label>
                 <textarea
                   required
                   rows={4}
@@ -142,23 +204,30 @@ export default function Contact() {
                     setFormState({ ...formState, message: e.target.value });
                     if (errors.message) setErrors({ ...errors, message: "" });
                   }}
-                  placeholder="Tell me about your project..."
-                  className={`w-full bg-transparent border-b py-4 focus:outline-none transition-all text-white text-sm tracking-wide resize-none ${errors.message ? "border-rose-500" : "border-glass-border focus:border-accent"}`}
+                  placeholder="Describe your project, timeline, or inquiry..."
+                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm resize-none ${
+                    errors.message ? "border-rose-500" : "border-white/10 focus:border-accent"
+                  }`}
                 />
-                {errors.message && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest mt-1">{errors.message}</p>}
+                {errors.message && <p className="text-xs text-rose-400 mt-1">{errors.message}</p>}
               </div>
 
               {status.msg && (
-                <div className={`p-4 rounded-xl text-[10px] uppercase tracking-widest font-bold ${status.type === "success" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border border-rose-500/20"}`}>
-                  {status.msg}
+                <div className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
+                  status.type === "success" 
+                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                }`}>
+                  {status.type === "success" && <CheckCircle2 size={16} />}
+                  <span>{status.msg}</span>
                 </div>
               )}
 
-              <div className="flex gap-4">
+              <div className="flex gap-4 pt-2">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-5 bg-accent text-white text-xs font-black tracking-[0.2em] uppercase hover:bg-accent/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-[0_0_30px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 rounded-xl"
+                  className="flex-1 py-4 bg-accent text-white text-xs font-bold tracking-widest uppercase hover:bg-accent/90 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-[0_0_20px_rgba(61,90,254,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rounded-xl"
                 >
                   {loading ? (
                     <>
@@ -167,12 +236,16 @@ export default function Contact() {
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full"
                       />
-                      <span>SENDING...</span>
+                      <span>Sending Message...</span>
                     </>
                   ) : (
-                    "SEND MESSAGE"
+                    <>
+                      <Send size={14} />
+                      <span>Send Message</span>
+                    </>
                   )}
                 </button>
+                
                 <button
                   type="button"
                   onClick={() => {
@@ -180,9 +253,9 @@ export default function Contact() {
                     setStatus({ type: null, msg: null });
                     setErrors({});
                   }}
-                  className="px-8 py-5 border border-glass-border text-text-dim text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white/5 hover:text-white transition-all rounded-xl"
+                  className="px-6 py-4 border border-white/10 text-slate-400 text-xs font-semibold hover:bg-white/5 hover:text-white transition-all rounded-xl"
                 >
-                  RESET
+                  Reset
                 </button>
               </div>
             </form>
@@ -190,6 +263,5 @@ export default function Contact() {
         </div>
       </div>
     </section>
-
   );
 }

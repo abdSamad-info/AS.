@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useState } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -12,8 +13,14 @@ import Projects from "./components/Projects";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import BackToTop from "./components/BackToTop";
+import ResumeModal from "./components/ResumeModal";
 
 export default function App() {
+  const [isResumeOpen, setIsResumeOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+
+  const isAnyModalOpen = isResumeOpen || isProjectModalOpen;
+
   return (
     <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden">
       {/* Background Glows */}
@@ -22,15 +29,21 @@ export default function App() {
 
       <Navbar />
       <main className="relative z-10">
-        <Hero />
-        <About />
+        <Hero onOpenResume={() => setIsResumeOpen(true)} />
+        <About onOpenResume={() => setIsResumeOpen(true)} />
         <Skills />
         <Experience />
-        <Projects />
+        <Projects onModalStateChange={setIsProjectModalOpen} />
         <Contact />
       </main>
       <Footer />
-      <BackToTop />
+      <BackToTop isModalOpen={isAnyModalOpen} />
+
+      {/* Interactive CV / Resume Viewer & Uploader Modal */}
+      <ResumeModal
+        isOpen={isResumeOpen}
+        onClose={() => setIsResumeOpen(false)}
+      />
     </div>
   );
 }

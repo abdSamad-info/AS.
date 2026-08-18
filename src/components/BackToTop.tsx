@@ -2,7 +2,11 @@ import { motion, AnimatePresence } from "motion/react";
 import { ChevronUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
-export default function BackToTop() {
+interface BackToTopProps {
+  isModalOpen?: boolean;
+}
+
+export default function BackToTop({ isModalOpen = false }: BackToTopProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -27,13 +31,13 @@ export default function BackToTop() {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {isVisible && !isModalOpen && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           onClick={scrollToTop}
-          className="fixed bottom-10 right-10 z-[100] w-14 h-14 glass rounded-2xl flex items-center justify-center text-white border-accent shadow-[0_0_30px_rgba(61,90,254,0.3)] hover:bg-accent transition-all group"
+          className="fixed bottom-10 right-10 z-[80] w-14 h-14 glass rounded-2xl flex items-center justify-center text-white border-accent shadow-[0_0_30px_rgba(61,90,254,0.3)] hover:bg-accent transition-all group"
           aria-label="Back to top"
         >
           <ChevronUp className="group-hover:-translate-y-1 transition-transform" />
