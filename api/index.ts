@@ -39,7 +39,7 @@ if (process.env.PG_CONNECTION_STRING) {
 
 function getTransporter() {
   const user = process.env.EMAIL_USER || process.env.GMAIL_USER;
-  const pass = process.env.EMAIL_PASSWORD || process.env.GMAIL_APP_PASSWORD;
+  const pass = process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
 
   if (!user || !pass) return null;
 
