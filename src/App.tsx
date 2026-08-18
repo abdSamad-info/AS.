@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -14,12 +14,26 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import BackToTop from "./components/BackToTop";
 import ResumeModal from "./components/ResumeModal";
+import AdminModal from "./components/AdminModal";
 
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  const isAnyModalOpen = isResumeOpen || isProjectModalOpen;
+  const isAnyModalOpen = isResumeOpen || isProjectModalOpen || isAdminOpen;
+
+  // Global shortcut to toggle Admin Portal (Ctrl+Shift+A or Cmd+Shift+A)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "A" || e.key === "a")) {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden">
@@ -36,13 +50,19 @@ export default function App() {
         <Projects onModalStateChange={setIsProjectModalOpen} />
         <Contact />
       </main>
-      <Footer />
+      <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
       <BackToTop isModalOpen={isAnyModalOpen} />
 
       {/* Interactive CV / Resume Viewer & Uploader Modal */}
       <ResumeModal
         isOpen={isResumeOpen}
         onClose={() => setIsResumeOpen(false)}
+      />
+
+      {/* Admin Security & Submissions Log Modal */}
+      <AdminModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
       />
     </div>
   );
