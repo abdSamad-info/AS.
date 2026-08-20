@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import BackToTop from "./components/BackToTop";
 import ResumeModal from "./components/ResumeModal";
 import AdminModal from "./components/AdminModal";
+import Scroll3DLine from "./components/Scroll3DLine";
 
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
@@ -67,6 +68,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden">
+      {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
+      <Scroll3DLine />
+
       {/* Background Glows */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent-glow blur-[120px] pointer-events-none z-0" />
       <div className="absolute bottom-[20%] left-[-5%] w-[400px] h-[400px] rounded-full bg-accent-glow/50 blur-[100px] pointer-events-none z-0" />

@@ -6,6 +6,12 @@ interface AboutProps {
 }
 
 export default function About({ onOpenResume }: AboutProps) {
+  // Dynamically calculate exact years of production experience from May 2025
+  const startCareerDate = new Date(2025, 4, 1); // May 2025
+  const now = new Date();
+  const diffInMonths = (now.getFullYear() - startCareerDate.getFullYear()) * 12 + (now.getMonth() - startCareerDate.getMonth());
+  const exactYears = Math.max(1.3, Number((diffInMonths / 12).toFixed(1)));
+
   return (
     <section id="about" className="py-24 relative overflow-hidden">
       {/* Subtle Background Glows */}
@@ -24,17 +30,18 @@ export default function About({ onOpenResume }: AboutProps) {
             className="lg:col-span-5 relative"
           >
             <div className="relative mx-auto max-w-sm lg:max-w-none">
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden glass border-white/10 p-3 shadow-2xl relative group">
+              {/* Image Frame - Clean on mobile without dark overlays or hover effects */}
+              <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-transparent md:glass border border-white/10 p-2 sm:p-3 shadow-2xl relative">
                 <img 
-                  src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800"}
+                  src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "https://res.cloudinary.com/dkoqssfa/image/upload/v1776602242/profiles_yx9geb.jpg"}
                   alt="Abdul Samad" 
-                  className="w-full h-full object-cover rounded-2xl grayscale group-hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover rounded-2xl brightness-100 contrast-100"
                   referrerPolicy="no-referrer"
                   loading="lazy"
                 />
                 
                 {/* Overlay Badge */}
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-[#0a0b12]/90 backdrop-blur-xl border border-white/10 shadow-xl">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 p-3.5 sm:p-4 rounded-2xl bg-[#0a0b12]/90 backdrop-blur-xl border border-white/10 shadow-xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white font-bold text-sm tracking-tight">Abdul Samad</p>
@@ -53,7 +60,7 @@ export default function About({ onOpenResume }: AboutProps) {
             {/* Quick Metrics */}
             <div className="grid grid-cols-3 gap-3 mt-6">
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
-                <span className="text-2xl font-black text-white block">1+</span>
+                <span className="text-2xl font-black text-white block">{exactYears}+</span>
                 <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Years Prod Exp</span>
               </div>
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
@@ -83,7 +90,7 @@ export default function About({ onOpenResume }: AboutProps) {
 
             <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal">
               <p>
-                I am a <strong className="text-white">Full Stack Developer</strong> with over 1+ year of dedicated experience building, maintaining, and deploying production-grade web applications. While proficient across the full stack, my primary engineering focus and deep passion lie in <strong className="text-white">backend architecture, RESTful & GraphQL API design, system modeling, and database optimization</strong>.
+                I am a <strong className="text-white">Full Stack Developer</strong> with {exactYears}+ years of dedicated experience building, maintaining, and deploying production-grade web applications. While proficient across the full stack, my primary engineering focus and deep passion lie in <strong className="text-white">backend architecture, RESTful & GraphQL API design, system modeling, and database optimization</strong>.
               </p>
               <p>
                 At <span className="text-white font-medium">Glacier Agency (Toronto, Canada)</span>, I architect and maintain mission-critical backend modules, custom pricing logic, secure file upload pipelines via Google Cloud Storage, and Shopify App Bridge integrations supporting live merchant stores with high transaction volume.
