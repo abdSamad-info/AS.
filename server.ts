@@ -486,6 +486,20 @@ async function startServer() {
     res.json({ messages: inMemorySubmissions });
   });
 
+  // Admin Delete Message Endpoint
+  app.delete("/api/admin/messages/:id", authenticateAdmin, async (req, res) => {
+    const id = req.params.id;
+    if (pool && id) {
+      try {
+        await pool.query("DELETE FROM contacts WHERE id = $1", [id]);
+      } catch (err) {
+        console.error("DB Delete Error:", err);
+      }
+    }
+    inMemorySubmissions = inMemorySubmissions.filter((m) => m.id !== id);
+    res.json({ success: true, message: "Message deleted" });
+  });
+
   // 13. Admin Endpoint: Security Stats & System Status
   app.get("/api/admin/system-status", authenticateAdmin, (req, res) => {
     const hasSmtpConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);

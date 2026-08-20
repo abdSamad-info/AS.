@@ -19,9 +19,32 @@ import AdminModal from "./components/AdminModal";
 export default function App() {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(() => {
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      return path === "/admin" || path.startsWith("/admin/") || hash === "#admin";
+    }
+    return false;
+  });
 
   const isAnyModalOpen = isResumeOpen || isProjectModalOpen || isAdminOpen;
+
+  // Listen to popstate / hashchange for direct /admin URL navigation
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      setIsAdminOpen(path === "/admin" || path.startsWith("/admin/") || hash === "#admin");
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("hashchange", handleLocationChange);
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("hashchange", handleLocationChange);
+    };
+  }, []);
 
   // Global shortcut to toggle Admin Portal (Ctrl+Shift+A or Cmd+Shift+A)
   useEffect(() => {
@@ -34,6 +57,13 @@ export default function App() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  const handleCloseAdmin = () => {
+    setIsAdminOpen(false);
+    if (typeof window !== "undefined" && (window.location.pathname === "/admin" || window.location.hash === "#admin")) {
+      window.history.pushState({}, "", "/");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden">
@@ -50,7 +80,7 @@ export default function App() {
         <Projects onModalStateChange={setIsProjectModalOpen} />
         <Contact />
       </main>
-      <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
+      <Footer />
       <BackToTop isModalOpen={isAnyModalOpen} />
 
       {/* Interactive CV / Resume Viewer & Uploader Modal */}
@@ -59,10 +89,10 @@ export default function App() {
         onClose={() => setIsResumeOpen(false)}
       />
 
-      {/* Admin Security & Submissions Log Modal */}
+      {/* Simple Admin Portal via /admin URL */}
       <AdminModal
         isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
+        onClose={handleCloseAdmin}
       />
     </div>
   );

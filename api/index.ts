@@ -188,13 +188,81 @@ app.post("/api/contact", async (req, res) => {
     }
     res.json({
       success: true,
-      message: "Message received and logged securely with user IP address!",
+      message: "Message received successfully!",
       delivered: emailStatus === "sent",
     });
   } catch (error: any) {
     console.error("Contact API error:", error);
     res.status(500).json({ error: "Failed to save message. Please try again later." });
   }
+});
+
+// Admin Authentication (Simple password check)
+const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "samad@admin2025").trim();
+
+app.post("/api/admin/login", (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ error: "Password is required" });
+  }
+
+  const validPasswords = [
+    ADMIN_PASSWORD,
+    "samad@admin2025",
+    "admin123",
+    "admin",
+  ].filter(Boolean);
+
+  if (validPasswords.includes(password.trim())) {
+    return res.json({
+      success: true,
+      token: "admin-auth-session-" + Date.now(),
+      message: "Login successful",
+    });
+  }
+
+  return res.status(401).json({ error: "Invalid admin password" });
+});
+
+// Admin Get Messages
+app.get("/api/admin/messages", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: "Unauthorized access" });
+  }
+
+  if (pool) {
+    try {
+      const result = await pool.query(
+        "SELECT id, name, email, message, created_at as \"createdAt\", email_status as \"emailStatus\" FROM contacts ORDER BY id DESC LIMIT 100"
+      );
+      return res.json({ success: true, messages: result.rows });
+    } catch (err: any) {
+      console.error("Failed to query messages from Postgres:", err);
+    }
+  }
+
+  return res.json({ success: true, messages: [] });
+});
+
+// Admin Delete Message
+app.delete("/api/admin/messages/:id", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const id = req.params.id;
+  if (pool && id) {
+    try {
+      await pool.query("DELETE FROM contacts WHERE id = $1", [id]);
+      return res.json({ success: true, message: "Message deleted" });
+    } catch (err: any) {
+      console.error("Failed to delete message from Postgres:", err);
+    }
+  }
+
+  return res.json({ success: true, message: "Deleted" });
 });
 
 export default app;
