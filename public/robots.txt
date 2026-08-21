@@ -1,0 +1,8 @@
+# Robots.txt for Abdul Samad Portfolio
+# https://abdsamad.info
+
+User-agent: *
+Allow: /
+
+# Direct search engine crawlers to Sitemap
+Sitemap: https://abdsamad.info/sitemap.xml

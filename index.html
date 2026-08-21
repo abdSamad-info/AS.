@@ -8,12 +8,17 @@
     <meta name="google-site-verification" content="kneDJMLAyWXsLAtWm5JHGpQKBLUKxAofvXynZCyVSC4" />
     <title>Abdul Samad | Full Stack & Backend Engineer</title>
     <meta name="title" content="Abdul Samad | Full Stack & Backend Engineer" />
-    <meta name="description" content="Full Stack Developer specializing in Node.js, Express, React, TypeScript, PostgreSQL, Shopify App Bridge & embedded apps, and Google Cloud Platform (GCP). Explore production apps and architecture." />
-    <meta name="keywords" content="Abdul Samad, Full Stack Developer, Backend Engineer, Node.js, Express, React, TypeScript, PostgreSQL, Shopify App Developer, GraphQL, Google Cloud Platform, GCP, Web Developer Portfolio" />
+    <meta name="description" content="Official portfolio of Abdul Samad, Full Stack & Backend Developer specializing in Node.js, Express, React, TypeScript, PostgreSQL, Shopify App Development, and Google Cloud Platform (GCP)." />
+    <meta name="keywords" content="Abdul Samad, Full Stack Developer, Backend Developer, Node.js Engineer, React Developer, TypeScript, PostgreSQL, Shopify App Developer, GraphQL, Google Cloud Platform, GCP, Web Developer Karachi, Software Engineer Portfolio" />
     <meta name="author" content="Abdul Samad" />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="theme-color" content="#06070b" />
+    <meta name="rating" content="General" />
+    <meta name="geo.region" content="PK-SD" />
+    <meta name="geo.placename" content="Karachi" />
     <link rel="canonical" href="https://abdsamad.info/" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
 
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website" />
@@ -33,34 +38,81 @@
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200&h=630" />
     <meta name="twitter:image:alt" content="Abdul Samad Full Stack Engineer Portfolio" />
 
-    <!-- Structured Data / JSON-LD -->
+    <!-- Structured Data / JSON-LD (WebSite, ProfilePage & Person Schema) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Abdul Samad",
-        "jobTitle": "Full Stack Developer",
-        "worksFor": {
-          "@type": "Organization",
-          "name": "Glacier Agency"
-        },
-        "email": "mailto:samadpakhtoon09@gmail.com",
-        "url": "https://abdsamad.info",
-        "sameAs": [
-          "https://github.com/ABDLSamaD",
-          "https://www.linkedin.com/in/abdul-samad-421793309"
-        ],
-        "knowsAbout": [
-          "Node.js",
-          "Express.js",
-          "React.js",
-          "TypeScript",
-          "PostgreSQL",
-          "Shopify App Development",
-          "Shopify GraphQL Admin API",
-          "Google Cloud Platform",
-          "REST APIs",
-          "OAuth 2.0"
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://abdsamad.info/#website",
+            "url": "https://abdsamad.info/",
+            "name": "Abdul Samad | Full Stack Developer",
+            "description": "Portfolio and technical showcase of Abdul Samad, Full Stack & Backend Engineer.",
+            "inLanguage": "en-US"
+          },
+          {
+            "@type": "ProfilePage",
+            "@id": "https://abdsamad.info/#profilepage",
+            "url": "https://abdsamad.info/",
+            "name": "Abdul Samad - Full Stack & Backend Engineer",
+            "isPartOf": {
+              "@id": "https://abdsamad.info/#website"
+            },
+            "mainEntity": {
+              "@type": "Person",
+              "@id": "https://abdsamad.info/#person",
+              "name": "Abdul Samad",
+              "alternateName": ["Abdul Samad Pakhtoon", "Abdul Samad Developer"],
+              "jobTitle": "Full Stack Developer",
+              "description": "Full Stack Developer specializing in Node.js, Express, React, TypeScript, PostgreSQL, and Google Cloud Platform.",
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Glacier Agency",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Toronto",
+                  "addressCountry": "Canada"
+                }
+              },
+              "email": "mailto:samadpakhtoon09@gmail.com",
+              "telephone": "+92-330-5786110",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Karachi",
+                "addressRegion": "Sindh",
+                "addressCountry": "Pakistan"
+              },
+              "url": "https://abdsamad.info",
+              "sameAs": [
+                "https://github.com/ABDLSamaD",
+                "https://www.linkedin.com/in/abdul-samad-421793309"
+              ],
+              "knowsAbout": [
+                "Full Stack Web Development",
+                "Node.js",
+                "Express.js",
+                "React.js",
+                "TypeScript",
+                "JavaScript (ES6+)",
+                "PostgreSQL",
+                "MongoDB",
+                "Firestore",
+                "Shopify App Development",
+                "Shopify GraphQL Admin API",
+                "Google Cloud Platform (GCP)",
+                "App Engine",
+                "Cloud SQL",
+                "RESTful APIs",
+                "OAuth 2.0"
+              ],
+              "alumniOf": {
+                "@type": "CollegeOrUniversity",
+                "name": "University of Sindh",
+                "location": "Jamshoro, Pakistan"
+              }
+            }
+          }
         ]
       }
     </script>
