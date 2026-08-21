@@ -55,3 +55,44 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-indigo-500/20 rounded-full hover:bg-indigo-500/40 transition-colors;
 }
+
+/* Optimized Print Styling */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  nav, footer, .pointer-events-none, #back-to-top, button {
+    display: none !important;
+  }
+
+  #printable-resume {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  #printable-resume h1,
+  #printable-resume h2,
+  #printable-resume h3,
+  #printable-resume h4,
+  #printable-resume strong,
+  #printable-resume span.text-white {
+    color: #0f172a !important;
+  }
+
+  #printable-resume p,
+  #printable-resume span,
+  #printable-resume li {
+    color: #334155 !important;
+  }
+
+  #printable-resume div.border,
+  #printable-resume div.border-b {
+    border-color: #e2e8f0 !important;
+    background: transparent !important;
+  }
+}

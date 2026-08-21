@@ -71,9 +71,11 @@ export default function App() {
       {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
       <Scroll3DLine />
 
-      {/* Background Glows */}
-      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-accent-glow blur-[120px] pointer-events-none z-0" />
-      <div className="absolute bottom-[20%] left-[-5%] w-[400px] h-[400px] rounded-full bg-accent-glow/50 blur-[100px] pointer-events-none z-0" />
+      {/* Background Ambient Atmospheric Glows */}
+      <div className="absolute top-[-5%] right-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] rounded-full bg-accent/10 blur-[90px] pointer-events-none z-0 will-change-transform" />
+      <div className="absolute top-[35%] right-[-8%] w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-emerald-500/[0.04] blur-[100px] pointer-events-none z-0 will-change-transform" />
+      <div className="absolute bottom-[20%] left-[-5%] w-[300px] sm:w-[380px] h-[300px] sm:h-[380px] rounded-full bg-indigo-600/10 blur-[80px] pointer-events-none z-0 will-change-transform" />
+      <div className="absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
 
       <Navbar />
       <main className="relative z-10">
