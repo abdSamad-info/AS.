@@ -2,15 +2,11 @@
   "version": 2,
   "headers": [
     {
-      "source": "/images/(.*)",
+      "source": "/(assets|images)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        },
-        {
-          "key": "Accept-Ranges",
-          "value": "none"
         }
       ]
     }
@@ -21,11 +17,8 @@
       "destination": "/api/index.ts"
     },
     {
-      "source": "/((?!api|images|assets|_next).*)",
+      "source": "/((?!api|assets|images|_next|favicon|.*\\..*).*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
