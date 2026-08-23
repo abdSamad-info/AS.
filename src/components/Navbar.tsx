@@ -22,8 +22,17 @@ export default function Navbar() {
     } else {
       document.body.style.overflow = "unset";
     }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.body.style.overflow = "unset";
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
 
@@ -129,8 +138,10 @@ export default function Navbar() {
           {!isOpen && (
             <button 
               onClick={() => setIsOpen(true)} 
-              className="text-white w-10 h-10 flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 rounded-full transition-colors active:scale-95 shadow-sm"
-              aria-label="Open menu"
+              className="text-white w-10 h-10 flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 rounded-full transition-colors active:scale-95 shadow-sm focus-visible:ring-2 focus-visible:ring-accent"
+              aria-label="Open main navigation menu"
+              aria-expanded={false}
+              aria-controls="mobile-menu-drawer"
             >
               <Menu size={20} className="text-white" />
             </button>

@@ -70,6 +70,14 @@ export default function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden text-white transition-colors duration-300">
+        {/* Accessible Keyboard Navigation Skip Link */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:px-5 focus:py-2.5 focus:bg-accent focus:text-white focus:rounded-xl focus:shadow-2xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#06070b] font-mono text-xs font-bold uppercase tracking-wider"
+        >
+          Skip to Main Content
+        </a>
+
         {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
         <Scroll3DLine />
 
@@ -80,7 +88,7 @@ export default function App() {
         <div className="absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
 
         <Navbar />
-        <main className="relative z-10">
+        <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
           <Hero onOpenResume={() => setIsResumeOpen(true)} />
           <About onOpenResume={() => setIsResumeOpen(true)} />
           <Skills />

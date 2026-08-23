@@ -148,6 +148,24 @@ interface ProjectsProps {
 export default function Projects({ onModalStateChange }: ProjectsProps) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initial load simulation & filter transition for perceived performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleFilterChange = (cat: string) => {
+    if (cat === activeFilter) return;
+    setIsLoading(true);
+    setActiveFilter(cat);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 280);
+  };
 
   useEffect(() => {
     if (selectedProject) {
@@ -166,13 +184,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
   // Escape key handler for closing modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && selectedProject) {
         setSelectedProject(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [selectedProject]);
 
   const categories = ["All", "Shopify", "Full Stack", "Backend / API"];
 
@@ -182,7 +200,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
   }, [activeFilter]);
 
   return (
-    <section id="projects" className="py-24 relative">
+    <section id="projects" aria-labelledby="projects-heading" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
         <motion.div 
@@ -196,7 +214,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
             <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
               [ 04 ] Production & Engineering Work
             </h2>
-            <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
+            <h3 id="projects-heading" className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
               Featured Projects
             </h3>
           </div>
@@ -212,12 +230,21 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
             <Filter size={14} />
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Filter:</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div role="tablist" aria-label="Project categories" className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 ${
+                role="tab"
+                aria-selected={activeFilter === cat}
+                tabIndex={0}
+                onClick={() => handleFilterChange(cat)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleFilterChange(cat);
+                  }
+                }}
+                className={`relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent ${
                   activeFilter === cat
                     ? "bg-accent text-white shadow-[0_0_15px_rgba(61,90,254,0.4)]"
                     : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
@@ -229,118 +256,185 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
           </div>
         </div>
 
-        {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
-                onClick={() => setSelectedProject(project)}
-                className="group glass p-6 sm:p-7 rounded-3xl border-white/10 hover:border-accent/40 hover:bg-white/[0.04] transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-lg hover:shadow-[0_10px_30px_rgba(61,90,254,0.15)]"
+        {/* Skeleton Loading State or Project Cards Grid */}
+        {isLoading ? (
+          <div 
+            aria-busy="true" 
+            aria-label="Loading projects..."
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
+          >
+            {[1, 2, 3, 4, 5, 6].map((sk) => (
+              <div
+                key={sk}
+                className="glass p-6 sm:p-7 rounded-3xl border-white/10 flex flex-col justify-between overflow-hidden shadow-lg animate-pulse"
               >
-                {/* Top Badge & Index */}
                 <div>
+                  {/* Skeleton Badge & Index */}
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest">
-                      0{index + 1} // {project.category}
-                    </span>
-                    {project.badge && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-mono font-medium text-accent">
-                        {project.badge}
-                      </span>
-                    )}
+                    <div className="h-3.5 w-24 bg-white/10 rounded-full skeleton-shimmer" />
+                    <div className="h-4 w-16 bg-white/10 rounded-full skeleton-shimmer" />
                   </div>
 
-                  <h4 className="text-2xl font-bold text-white mb-1 group-hover:text-accent transition-colors">
-                    {project.title}
-                  </h4>
-                  <p className="text-xs font-mono text-slate-400 mb-4">
-                    {project.subtitle}
-                  </p>
+                  {/* Skeleton Title & Subtitle */}
+                  <div className="h-7 w-3/4 bg-white/10 rounded-xl mb-2 skeleton-shimmer" />
+                  <div className="h-3.5 w-1/2 bg-white/5 rounded-md mb-5 skeleton-shimmer" />
 
-                  {/* Project Visual Preview */}
-                  {project.image && (
-                    <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
-                      <img
-                        src={project.image}
-                        alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
-                    </div>
-                  )}
+                  {/* Skeleton Image Area */}
+                  <div className="w-full aspect-[16/10] rounded-2xl mb-5 bg-white/5 skeleton-shimmer border border-white/5" />
 
-                  {/* Purpose Summary Box */}
-                  <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 group-hover:border-accent/20 transition-colors">
-                    <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent mb-1 flex items-center gap-1.5">
-                      <Sparkles size={11} /> Purpose & Applicability
-                    </p>
-                    <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                      {project.purpose}
-                    </p>
+                  {/* Skeleton Purpose Box */}
+                  <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 space-y-2">
+                    <div className="h-3 w-28 bg-white/10 rounded skeleton-shimmer" />
+                    <div className="h-2.5 w-full bg-white/5 rounded skeleton-shimmer" />
+                    <div className="h-2.5 w-5/6 bg-white/5 rounded skeleton-shimmer" />
                   </div>
                 </div>
 
-                {/* Tech Badges & Details Link */}
                 <div>
+                  {/* Skeleton Tech Chips */}
                   <div className="flex flex-wrap gap-1.5 mb-5">
-                    {project.tech.slice(0, 4).map((t) => (
-                      <span
-                        key={t}
-                        className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/5 text-[10px] font-mono text-slate-300"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                    {project.tech.length > 4 && (
-                      <span className="px-2 py-1 rounded-lg bg-white/[0.03] text-[10px] font-mono text-text-dim">
-                        +{project.tech.length - 4} more
-                      </span>
-                    )}
+                    <div className="h-6 w-16 bg-white/5 rounded-lg skeleton-shimmer" />
+                    <div className="h-6 w-20 bg-white/5 rounded-lg skeleton-shimmer" />
+                    <div className="h-6 w-14 bg-white/5 rounded-lg skeleton-shimmer" />
                   </div>
 
+                  {/* Skeleton Bottom Action */}
                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all"
-                          title="GitHub Repository"
-                        >
-                          <Github size={14} />
-                        </a>
-                      )}
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all"
-                          title="Live Demo"
-                        >
-                          <ExternalLink size={14} />
-                        </a>
+                    <div className="h-7 w-16 bg-white/5 rounded-lg skeleton-shimmer" />
+                    <div className="h-4 w-28 bg-white/10 rounded-md skeleton-shimmer" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <AnimatePresence mode="popLayout">
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-haspopup="dialog"
+                  aria-label={`View architectural details for ${project.title}: ${project.subtitle}`}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
+                  onClick={() => setSelectedProject(project)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedProject(project);
+                    }
+                  }}
+                  className="group glass p-6 sm:p-7 rounded-3xl border-white/10 hover:border-accent/40 hover:bg-white/[0.04] focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-lg hover:shadow-[0_10px_30px_rgba(61,90,254,0.15)]"
+                >
+                  {/* Top Badge & Index */}
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest">
+                        0{index + 1} // {project.category}
+                      </span>
+                      {project.badge && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-mono font-medium text-accent">
+                          {project.badge}
+                        </span>
                       )}
                     </div>
 
-                    <button className="text-xs font-bold text-accent group-hover:text-white flex items-center gap-1.5 transition-colors">
-                      <span>View Architecture</span>
-                      <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    <h4 className="text-2xl font-bold text-white mb-1 group-hover:text-accent transition-colors">
+                      {project.title}
+                    </h4>
+                    <p className="text-xs font-mono text-slate-400 mb-4">
+                      {project.subtitle}
+                    </p>
+
+                    {/* Project Visual Preview */}
+                    {project.image && (
+                      <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
+                        <img
+                          src={project.image}
+                          alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    )}
+
+                    {/* Purpose Summary Box */}
+                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 group-hover:border-accent/20 transition-colors">
+                      <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent mb-1 flex items-center gap-1.5">
+                        <Sparkles size={11} /> Purpose & Applicability
+                      </p>
+                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                        {project.purpose}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+
+                  {/* Tech Badges & Details Link */}
+                  <div>
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      {project.tech.slice(0, 4).map((t) => (
+                        <span
+                          key={t}
+                          className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/5 text-[10px] font-mono text-slate-300"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                      {project.tech.length > 4 && (
+                        <span className="px-2 py-1 rounded-lg bg-white/[0.03] text-[10px] font-mono text-text-dim">
+                          +{project.tech.length - 4} more
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                      <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                            title="GitHub Repository"
+                            aria-label={`${project.title} GitHub Repository`}
+                          >
+                            <Github size={14} />
+                          </a>
+                        )}
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                            title="Live Demo"
+                            aria-label={`${project.title} Live Demo`}
+                          >
+                            <ExternalLink size={14} />
+                          </a>
+                        )}
+                      </div>
+
+                      <button 
+                        tabIndex={-1} 
+                        className="text-xs font-bold text-accent group-hover:text-white flex items-center gap-1.5 transition-colors"
+                      >
+                        <span>View Architecture</span>
+                        <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
 
       {/* Project Detail Modal - Viewport-Safe on Mobile & Desktop Rendered at Body Level */}
@@ -348,7 +442,12 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
         createPortal(
           <AnimatePresence>
             {selectedProject && (
-              <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-6 md:p-8 pt-10 sm:pt-16 pb-8 sm:pb-14">
+              <div 
+                className="fixed inset-0 z-[9999] overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-3.5 sm:p-6 md:p-8 pt-10 sm:pt-16 pb-8 sm:pb-14"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") setSelectedProject(null);
+                }}
+              >
                 {/* Backdrop click dismiss */}
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -356,6 +455,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   exit={{ opacity: 0 }}
                   onClick={() => setSelectedProject(null)}
                   className="fixed inset-0"
+                  aria-hidden="true"
                 />
 
                 {/* Modal Box */}
@@ -368,7 +468,8 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
                   onClick={(e) => e.stopPropagation()}
-                  className="relative w-full max-w-3xl my-auto bg-[#0c0d14] border border-white/20 rounded-2xl sm:rounded-3xl shadow-2xl z-10 flex flex-col max-h-[82vh] sm:max-h-[85vh] overflow-hidden"
+                  className="relative w-full max-w-3xl my-auto bg-[#0c0d14] border border-white/20 rounded-2xl sm:rounded-3xl shadow-2xl z-10 flex flex-col max-h-[82vh] sm:max-h-[85vh] overflow-hidden focus:outline-none"
+                  tabIndex={-1}
                 >
                   {/* Sticky Top Header with Close Button */}
                   <div className="sticky top-0 z-20 flex items-center justify-between px-5 sm:px-7 py-3.5 sm:py-4 border-b border-white/10 bg-[#0c0d14] shrink-0">
@@ -389,9 +490,10 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         </span>
                       )}
                       <button
+                        autoFocus
                         onClick={() => setSelectedProject(null)}
-                        className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-colors"
-                        aria-label="Close modal"
+                        className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-colors focus-visible:ring-2 focus-visible:ring-accent"
+                        aria-label="Close modal (Escape)"
                       >
                         <X size={18} />
                       </button>
@@ -494,7 +596,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           href={selectedProject.github}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all"
+                          className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-semibold flex items-center gap-1.5 transition-all focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           <Github size={14} />
                           <span>Code</span>
@@ -506,7 +608,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           href={selectedProject.link}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-5 py-2 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(61,90,254,0.3)] transition-all"
+                          className="px-5 py-2 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(61,90,254,0.3)] transition-all focus-visible:ring-2 focus-visible:ring-white"
                         >
                           <ExternalLink size={14} />
                           <span>Launch App</span>
@@ -514,7 +616,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                       ) : (
                         <button
                           onClick={() => setSelectedProject(null)}
-                          className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-semibold transition-all"
+                          className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-accent"
                         >
                           Close
                         </button>
