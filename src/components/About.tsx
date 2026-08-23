@@ -82,7 +82,7 @@ export default function About({ onOpenResume }: AboutProps) {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             className="lg:col-span-7"
           >
-            <span className="meta-label mb-4 block text-accent font-mono">[ 01 ] Professional Profile</span>
+            <span className="meta-label mb-4 block text-accent font-mono">0/1 Professional Profile</span>
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight uppercase tracking-tighter text-white">
               Engineering Scalable Systems <br />
               <span className="text-accent">With Backend Precision.</span>
@@ -93,7 +93,7 @@ export default function About({ onOpenResume }: AboutProps) {
                 I am a <strong className="text-white">Full Stack Developer</strong> with {exactYears}+ years of dedicated experience building, maintaining, and deploying production-grade web applications. While proficient across the full stack, my primary engineering focus and deep passion lie in <strong className="text-white">backend architecture, RESTful & GraphQL API design, system modeling, and database optimization</strong>.
               </p>
               <p>
-                At <span className="text-white font-medium">Glacier Agency (Toronto, Canada)</span>, I architect and maintain mission-critical backend modules, custom pricing logic, secure file upload pipelines via Google Cloud Storage, and Shopify App Bridge integrations supporting live merchant stores with high transaction volume.
+                At <span className="text-white font-medium">Glacier Agency (Toronto, Canada)</span>, I architect and maintain mission backend modules, custom pricing logic, secure file upload pipelines via Google Cloud Storage, and Shopify App Bridge integrations supporting live merchant stores with high transaction volume.
               </p>
               <p>
                 I prioritize clean architecture, robust session management (OAuth 2.0, JWT, secure HttpOnly cookies), and cloud deployment workflows (GCP App Engine, Cloud SQL, Secret Manager). At the same time, I ensure frontend interfaces built with React, Vite, and Tailwind CSS provide intuitive, responsive user experiences that connect effortlessly with complex server APIs.

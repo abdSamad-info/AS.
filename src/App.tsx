@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
@@ -67,39 +68,41 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden">
-      {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
-      <Scroll3DLine />
+    <ThemeProvider>
+      <div className="min-h-screen bg-bg selection:bg-accent/30 relative overflow-hidden text-white transition-colors duration-300">
+        {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
+        <Scroll3DLine />
 
-      {/* Background Ambient Atmospheric Glows */}
-      <div className="absolute top-[-5%] right-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] rounded-full bg-accent/10 blur-[90px] pointer-events-none z-0 will-change-transform" />
-      <div className="absolute top-[35%] right-[-8%] w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-emerald-500/[0.04] blur-[100px] pointer-events-none z-0 will-change-transform" />
-      <div className="absolute bottom-[20%] left-[-5%] w-[300px] sm:w-[380px] h-[300px] sm:h-[380px] rounded-full bg-indigo-600/10 blur-[80px] pointer-events-none z-0 will-change-transform" />
-      <div className="absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
+        {/* Background Ambient Atmospheric Glows */}
+        <div className="absolute top-[-5%] right-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] rounded-full bg-accent/10 blur-[90px] pointer-events-none z-0 will-change-transform" />
+        <div className="absolute top-[35%] right-[-8%] w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-emerald-500/[0.04] blur-[100px] pointer-events-none z-0 will-change-transform" />
+        <div className="absolute bottom-[20%] left-[-5%] w-[300px] sm:w-[380px] h-[300px] sm:h-[380px] rounded-full bg-indigo-600/10 blur-[80px] pointer-events-none z-0 will-change-transform" />
+        <div className="absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
 
-      <Navbar />
-      <main className="relative z-10">
-        <Hero onOpenResume={() => setIsResumeOpen(true)} />
-        <About onOpenResume={() => setIsResumeOpen(true)} />
-        <Skills />
-        <Experience />
-        <Projects onModalStateChange={setIsProjectModalOpen} />
-        <Contact />
-      </main>
-      <Footer />
-      <BackToTop isModalOpen={isAnyModalOpen} />
+        <Navbar />
+        <main className="relative z-10">
+          <Hero onOpenResume={() => setIsResumeOpen(true)} />
+          <About onOpenResume={() => setIsResumeOpen(true)} />
+          <Skills />
+          <Experience />
+          <Projects onModalStateChange={setIsProjectModalOpen} />
+          <Contact />
+        </main>
+        <Footer />
+        <BackToTop isModalOpen={isAnyModalOpen} />
 
-      {/* Interactive CV / Resume Viewer & Uploader Modal */}
-      <ResumeModal
-        isOpen={isResumeOpen}
-        onClose={() => setIsResumeOpen(false)}
-      />
+        {/* Interactive CV / Resume Viewer & Uploader Modal */}
+        <ResumeModal
+          isOpen={isResumeOpen}
+          onClose={() => setIsResumeOpen(false)}
+        />
 
-      {/* Simple Admin Portal via /admin URL */}
-      <AdminModal
-        isOpen={isAdminOpen}
-        onClose={handleCloseAdmin}
-      />
-    </div>
+        {/* Simple Admin Portal via /admin URL */}
+        <AdminModal
+          isOpen={isAdminOpen}
+          onClose={handleCloseAdmin}
+        />
+      </div>
+    </ThemeProvider>
   );
 }

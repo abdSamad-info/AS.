@@ -7,7 +7,7 @@ import {
   Monitor, 
   Code2, 
   Wrench,
-  ShieldCheck
+  Cpu
 } from "lucide-react";
 
 const skillCategories = [
@@ -17,6 +17,9 @@ const skillCategories = [
     icon: Server,
     commentary: "Designing scalable RESTful & GraphQL APIs, secure authentication pipelines, and real-time event streams.",
     skills: [
+      "System Design",
+      "Middleware",
+      "Authentication",
       "Node.js", 
       "Express.js", 
       "REST APIs", 
@@ -25,6 +28,44 @@ const skillCategories = [
       "Session Authentication", 
       "Socket.io", 
       "Mongoose"
+    ],
+  },
+  {
+    title: "Languages",
+    tag: "[ CORE PROGRAMMING ]",
+    icon: Code2,
+    commentary: "Writing type-safe, maintainable, and high-performance code across standard runtime environments.",
+    skills: [
+      "JavaScript",
+      "Python",
+      "Java"
+    ],
+  },
+  {
+    title: "Tools & Infrastructure",
+    tag: "[ ECOSYSTEM & WORKFLOW ]",
+    icon: Wrench,
+    commentary: "Comprehensive toolchain spanning databases, cloud infrastructure, containerization, and e-commerce APIs.",
+    skills: [
+      "HTML",
+      "CSS",
+      "Git",
+      "GitHup",
+      "Postman",
+      "Git Hub Actions",
+      "Google Cloud",
+      "Docker",
+      "AWS",
+      "Kubernetes",
+      "MongoDB",
+      "PostgreSQL",
+      "MySQL",
+      "Firebase",
+      "Shopify",
+      "Graph QL",
+      "Admin billing APIs",
+      "Liquid templates",
+      "Embeddable apps"
     ],
   },
   {
@@ -50,27 +91,12 @@ const skillCategories = [
     skills: [
       "PostgreSQL", 
       "MongoDB", 
+      "MySQL",
       "Cloud SQL", 
       "Firestore", 
+      "Firebase",
       "Aggregation Pipelines", 
       "Query Optimization"
-    ],
-  },
-  {
-    title: "Cloud & DevOps",
-    tag: "[ GCP & CI/CD INFRASTRUCTURE ]",
-    icon: Cloud,
-    commentary: "Deploying and managing production cloud infrastructure, secrets, and automated build pipelines.",
-    skills: [
-      "Google Cloud Platform", 
-      "App Engine", 
-      "Cloud Run", 
-      "Cloud SQL", 
-      "Cloud Storage (GCS)", 
-      "Secret Manager", 
-      "GitHub Actions", 
-      "Vercel", 
-      "Render"
     ],
   },
   {
@@ -87,22 +113,6 @@ const skillCategories = [
       "Material UI", 
       "Component Architecture", 
       "Responsive UI"
-    ],
-  },
-  {
-    title: "Languages & Tools",
-    tag: "[ CODE & WORKFLOW ]",
-    icon: Code2,
-    commentary: "Writing clean, type-safe code with robust testing and version control workflows.",
-    skills: [
-      "JavaScript (ES6+)", 
-      "TypeScript", 
-      "Python", 
-      "HTML5 / CSS3", 
-      "Git & GitHub", 
-      "Postman", 
-      "Figma", 
-      "Jest & Cypress"
     ],
   },
 ];

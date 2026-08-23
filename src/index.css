@@ -17,7 +17,7 @@
 
 @layer base {
   body {
-    @apply bg-bg text-white antialiased selection:bg-accent/30 font-sans;
+    @apply bg-bg text-white antialiased selection:bg-accent/30 font-sans transition-colors duration-300;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
   h1, h2, h3, h4, h5, h6 {
@@ -27,7 +27,7 @@
 
 @layer utilities {
   .glass {
-    @apply bg-glass backdrop-blur-md border border-glass-border;
+    @apply bg-glass backdrop-blur-md border border-glass-border transition-all duration-300;
   }
   
   .text-glow {
@@ -41,6 +41,128 @@
   .massive-title {
     @apply text-6xl md:text-[5rem] lg:text-[7rem] leading-[0.85] font-sans font-black tracking-[-0.05em] uppercase;
   }
+}
+
+/* ==========================================================================
+   HIGH-CONTRAST LIGHT THEME ADAPTATION
+   ========================================================================== */
+html.light {
+  --color-bg: #f8fafc;
+  --color-accent: #2563eb;
+  --color-accent-glow: rgba(37, 99, 235, 0.15);
+  --color-glass: rgba(255, 255, 255, 0.94);
+  --color-glass-border: rgba(15, 23, 42, 0.12);
+  --color-text-dim: #475569;
+}
+
+html.light body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html.light .glass {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+}
+
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.light .text-text-dim {
+  color: #475569 !important;
+}
+
+/* Surfaces & Containers */
+html.light .bg-\[\#050505\],
+html.light .bg-\[\#06070b\],
+html.light .bg-\[\#06070c\],
+html.light .bg-\[\#07070a\],
+html.light .bg-\[\#07070a\]\/40,
+html.light .bg-\[\#08090e\],
+html.light .bg-\[\#0a0b12\],
+html.light .bg-\[\#0b0c13\],
+html.light .bg-\[\#0c0d14\],
+html.light .bg-\[\#0f101a\] {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-\[\#050505\]\/90,
+html.light .bg-\[\#06070b\]\/60,
+html.light .bg-\[\#0a0b12\]\/90,
+html.light .bg-\[\#0b0c13\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.light .bg-white\/\[0\.02\],
+html.light .bg-white\/\[0\.03\],
+html.light .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .bg-white\/10 {
+  background-color: #e2e8f0 !important;
+}
+
+html.light .bg-white\/\[0\.04\] {
+  background-color: #f8fafc !important;
+}
+
+/* Borders */
+html.light .border-white\/5,
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20 {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Input Fields */
+html.light input,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.light input:focus,
+html.light textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
+
+/* Retain high-contrast white text on solid accent buttons */
+html.light .bg-accent,
+html.light button.bg-accent,
+html.light a.bg-accent {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+html.light .bg-accent span,
+html.light button.bg-accent span,
+html.light a.bg-accent span {
+  color: #ffffff !important;
+}
+
+html.light .text-glow {
+  text-shadow: 0 0 20px rgba(37, 99, 235, 0.25);
 }
 
 /* Custom scrollbar */

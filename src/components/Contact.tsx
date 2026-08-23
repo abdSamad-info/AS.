@@ -1,26 +1,34 @@
-import { motion } from "motion/react";
-import { Mail, Phone, MapPin, Send, Github, Linkedin, MessageSquare, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Mail, Phone, MapPin, Send, Github, Linkedin, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useState, FormEvent } from "react";
 
 export default function Contact() {
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string | null }>({ type: null, msg: null });
+  const [alertInfo, setAlertInfo] = useState<{ type: "warning" | "error" | "success" | null; msg: string | null }>({ type: null, msg: null });
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validate = () => {
-    const newErrors: { [key: string]: string } = {};
-    if (!formState.name.trim()) newErrors.name = "Name is required";
-    if (!formState.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formState.email)) {
-      newErrors.email = "Email is invalid";
+    if (!formState.name.trim()) {
+      setAlertInfo({ type: "warning", msg: "Alert: Please enter your name before sending." });
+      return false;
     }
-    if (!formState.message.trim()) newErrors.message = "Message is required";
-    else if (formState.message.length < 10) newErrors.message = "Message must be at least 10 characters";
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formState.email.trim()) {
+      setAlertInfo({ type: "warning", msg: "Alert: Please enter your email address." });
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(formState.email)) {
+      setAlertInfo({ type: "warning", msg: "Alert: Please provide a valid email address." });
+      return false;
+    }
+    if (!formState.message.trim()) {
+      setAlertInfo({ type: "warning", msg: "Alert: Please enter your message." });
+      return false;
+    }
+    if (formState.message.length < 10) {
+      setAlertInfo({ type: "warning", msg: "Alert: Message must be at least 10 characters long." });
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -28,7 +36,7 @@ export default function Contact() {
     if (!validate()) return;
     
     setLoading(true);
-    setStatus({ type: null, msg: null });
+    setAlertInfo({ type: null, msg: null });
 
     try {
       const res = await fetch("/api/contact", {
@@ -39,13 +47,13 @@ export default function Contact() {
       const data = await res.json();
       
       if (res.ok) {
-        setStatus({ type: "success", msg: data.message || "Thank you! Your message has been received." });
+        setAlertInfo({ type: "success", msg: data.message || "Thank you! Your message has been sent successfully." });
         setFormState({ name: "", email: "", message: "" });
       } else {
-        setStatus({ type: "error", msg: data.error || "Failed to submit message." });
+        setAlertInfo({ type: "error", msg: data.error || "Alert: Failed to submit message. Please try again." });
       }
     } catch (err) {
-      setStatus({ type: "error", msg: "Something went wrong. Please try again or reach out directly via email." });
+      setAlertInfo({ type: "error", msg: "Alert: Something went wrong. Please try again or reach out directly via email." });
     } finally {
       setLoading(false);
     }
@@ -147,29 +155,51 @@ export default function Contact() {
             className="lg:col-span-7 glass p-8 sm:p-10 rounded-3xl border-white/10"
           >
             <h4 className="text-xl font-bold text-white mb-2">Send a Message</h4>
-            <p className="text-xs text-text-dim mb-8">
+            <p className="text-xs text-text-dim mb-6">
               Have a project, job opportunity, or technical inquiry? Fill out the form below.
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Alert Notification Display */}
+            <AnimatePresence mode="wait">
+              {alertInfo.msg && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  role="alert"
+                  className={`p-4 mb-6 rounded-xl text-xs flex items-center gap-3 ${
+                    alertInfo.type === "success" 
+                      ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" 
+                      : alertInfo.type === "warning"
+                      ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                      : "bg-rose-500/15 text-rose-300 border border-rose-500/30"
+                  }`}
+                >
+                  {alertInfo.type === "success" ? (
+                    <CheckCircle2 size={18} className="shrink-0 text-emerald-400" />
+                  ) : (
+                    <AlertCircle size={18} className="shrink-0 text-amber-400" />
+                  )}
+                  <span className="font-medium leading-relaxed">{alertInfo.msg}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-mono font-bold text-slate-400">
                   Your Name
                 </label>
                 <input
                   type="text"
-                  required
                   value={formState.name}
                   onChange={(e) => {
                     setFormState({ ...formState, name: e.target.value });
-                    if (errors.name) setErrors({ ...errors, name: "" });
+                    if (alertInfo.msg) setAlertInfo({ type: null, msg: null });
                   }}
                   placeholder="e.g. John Doe"
-                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm ${
-                    errors.name ? "border-rose-500" : "border-white/10 focus:border-accent"
-                  }`}
+                  className="w-full bg-white/[0.02] border border-white/10 focus:border-accent rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm"
                 />
-                {errors.name && <p className="text-xs text-rose-400 mt-1">{errors.name}</p>}
               </div>
 
               <div className="space-y-2">
@@ -178,18 +208,14 @@ export default function Contact() {
                 </label>
                 <input
                   type="email"
-                  required
                   value={formState.email}
                   onChange={(e) => {
                     setFormState({ ...formState, email: e.target.value });
-                    if (errors.email) setErrors({ ...errors, email: "" });
+                    if (alertInfo.msg) setAlertInfo({ type: null, msg: null });
                   }}
                   placeholder="john@example.com"
-                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm ${
-                    errors.email ? "border-rose-500" : "border-white/10 focus:border-accent"
-                  }`}
+                  className="w-full bg-white/[0.02] border border-white/10 focus:border-accent rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm"
                 />
-                {errors.email && <p className="text-xs text-rose-400 mt-1">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -197,31 +223,16 @@ export default function Contact() {
                   Message / Project Details
                 </label>
                 <textarea
-                  required
                   rows={4}
                   value={formState.message}
                   onChange={(e) => {
                     setFormState({ ...formState, message: e.target.value });
-                    if (errors.message) setErrors({ ...errors, message: "" });
+                    if (alertInfo.msg) setAlertInfo({ type: null, msg: null });
                   }}
                   placeholder="Describe your project, timeline, or inquiry..."
-                  className={`w-full bg-white/[0.02] border rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm resize-none ${
-                    errors.message ? "border-rose-500" : "border-white/10 focus:border-accent"
-                  }`}
+                  className="w-full bg-white/[0.02] border border-white/10 focus:border-accent rounded-xl px-4 py-3.5 focus:outline-none transition-all text-white text-sm resize-none"
                 />
-                {errors.message && <p className="text-xs text-rose-400 mt-1">{errors.message}</p>}
               </div>
-
-              {status.msg && (
-                <div className={`p-4 rounded-xl text-xs flex items-center gap-2 ${
-                  status.type === "success" 
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                }`}>
-                  {status.type === "success" && <CheckCircle2 size={16} />}
-                  <span>{status.msg}</span>
-                </div>
-              )}
 
               <div className="flex gap-4 pt-2">
                 <button
@@ -250,8 +261,7 @@ export default function Contact() {
                   type="button"
                   onClick={() => {
                     setFormState({ name: "", email: "", message: "" });
-                    setStatus({ type: null, msg: null });
-                    setErrors({});
+                    setAlertInfo({ type: null, msg: null });
                   }}
                   className="px-6 py-4 border border-white/10 text-slate-400 text-xs font-semibold hover:bg-white/5 hover:text-white transition-all rounded-xl"
                 >

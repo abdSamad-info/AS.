@@ -347,7 +347,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs space-y-1.5">
                             <p className="text-slate-300"><strong className="text-white">MERN Stack Certified:</strong> Hazza Institute (2023)</p>
-                            <p className="text-slate-300"><strong className="text-white">IEEE ICT Exhibition:</strong> Univ. of Sindh (2022)</p>
+                            <p className="text-slate-300"><strong className="text-white">Writing Machine Exhibition:</strong> Univ. of Sindh (2022)</p>
                             <p className="text-slate-400 pt-1 border-t border-white/5 font-mono">
                               Languages: English (Professional), Urdu (Native)
                             </p>

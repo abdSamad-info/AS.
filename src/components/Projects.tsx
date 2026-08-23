@@ -44,7 +44,7 @@ const projects: ProjectItem[] = [
       "Embedded merchant dashboard for custom lens catalogs and rule management"
     ],
     link: null,
-    github: "https://github.com/ABDLSamaD",
+    github: null,
     isProduction: true
   },
   {
@@ -67,7 +67,7 @@ const projects: ProjectItem[] = [
       "Responsive merchant configuration admin dashboard built with React and Vite"
     ],
     link: null,
-    github: "https://github.com/ABDLSamaD",
+    github: null,
     isProduction: true
   },
   {

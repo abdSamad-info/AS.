@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
-import { Github, Linkedin, Mail, Menu, X } from "lucide-react";
+import { Github, Linkedin, Mail, Menu, X, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 const navLinks = [
   { name: "About", href: "#about" },
@@ -13,6 +14,7 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { theme, toggleTheme, isDark } = useTheme();
 
   useEffect(() => {
     if (isOpen) {
@@ -53,7 +55,7 @@ export default function Navbar() {
         </motion.a>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-10">
+        <div className="hidden md:flex items-center space-x-8">
           {navLinks.map((link, i) => (
             <motion.a
               key={link.name}
@@ -67,6 +69,22 @@ export default function Navbar() {
               {link.name}
             </motion.a>
           ))}
+
+          {/* Theme Switcher Toggle */}
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-accent transition-all active:scale-95 flex items-center justify-center"
+            title={isDark ? "Switch to High-Contrast Light Mode" : "Switch to Dark Mode"}
+            aria-label={isDark ? "Switch to High-Contrast Light Mode" : "Switch to Dark Mode"}
+          >
+            {isDark ? (
+              <Sun size={17} className="text-amber-400 hover:rotate-45 transition-transform" />
+            ) : (
+              <Moon size={17} className="text-indigo-600 hover:-rotate-12 transition-transform" />
+            )}
+          </motion.button>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -94,16 +112,30 @@ export default function Navbar() {
           </motion.div>
         </div>
 
-        {/* Mobile Toggle Button (Visible only when menu is closed) */}
-        {!isOpen && (
-          <button 
-            onClick={() => setIsOpen(true)} 
-            className="md:hidden text-white w-10 h-10 flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 rounded-full transition-colors active:scale-95 shadow-sm"
-            aria-label="Open menu"
+        {/* Mobile Actions: Theme Toggle + Menu Button */}
+        <div className="flex md:hidden items-center gap-2.5">
+          <button
+            onClick={toggleTheme}
+            className="text-white w-10 h-10 flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 rounded-full transition-colors active:scale-95 shadow-sm"
+            aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            <Menu size={20} className="text-white" />
+            {isDark ? (
+              <Sun size={18} className="text-amber-400" />
+            ) : (
+              <Moon size={18} className="text-indigo-600" />
+            )}
           </button>
-        )}
+
+          {!isOpen && (
+            <button 
+              onClick={() => setIsOpen(true)} 
+              className="text-white w-10 h-10 flex items-center justify-center border border-white/20 bg-white/5 hover:bg-white/10 rounded-full transition-colors active:scale-95 shadow-sm"
+              aria-label="Open menu"
+            >
+              <Menu size={20} className="text-white" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Mobile Menu Drawer */}
@@ -116,7 +148,7 @@ export default function Navbar() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="fixed inset-0 z-[120] md:hidden bg-[#06070c] flex flex-col p-6 sm:p-8 overflow-y-auto"
           >
-            {/* Mobile Menu Header - Single clear Close button */}
+            {/* Mobile Menu Header */}
             <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-8 shrink-0">
               <a 
                 href="#" 
@@ -127,14 +159,25 @@ export default function Navbar() {
                 <span className="text-accent text-3xl leading-none">.</span>
               </a>
 
-              <button
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg"
-                aria-label="Close menu"
-              >
-                <X size={16} className="text-accent" />
-                <span>Close</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleTheme}
+                  className="p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center gap-1.5 text-xs font-mono"
+                  aria-label="Toggle Theme"
+                >
+                  {isDark ? <Sun size={15} className="text-amber-400" /> : <Moon size={15} className="text-indigo-600" />}
+                  <span>{isDark ? "Light" : "Dark"}</span>
+                </button>
+
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold uppercase tracking-wider transition-all active:scale-95 shadow-lg"
+                  aria-label="Close menu"
+                >
+                  <X size={16} className="text-accent" />
+                  <span>Close</span>
+                </button>
+              </div>
             </div>
 
             {/* Navigation Links */}

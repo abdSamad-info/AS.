@@ -139,10 +139,10 @@ export default function Experience() {
                 <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 text-xs">
                   <div className="flex items-center gap-2 text-accent font-bold mb-1">
                     <Award size={14} />
-                    <span>ICT & IEEE Mini Project Exhibition</span>
+                    <span>Writing Machine</span>
                   </div>
                   <p className="text-slate-400 leading-relaxed">
-                    University of Sindh (May 2022). Recognized for outstanding project architecture and software design.
+                    University of Sindh (May 2022). Recognized for outstanding project architecture, automated control, and software design.
                   </p>
                 </div>
               </div>
