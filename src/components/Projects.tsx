@@ -9,6 +9,8 @@ export interface ProjectItem {
   subtitle: string;
   category: string;
   badge?: string;
+  image?: string;
+  imageAlt?: string;
   purpose: string;
   applicability: string;
   desc: string;
@@ -27,6 +29,8 @@ const projects: ProjectItem[] = [
     subtitle: "Shopify Prescription Eyewear App",
     category: "Shopify",
     badge: "Live on Shopify Store",
+    image: "/images/presia.png",
+    imageAlt: "Presia - Shopify Prescription Eyewear App embedded admin and storefront builder interface",
     purpose: "Enables optical and eyewear merchants to seamlessly integrate complex prescription lenses, optical parameters (sphere, cylinder, axis, PD), and contact lens selection flows into their live Shopify storefronts.",
     applicability: "Commercial eyewear brands, optical retail merchants, and prescription lab suppliers wanting an automated, zero-friction storefront prescription builder with real-time price recalculation.",
     desc: "Built and published a production Shopify application using PERN stack and TypeScript, deployed on Google App Engine with Cloud SQL and Google Cloud Storage.",
@@ -49,6 +53,8 @@ const projects: ProjectItem[] = [
     subtitle: "Shopify Face Measurement App",
     category: "Shopify",
     badge: "Live Production App",
+    image: "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&q=80&w=800&h=500",
+    imageAlt: "Alira - AI Facial Dimension Sizing and Optical Measurement App for Shopify Storefronts",
     purpose: "AI-assisted eyewear sizing application where customers measure exact facial dimensions via camera or photo upload for customized frame size recommendations.",
     applicability: "Online eyewear e-commerce stores wanting to reduce costly return rates and give customers confidence in frame sizing before purchasing.",
     desc: "Contributed to a live Shopify app utilizing Node.js, Express, React, Vite, Python, MediaPipe, Firestore, and Shopify Billing GraphQL APIs.",
@@ -70,6 +76,8 @@ const projects: ProjectItem[] = [
     subtitle: "Electrical Contractor Web App",
     category: "Full Stack",
     badge: "Enterprise Web App",
+    image: "/images/electrica.png",
+    imageAlt: "Electrica - Electrical Contractor Management Platform Dashboard with Real-Time Communication",
     purpose: "Multi-user contractor management platform that streamlines project phases, contracts, complaints, daily progress logging, and real-time team communication.",
     applicability: "Commercial and residential electrical contractors, field technicians, project managers, and clients requiring structured project tracking and instant messaging.",
     desc: "Engineered a secure multi-user MERN platform with role-based dashboards, OTP login, HttpOnly cookie security, and Socket.io real-time chat.",
@@ -91,6 +99,8 @@ const projects: ProjectItem[] = [
     subtitle: "Real-Time Seat Booking Engine",
     category: "Backend / API",
     badge: "Booking Engine",
+    image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=800&h=500",
+    imageAlt: "Cinema Ticket System - High-Concurrency Real-Time Seat Reservation Engine and Seat Selection Map",
     purpose: "High-concurrency seat reservation and ticketing engine with live seat selection, booking validation, and double-booking collision prevention.",
     applicability: "Cinemas, theatres, and event organizers requiring fast, reliable seat maps and high-throughput booking under heavy release-day traffic.",
     desc: "Built with React, Node.js, Express, and MongoDB. Leveraged MongoDB aggregation pipelines and indexing to improve response time by 30%+ under heavy load.",
@@ -112,6 +122,8 @@ const projects: ProjectItem[] = [
     subtitle: "High-Performance Portfolio & CV Hub",
     category: "Full Stack",
     badge: "Portfolio Showcase",
+    image: "/images/abdfolio.png",
+    imageAlt: "MERN Developer Portfolio - High-Performance Interactive CV Hub and Technical Architecture Breakdown",
     purpose: "Responsive developer showcase featuring production project breakdowns, technical competencies, live application links, and an interactive CV management system.",
     applicability: "Modern engineering showcase highlighting real-world production systems and verified technical credentials.",
     desc: "Built with React, TypeScript, Express, and Tailwind CSS. Features clean visual hierarchy, smooth transitions, and integrated CV download and upload utilities.",
@@ -250,6 +262,20 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                     {project.subtitle}
                   </p>
 
+                  {/* Project Visual Preview */}
+                  {project.image && (
+                    <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
+                      <img
+                        src={project.image}
+                        alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                  )}
+
                   {/* Purpose Summary Box */}
                   <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 group-hover:border-accent/20 transition-colors">
                     <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent mb-1 flex items-center gap-1.5">
@@ -374,6 +400,20 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
 
                   {/* Scrollable Content Body */}
                   <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5 text-slate-300 text-xs sm:text-sm">
+                    {/* Project Preview Image */}
+                    {selectedProject.image && (
+                      <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-white/[0.02]">
+                        <img
+                          src={selectedProject.image}
+                          alt={selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover object-center"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    )}
+
                     {/* 1. Purpose & Real-World Applicability */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
