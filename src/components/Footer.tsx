@@ -1,4 +1,5 @@
 import { Github, Linkedin, Mail } from "lucide-react";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
@@ -6,8 +7,10 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
-            <a href="#" className="text-2xl font-bold tracking-tighter text-gradient">AS.</a>
-            <p className="text-slate-500 text-sm mt-1">© 2026 Abdul Samad · Full Stack Developer. All rights reserved.</p>
+            <a href="#" className="inline-block focus-visible:ring-2 focus-visible:ring-accent rounded-xl" aria-label="Abdul Samad Portfolio Homepage">
+              <Logo size="sm" subtitle={true} />
+            </a>
+            <p className="text-slate-500 text-xs mt-2 font-mono">© 2026 Abdul Samad · Full Stack &amp; Backend Engineer. All rights reserved.</p>
           </div>
 
           <div className="flex items-center gap-5 text-slate-400">
