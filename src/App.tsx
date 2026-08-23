@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from "react";
-import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -111,9 +110,6 @@ export default function App() {
           isOpen={isAdminOpen}
           onClose={handleCloseAdmin}
         />
-
-        {/* Vercel Web Analytics */}
-        <Analytics />
       </div>
     </ThemeProvider>
   );

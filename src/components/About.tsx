@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { Server, Database, Cloud, Code2, GraduationCap, Award, CheckCircle } from "lucide-react";
-import profileImg from "../assets/images/profiles.jpg";
 
 interface AboutProps {
   onOpenResume?: () => void;
@@ -34,7 +33,7 @@ export default function About({ onOpenResume }: AboutProps) {
               {/* Image Frame - Clean on mobile without dark overlays or hover effects */}
               <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-transparent md:glass border border-white/10 p-2 sm:p-3 shadow-2xl relative">
                 <img 
-                  src={profileImg || import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "/images/profiles.jpg"}
+                  src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "https://res.cloudinary.com/sdsa/image/upload/v1776602242/profiles_yx9geb.jpg"}
                   alt="Abdul Samad" 
                   className="w-full h-full object-cover rounded-2xl brightness-100 contrast-100"
                   referrerPolicy="no-referrer"

@@ -3,12 +3,6 @@ import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-// Bundled static asset imports for reliable production deployment resolution
-import presiaImg from "../assets/images/presia.png";
-import forgeImg from "../assets/images/forge.png";
-import electricaImg from "../assets/images/electrica.png";
-import abdfolioImg from "../assets/images/abdfolio.png";
-
 export interface ProjectItem {
   id: number;
   title: string;
@@ -43,7 +37,7 @@ const projects: ProjectItem[] = [
     subtitle: "Shopify Prescription Eyewear App",
     category: "Shopify",
     badge: "Live on Shopify Store",
-    image: presiaImg || "/images/presia.png",
+    image: "/images/presia.png",
     imageAlt: "Presia - Shopify Prescription Eyewear App embedded admin and storefront builder interface",
     purpose: "Enables optical and eyewear merchants to seamlessly integrate complex prescription lenses, optical parameters (sphere, cylinder, axis, PD), and contact lens selection flows into their live Shopify storefronts.",
     applicability: "Commercial eyewear brands, optical retail merchants, and prescription lab suppliers wanting an automated, zero-friction storefront prescription builder with real-time price recalculation.",
@@ -68,7 +62,7 @@ const projects: ProjectItem[] = [
     category: "Desktop App",
     badge: "Desktop Software (v3.0.2)",
     version: "3.0.2",
-    image: forgeImg || "/images/forge.png",
+    image: "/images/forge.png",
     imageAlt: "Forge - Modern Electron Desktop Workspace, Project Management, and Task Engine",
     purpose: "Provide a simple, stable, and polished desktop productivity app that helps users stay organized, work efficiently, and manage their workflow with a smooth branded experience.",
     applicability: "Developers, technical leads, designers, and workflow managers needing a fast, distraction-free desktop application with offline data sovereignty and zero-cloud dependence.",
@@ -120,7 +114,7 @@ const projects: ProjectItem[] = [
     subtitle: "Electrical Contractor Web App",
     category: "Full Stack",
     badge: "Enterprise Web App",
-    image: electricaImg || "/images/electrica.png",
+    image: "/images/electrica.png",
     imageAlt: "Electrica - Electrical Contractor Management Platform Dashboard with Real-Time Communication",
     purpose: "Multi-user contractor management platform that streamlines project phases, contracts, complaints, daily progress logging, and real-time team communication.",
     applicability: "Commercial and residential electrical contractors, field technicians, project managers, and clients requiring structured project tracking and instant messaging.",
@@ -166,7 +160,7 @@ const projects: ProjectItem[] = [
     subtitle: "High-Performance Portfolio & CV Hub",
     category: "Full Stack",
     badge: "Portfolio Showcase",
-    image: abdfolioImg || "/images/abdfolio.png",
+    image: "/images/abdfolio.png",
     imageAlt: "MERN Developer Portfolio - High-Performance Interactive CV Hub and Technical Architecture Breakdown",
     purpose: "Responsive developer showcase featuring production project breakdowns, technical competencies, live application links, and an interactive CV management system.",
     applicability: "Modern engineering showcase highlighting real-world production systems and verified technical credentials.",
