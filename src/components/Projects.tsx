@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag } from "lucide-react";
+import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 
@@ -9,6 +9,7 @@ export interface ProjectItem {
   subtitle: string;
   category: string;
   badge?: string;
+  version?: string;
   image?: string;
   imageAlt?: string;
   purpose: string;
@@ -20,7 +21,14 @@ export interface ProjectItem {
   link?: string | null;
   github?: string | null;
   isProduction?: boolean;
+  downloadUrl?: string | null;
+  downloadSize?: string;
+  distributionType?: string;
+  downloadStatus?: "in_progress" | "available" | "pending";
+  downloadPendingNotice?: string;
 }
+
+const forgeDownloadUrl = import.meta.env.VITE_FORGE_DOWNLOAD_URL || "";
 
 const projects: ProjectItem[] = [
   {
@@ -49,6 +57,36 @@ const projects: ProjectItem[] = [
   },
   {
     id: 2,
+    title: "Forge",
+    subtitle: "Electron Desktop Workspace & Task Engine",
+    category: "Desktop App",
+    badge: "Desktop Software (v3.0.2)",
+    version: "3.0.2",
+    image: "/images/forge.png",
+    imageAlt: "Forge - Modern Electron Desktop Workspace, Project Management, and Task Engine",
+    purpose: "Provide a simple, stable, and polished desktop productivity app that helps users stay organized, work efficiently, and manage their workflow with a smooth branded experience.",
+    applicability: "Developers, technical leads, designers, and workflow managers needing a fast, distraction-free desktop application with offline data sovereignty and zero-cloud dependence.",
+    desc: "A modern Electron-based desktop workspace engineered for project, task, schedule, and activity management with instant feedback and file-based JSON storage.",
+    longDesc: "Forge is a modern Electron-based desktop workspace designed to help users manage projects, tasks, schedules, activity, and settings in one place. It focuses on fast interaction, instant save feedback, and reliable local data storage.\n\nThe app uses file-based JSON storage to keep data persistent and easy to back up, while also supporting Windows installer and portable builds for simple distribution.\n\nArchitected with a decoupled Electron IPC bridge, multi-window support, background autosave debounce pipelines, and offline-first data integrity.",
+    tech: ["Electron", "React", "TypeScript", "Tailwind CSS", "Node.js", "JSON Storage", "Vite", "Electron Builder", "IPC", "NSIS"],
+    features: [
+      "Unified desktop dashboard managing projects, tasks, schedules, activity logs, and preferences",
+      "Robust file-based JSON local storage architecture for data privacy and effortless backups",
+      "Instant save feedback engine with optimistic UI updates and zero cloud latency",
+      "Custom frameless desktop window with integrated titlebar controls and snappy navigation",
+      "Automated build pipeline producing Windows NSIS Installer (.exe) and standalone Portable executables"
+    ],
+    link: null,
+    github: "https://github.com/ABDLSamaD",
+    isProduction: true,
+    downloadStatus: forgeDownloadUrl.trim() !== "" ? "available" : "in_progress",
+    downloadPendingNotice: "Windows installer build (v3.0.2) is in progress and will be available shortly.",
+    downloadUrl: forgeDownloadUrl.trim() !== "" ? forgeDownloadUrl : null,
+    downloadSize: "~110 MB (Windows x64 / Portable)",
+    distributionType: "Windows Installer (.exe) & Portable Executable"
+  },
+  {
+    id: 3,
     title: "Alira",
     subtitle: "Shopify Face Measurement App",
     category: "Shopify",
@@ -71,7 +109,7 @@ const projects: ProjectItem[] = [
     isProduction: true
   },
   {
-    id: 3,
+    id: 4,
     title: "Electrica",
     subtitle: "Electrical Contractor Web App",
     category: "Full Stack",
@@ -94,7 +132,7 @@ const projects: ProjectItem[] = [
     isProduction: false
   },
   {
-    id: 4,
+    id: 5,
     title: "Cinema Ticket System",
     subtitle: "Real-Time Seat Booking Engine",
     category: "Backend / API",
@@ -117,7 +155,7 @@ const projects: ProjectItem[] = [
     isProduction: false
   },
   {
-    id: 5,
+    id: 6,
     title: "MERN Developer Portfolio",
     subtitle: "High-Performance Portfolio & CV Hub",
     category: "Full Stack",
@@ -148,23 +186,9 @@ interface ProjectsProps {
 export default function Projects({ onModalStateChange }: ProjectsProps) {
   const [activeFilter, setActiveFilter] = useState("All");
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Initial load simulation & filter transition for perceived performance
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleFilterChange = (cat: string) => {
-    if (cat === activeFilter) return;
-    setIsLoading(true);
     setActiveFilter(cat);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 280);
   };
 
   useEffect(() => {
@@ -192,7 +216,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedProject]);
 
-  const categories = ["All", "Shopify", "Full Stack", "Backend / API"];
+  const categories = ["All", "Shopify", "Desktop App", "Full Stack", "Backend / API"];
 
   const filteredProjects = useMemo(() => {
     if (activeFilter === "All") return projects;
@@ -219,7 +243,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
             </h3>
           </div>
           <p className="max-w-md text-slate-400 text-sm leading-relaxed">
-            Real-world production applications, Shopify apps with live merchant stores, 
+            Real-world production applications, desktop suites, Shopify apps with live merchant stores, 
             and scalable PERN/MERN systems built with TypeScript and GCP.
           </p>
         </motion.div>
@@ -256,61 +280,10 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
           </div>
         </div>
 
-        {/* Skeleton Loading State or Project Cards Grid */}
-        {isLoading ? (
-          <div 
-            aria-busy="true" 
-            aria-label="Loading projects..."
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
-          >
-            {[1, 2, 3, 4, 5, 6].map((sk) => (
-              <div
-                key={sk}
-                className="glass p-6 sm:p-7 rounded-3xl border-white/10 flex flex-col justify-between overflow-hidden shadow-lg animate-pulse"
-              >
-                <div>
-                  {/* Skeleton Badge & Index */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="h-3.5 w-24 bg-white/10 rounded-full skeleton-shimmer" />
-                    <div className="h-4 w-16 bg-white/10 rounded-full skeleton-shimmer" />
-                  </div>
-
-                  {/* Skeleton Title & Subtitle */}
-                  <div className="h-7 w-3/4 bg-white/10 rounded-xl mb-2 skeleton-shimmer" />
-                  <div className="h-3.5 w-1/2 bg-white/5 rounded-md mb-5 skeleton-shimmer" />
-
-                  {/* Skeleton Image Area */}
-                  <div className="w-full aspect-[16/10] rounded-2xl mb-5 bg-white/5 skeleton-shimmer border border-white/5" />
-
-                  {/* Skeleton Purpose Box */}
-                  <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 space-y-2">
-                    <div className="h-3 w-28 bg-white/10 rounded skeleton-shimmer" />
-                    <div className="h-2.5 w-full bg-white/5 rounded skeleton-shimmer" />
-                    <div className="h-2.5 w-5/6 bg-white/5 rounded skeleton-shimmer" />
-                  </div>
-                </div>
-
-                <div>
-                  {/* Skeleton Tech Chips */}
-                  <div className="flex flex-wrap gap-1.5 mb-5">
-                    <div className="h-6 w-16 bg-white/5 rounded-lg skeleton-shimmer" />
-                    <div className="h-6 w-20 bg-white/5 rounded-lg skeleton-shimmer" />
-                    <div className="h-6 w-14 bg-white/5 rounded-lg skeleton-shimmer" />
-                  </div>
-
-                  {/* Skeleton Bottom Action */}
-                  <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                    <div className="h-7 w-16 bg-white/5 rounded-lg skeleton-shimmer" />
-                    <div className="h-4 w-28 bg-white/10 rounded-md skeleton-shimmer" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            <AnimatePresence mode="popLayout">
-              {filteredProjects.map((project, index) => (
+        {/* Project Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <AnimatePresence mode="popLayout">
+            {filteredProjects.map((project, index) => (
                 <motion.div
                   key={project.id}
                   role="button"
@@ -333,7 +306,8 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   {/* Top Badge & Index */}
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-4">
-                      <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest">
+                      <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest flex items-center gap-1.5">
+                        {project.category === "Desktop App" && <Laptop size={12} className="text-accent" />}
                         0{index + 1} // {project.category}
                       </span>
                       {project.badge && (
@@ -387,7 +361,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         </span>
                       ))}
                       {project.tech.length > 4 && (
-                        <span className="px-2 py-1 rounded-lg bg-white/[0.03] text-[10px] font-mono text-text-dim">
+                        <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] text-[10px] font-mono text-text-dim">
                           +{project.tech.length - 4} more
                         </span>
                       )}
@@ -407,7 +381,26 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                             <Github size={14} />
                           </a>
                         )}
-                        {project.link && (
+                        {project.downloadStatus === "in_progress" && !project.downloadUrl ? (
+                          <span
+                            className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-300 flex items-center gap-1.5"
+                            title="Download link is pending and will be available shortly"
+                          >
+                            <Clock size={11} className="text-amber-400" />
+                            <span>In Progress</span>
+                          </span>
+                        ) : project.downloadUrl ? (
+                          <a
+                            href={project.downloadUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center text-accent hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                            title="Download Desktop Software (.exe)"
+                            aria-label={`${project.title} Download Installer`}
+                          >
+                            <Download size={14} />
+                          </a>
+                        ) : project.link ? (
                           <a
                             href={project.link}
                             target="_blank"
@@ -418,7 +411,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           >
                             <ExternalLink size={14} />
                           </a>
-                        )}
+                        ) : null}
                       </div>
 
                       <button 
@@ -434,8 +427,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
               ))}
             </AnimatePresence>
           </div>
-        )}
-      </div>
+        </div>
 
       {/* Project Detail Modal - Viewport-Safe on Mobile & Desktop Rendered at Body Level */}
       {typeof document !== "undefined" &&
@@ -475,7 +467,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   <div className="sticky top-0 z-20 flex items-center justify-between px-5 sm:px-7 py-3.5 sm:py-4 border-b border-white/10 bg-[#0c0d14] shrink-0">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-accent/20 border border-accent/40 flex items-center justify-center text-accent shrink-0">
-                        <Layers size={18} />
+                        {selectedProject.category === "Desktop App" ? <Laptop size={18} /> : <Layers size={18} />}
                       </div>
                       <div>
                         <h3 id="project-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">{selectedProject.title}</h3>
@@ -513,6 +505,50 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           className="w-full h-full object-cover object-center"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    )}
+
+                    {/* Download & Distribution Pill (if Desktop App) */}
+                    {selectedProject.downloadSize && (
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                          <HardDrive size={16} className="text-accent shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-bold text-xs">Binary Distribution Package</p>
+                              {selectedProject.version && (
+                                <span className="px-2 py-0.5 rounded-md bg-accent/20 border border-accent/40 text-[10px] font-mono font-bold text-accent">
+                                  v{selectedProject.version}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-300 font-mono">{selectedProject.distributionType || "Windows Installer & Portable"}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-slate-300">
+                            {selectedProject.downloadSize}
+                          </span>
+                          {selectedProject.downloadStatus === "in_progress" && !selectedProject.downloadUrl && (
+                            <span className="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                              <Clock size={11} className="text-amber-400" />
+                              In Progress
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pending Download Notice Banner */}
+                    {selectedProject.downloadStatus === "in_progress" && !selectedProject.downloadUrl && (
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                        <Clock size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                        <div>
+                          <h6 className="text-xs font-bold text-amber-300">Download Link In Progress (v3.0.2)</h6>
+                          <p className="text-slate-300 text-xs mt-0.5 leading-relaxed">
+                            {selectedProject.downloadPendingNotice || "The Windows installer package (~110 MB) is currently pending cloud deployment and will be available for direct download shortly."}
+                          </p>
+                        </div>
                       </div>
                     )}
 
@@ -587,7 +623,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   {/* Sticky Footer with Direct Actions */}
                   <div className="sticky bottom-0 z-20 px-5 sm:px-7 py-3.5 sm:py-4 border-t border-white/10 bg-[#0c0d14] flex items-center justify-between gap-3 shrink-0">
                     <div className="text-xs text-text-dim font-mono">
-                      Status: <span className="text-accent font-semibold">{selectedProject.isProduction ? "Live Production System" : "Functional Application"}</span>
+                      Status: <span className="text-accent font-semibold">{selectedProject.isProduction ? "Production Release" : "Functional Application"}</span>
                     </div>
 
                     <div className="flex items-center gap-2.5">
@@ -603,7 +639,25 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         </a>
                       )}
 
-                      {selectedProject.link ? (
+                      {selectedProject.downloadStatus === "in_progress" && !selectedProject.downloadUrl ? (
+                        <div 
+                          className="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono font-semibold flex items-center gap-2 cursor-default shadow-sm"
+                          title="Download link is in progress and will be available shortly"
+                        >
+                          <Clock size={13} className="text-amber-400" />
+                          <span>Download: In Progress (v3.0.2)</span>
+                        </div>
+                      ) : selectedProject.downloadUrl ? (
+                        <a
+                          href={selectedProject.downloadUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-5 py-2 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(61,90,254,0.3)] transition-all focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                          <Download size={14} />
+                          <span>Download .exe ({selectedProject.downloadSize ? "110MB" : "Build"})</span>
+                        </a>
+                      ) : selectedProject.link ? (
                         <a
                           href={selectedProject.link}
                           target="_blank"

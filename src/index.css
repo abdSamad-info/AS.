@@ -17,7 +17,7 @@
 
 @layer base {
   body {
-    @apply bg-bg text-white antialiased selection:bg-accent/30 font-sans transition-colors duration-300;
+    @apply bg-bg text-white antialiased selection:bg-accent/30 font-sans;
     font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
   h1, h2, h3, h4, h5, h6 {
@@ -27,7 +27,7 @@
 
 @layer utilities {
   .glass {
-    @apply bg-glass backdrop-blur-md border border-glass-border transition-all duration-300;
+    @apply bg-glass backdrop-blur-md border border-glass-border;
   }
   
   .text-glow {

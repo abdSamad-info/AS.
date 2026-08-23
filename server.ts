@@ -191,13 +191,28 @@ async function startServer() {
   // 7. Static files from public folder
   app.use(express.static(path.join(__dirname, "public")));
 
-  // 8. Resume download endpoint
+  // 8. Resume & Software download endpoints
   app.get(["/api/resume/download", "/Abdul-Samad-Resume.pdf", "/resume.pdf"], (req, res) => {
     const resumePath = path.join(__dirname, "public", "Abdul-Samad-Resume.pdf");
     res.download(resumePath, "Abdul-Samad-Resume.pdf", (err) => {
       if (err) {
         res.sendFile(resumePath);
       }
+    });
+  });
+
+  // Forge Desktop App Download redirect endpoint
+  app.get(["/api/forge/download", "/api/download/forge", "/forge/download"], (req, res) => {
+    const forgeUrl = process.env.FORGE_DOWNLOAD_URL || process.env.VITE_FORGE_DOWNLOAD_URL;
+    if (forgeUrl && forgeUrl.trim() !== "") {
+      return res.redirect(302, forgeUrl.trim());
+    }
+    return res.status(200).json({
+      status: "pending_link",
+      message: "Forge desktop installer build (110 MB) download link can be set via FORGE_DOWNLOAD_URL in environment settings.",
+      software: "Forge - Electron Desktop Workspace",
+      version: "1.0.0",
+      target: "Windows (x64) Installer & Portable"
     });
   });
 
@@ -576,8 +591,18 @@ async function startServer() {
       express.static(distPath, {
         maxAge: "31536000",
         setHeaders: (res, filePath) => {
-          if (filePath.endsWith(".html")) {
-            res.set("Cache-Control", "no-cache");
+          if (filePath.endsWith("sw.js")) {
+            // Service worker must always check for freshness
+            res.set("Cache-Control", "no-cache, no-store, must-revalidate");
+          } else if (filePath.endsWith(".html")) {
+            // HTML served with stale-while-revalidate for instant loading and SEO freshness
+            res.set("Cache-Control", "public, max-age=0, must-revalidate, stale-while-revalidate=86400");
+          } else if (filePath.includes("/assets/")) {
+            // Hashed Vite assets are immutable
+            res.set("Cache-Control", "public, max-age=31536000, immutable");
+          } else if (filePath.endsWith(".svg") || filePath.endsWith(".png") || filePath.endsWith(".jpg") || filePath.endsWith(".xml") || filePath.endsWith(".txt") || filePath.endsWith(".pdf")) {
+            // Static public assets cached for 7 days with long stale-while-revalidate
+            res.set("Cache-Control", "public, max-age=604800, stale-while-revalidate=2592000");
           }
         },
       })
@@ -591,6 +616,7 @@ async function startServer() {
       process.env.NODE_ENV === "production" ? "dist" : ".",
       "index.html"
     );
+    res.set("Cache-Control", "public, max-age=0, must-revalidate, stale-while-revalidate=86400");
     res.sendFile(indexPath, (err) => {
       if (err) {
         res.status(404).send("Application root not found");
