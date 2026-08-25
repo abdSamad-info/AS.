@@ -30,14 +30,14 @@ export interface ProjectItem {
 
 const forgeDownloadUrl = import.meta.env.VITE_FORGE_DOWNLOAD_URL || "";
 
-const projects: ProjectItem[] = [
+const initialProjects: ProjectItem[] = [
   {
     id: 1,
     title: "Presia",
     subtitle: "Shopify Prescription Eyewear App",
     category: "Shopify",
     badge: "Live on Shopify Store",
-    image: "/images/presia.png",
+    image: "/api/images/presia.png",
     imageAlt: "Presia - Shopify Prescription Eyewear App embedded admin and storefront builder interface",
     purpose: "Enables optical and eyewear merchants to seamlessly integrate complex prescription lenses, optical parameters (sphere, cylinder, axis, PD), and contact lens selection flows into their live Shopify storefronts.",
     applicability: "Commercial eyewear brands, optical retail merchants, and prescription lab suppliers wanting an automated, zero-friction storefront prescription builder with real-time price recalculation.",
@@ -62,7 +62,7 @@ const projects: ProjectItem[] = [
     category: "Desktop App",
     badge: "Desktop Software (v3.0.2)",
     version: "3.0.2",
-    image: "/images/forge.png",
+    image: "/api/images/forge-image.png",
     imageAlt: "Forge - Modern Electron Desktop Workspace, Project Management, and Task Engine",
     purpose: "Provide a simple, stable, and polished desktop productivity app that helps users stay organized, work efficiently, and manage their workflow with a smooth branded experience.",
     applicability: "Developers, technical leads, designers, and workflow managers needing a fast, distraction-free desktop application with offline data sovereignty and zero-cloud dependence.",
@@ -82,7 +82,7 @@ const projects: ProjectItem[] = [
     downloadStatus: forgeDownloadUrl.trim() !== "" ? "available" : "in_progress",
     downloadPendingNotice: "Windows installer build (v3.0.2) is in progress and will be available shortly.",
     downloadUrl: forgeDownloadUrl.trim() !== "" ? forgeDownloadUrl : null,
-    downloadSize: "~110 MB (Windows x64 / Portable)",
+    downloadSize: "74.8 MB (Windows x64 / Portable)",
     distributionType: "Windows Installer (.exe) & Portable Executable"
   },
   {
@@ -114,7 +114,7 @@ const projects: ProjectItem[] = [
     subtitle: "Electrical Contractor Web App",
     category: "Full Stack",
     badge: "Enterprise Web App",
-    image: "/images/electrica.png",
+    image: "/api/images/electrica.png",
     imageAlt: "Electrica - Electrical Contractor Management Platform Dashboard with Real-Time Communication",
     purpose: "Multi-user contractor management platform that streamlines project phases, contracts, complaints, daily progress logging, and real-time team communication.",
     applicability: "Commercial and residential electrical contractors, field technicians, project managers, and clients requiring structured project tracking and instant messaging.",
@@ -160,7 +160,7 @@ const projects: ProjectItem[] = [
     subtitle: "High-Performance Portfolio & CV Hub",
     category: "Full Stack",
     badge: "Portfolio Showcase",
-    image: "/images/abdfolio.png",
+    image: "/api/images/abdfolio.png",
     imageAlt: "MERN Developer Portfolio - High-Performance Interactive CV Hub and Technical Architecture Breakdown",
     purpose: "Responsive developer showcase featuring production project breakdowns, technical competencies, live application links, and an interactive CV management system.",
     applicability: "Modern engineering showcase highlighting real-world production systems and verified technical credentials.",
@@ -184,8 +184,59 @@ interface ProjectsProps {
 }
 
 export default function Projects({ onModalStateChange }: ProjectsProps) {
+  const [projectList, setProjectList] = useState<ProjectItem[]>(initialProjects);
   const [activeFilter, setActiveFilter] = useState("All");
-  const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+
+  // Auto-detect Forge download availability dynamically from backend environment
+  useEffect(() => {
+    let isMounted = true;
+    const fetchForgeStatus = async () => {
+      try {
+        const res = await fetch("/api/forge/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (isMounted && data) {
+          setProjectList((prev) =>
+            prev.map((p) => {
+              if (p.id === 2 || p.title.toLowerCase() === "forge") {
+                const isAvailable = Boolean(data.available || forgeDownloadUrl.trim() !== "");
+                return {
+                  ...p,
+                  downloadStatus: isAvailable ? "available" : "in_progress",
+                  downloadUrl: isAvailable
+                    ? (data.downloadUrl || forgeDownloadUrl || "/api/forge/download")
+                    : null,
+                  downloadPendingNotice: isAvailable
+                    ? undefined
+                    : (data.releaseNotes || "Windows installer build (v3.0.2) is in progress and will be available shortly."),
+                  downloadSize: data.size || p.downloadSize || "74.8 MB (Windows x64 / Portable)",
+                  distributionType: data.distributionType || p.distributionType || "Windows Installer (.exe) & Portable Executable",
+                };
+              }
+              return p;
+            })
+          );
+        }
+      } catch (err) {
+        // Fallback gracefully to default state
+      }
+    };
+
+    fetchForgeStatus();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const selectedProject = useMemo(() => {
+    if (selectedProjectId === null) return null;
+    return projectList.find((p) => p.id === selectedProjectId) || null;
+  }, [selectedProjectId, projectList]);
+
+  const setSelectedProject = (proj: ProjectItem | null) => {
+    setSelectedProjectId(proj ? proj.id : null);
+  };
 
   const handleFilterChange = (cat: string) => {
     setActiveFilter(cat);
@@ -219,9 +270,9 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
   const categories = ["All", "Shopify", "Desktop App", "Full Stack", "Backend / API"];
 
   const filteredProjects = useMemo(() => {
-    if (activeFilter === "All") return projects;
-    return projects.filter(p => p.category === activeFilter || p.tech.some(t => t.toLowerCase().includes(activeFilter.toLowerCase())));
-  }, [activeFilter]);
+    if (activeFilter === "All") return projectList;
+    return projectList.filter(p => p.category === activeFilter || p.tech.some(t => t.toLowerCase().includes(activeFilter.toLowerCase())));
+  }, [activeFilter, projectList]);
 
   return (
     <section id="projects" aria-labelledby="projects-heading" className="py-24 relative">
@@ -333,6 +384,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           loading="lazy"
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (project.image && project.image.startsWith("/api/images/")) {
+                              const filename = project.image.replace("/api/images/", "");
+                              target.src = `/images/${filename}`;
+                            }
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
                       </div>
@@ -503,6 +561,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           loading="lazy"
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover object-center"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (selectedProject.image && selectedProject.image.startsWith("/api/images/")) {
+                              const filename = selectedProject.image.replace("/api/images/", "");
+                              target.src = `/images/${filename}`;
+                            }
+                          }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
                       </div>
@@ -655,7 +720,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           className="px-5 py-2 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_15px_rgba(61,90,254,0.3)] transition-all focus-visible:ring-2 focus-visible:ring-white"
                         >
                           <Download size={14} />
-                          <span>Download .exe ({selectedProject.downloadSize ? "110MB" : "Build"})</span>
+                          <span>Download .exe ({selectedProject.downloadSize ? "74.8 MB" : "Build"})</span>
                         </a>
                       ) : selectedProject.link ? (
                         <a

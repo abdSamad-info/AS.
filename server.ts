@@ -1,6 +1,8 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import fs from "fs";
+import crypto from "crypto";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import pg from "pg";
@@ -12,12 +14,139 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const _rootDir = process.cwd();
+const _publicDir = path.join(_rootDir, "public");
+const _distDir = path.join(_rootDir, "dist");
 
 const JWT_SECRET = process.env.JWT_SECRET || "portfolio_secure_jwt_secret_samad_2025";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "samad@admin2025";
 const PERSONAL_EMAIL = process.env.PERSONAL_EMAIL || process.env.EMAIL_USER || "abdsamad.info@gmail.com";
+
+interface ImageCacheEntry {
+  buffer: Buffer;
+  contentType: string;
+  etag: string;
+  lastModified: Date;
+  size: number;
+  hitCount: number;
+  cachedAt: number;
+}
+
+// In-Memory Fast Media & API Cache
+const imageCache = new Map<string, ImageCacheEntry>();
+let cacheHitCount = 0;
+let cacheMissCount = 0;
+
+function resolveImageFilename(input: string): string {
+  const normalized = (input || "").trim().toLowerCase().replace(/_/g, "-");
+  if (
+    normalized === "profile" ||
+    normalized === "profile.jpg" ||
+    normalized === "profile.jpeg" ||
+    normalized === "profiles" ||
+    normalized === "profiles.jpeg" ||
+    normalized === "profile-pic" ||
+    normalized === "avatar"
+  ) {
+    return "profiles.jpg";
+  }
+  if (normalized === "presia" || normalized === "presia.png") return "presia.png";
+  if (
+    normalized === "forge" ||
+    normalized === "forge.png" ||
+    normalized === "forge-image" ||
+    normalized === "forge-image.png" ||
+    normalized === "forge-img" ||
+    normalized === "forge-img.png"
+  ) {
+    if (fs.existsSync(path.join(_publicDir, "images", "forge-image.png"))) return "forge-image.png";
+    if (fs.existsSync(path.join(_publicDir, "images", "forge.png"))) return "forge.png";
+    if (fs.existsSync(path.join(_publicDir, "images", "forge.svg"))) return "forge.svg";
+    return "forge-image.png";
+  }
+  if (normalized === "electrica" || normalized === "electrica.png") return "electrica.png";
+  if (normalized === "abdfolio" || normalized === "abdfolio.png") return "abdfolio.png";
+
+  if (
+    normalized.endsWith(".jpg") ||
+    normalized.endsWith(".jpeg") ||
+    normalized.endsWith(".png") ||
+    normalized.endsWith(".webp") ||
+    normalized.endsWith(".svg")
+  ) {
+    return normalized;
+  }
+  return `${normalized}.png`;
+}
+
+function getContentType(filename: string): string {
+  if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) return "image/jpeg";
+  if (filename.endsWith(".png")) return "image/png";
+  if (filename.endsWith(".webp")) return "image/webp";
+  if (filename.endsWith(".svg")) return "image/svg+xml";
+  if (filename.endsWith(".gif")) return "image/gif";
+  return "application/octet-stream";
+}
+
+function loadAndCacheImage(filename: string): ImageCacheEntry | null {
+  const possiblePaths = [
+    path.join(_publicDir, "images", filename),
+    path.join(_distDir, "images", filename),
+    path.join(_rootDir, "src", "assets", "images", filename),
+    path.join(_rootDir, "public", "images", filename),
+  ];
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      try {
+        const stats = fs.statSync(p);
+        const buffer = fs.readFileSync(p);
+        const hash = crypto.createHash("md5").update(buffer).digest("hex");
+        const etag = `"${hash}"`;
+        const entry: ImageCacheEntry = {
+          buffer,
+          contentType: getContentType(filename),
+          etag,
+          lastModified: stats.mtime,
+          size: buffer.length,
+          hitCount: 0,
+          cachedAt: Date.now(),
+        };
+        imageCache.set(filename, entry);
+        return entry;
+      } catch (err) {
+        console.error(`[CACHE ERROR] Failed reading ${p}:`, err);
+      }
+    }
+  }
+  return null;
+}
+
+// Pre-warm in-memory cache on startup for zero-latency initial responses
+function prewarmImageCache() {
+  const possibleDirs = [
+    path.join(_publicDir, "images"),
+    path.join(_distDir, "images"),
+  ];
+
+  for (const dir of possibleDirs) {
+    if (fs.existsSync(dir)) {
+      try {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          if (/\.(png|jpe?g|svg|webp)$/i.test(file)) {
+            loadAndCacheImage(file);
+          }
+        }
+      } catch (e) {
+        console.error(`[CACHE INIT] Error scanning ${dir}:`, e);
+      }
+    }
+  }
+  console.log(`[CACHE READY] Pre-warmed ${imageCache.size} assets into memory cache.`);
+}
+
+prewarmImageCache();
 
 interface ContactSubmission {
   id: string | number;
@@ -41,7 +170,7 @@ interface SecurityLog {
 }
 
 // In-memory persistent stores for fast logging & demo fallback
-const inMemorySubmissions: ContactSubmission[] = [
+let inMemorySubmissions: ContactSubmission[] = [
   {
     id: "init-1",
     name: "System Initializer",
@@ -93,7 +222,14 @@ function getClientIp(req: express.Request): string {
   } else if (Array.isArray(forwarded) && forwarded.length > 0) {
     return forwarded[0].trim();
   }
-  return req.socket.remoteAddress || req.ip || "127.0.0.1";
+  const fwdHeader = req.headers["forwarded"];
+  if (typeof fwdHeader === "string") {
+    const match = fwdHeader.match(/for="?([^;,\s]+)"?/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  return req.ip || req.socket.remoteAddress || "127.0.0.1";
 }
 
 function getTransporter() {
@@ -116,6 +252,9 @@ function getTransporter() {
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Enable trust proxy for reverse proxy / container / cloud environments
+  app.set("trust proxy", 1);
 
   // 1. Enhanced Security Middleware: Helmet (configured for iframe & cross-origin safety)
   app.use(
@@ -146,6 +285,12 @@ async function startServer() {
     max: 60,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => getClientIp(req),
+    validate: {
+      xForwardedForHeader: false,
+      forwardedHeader: false,
+      trustProxy: false,
+    },
     handler: (req, res) => {
       const ip = getClientIp(req);
       logSecurityEvent("RATE_LIMIT_TRIGGERED", ip, `General API rate limit reached on ${req.originalUrl}`, "warning");
@@ -160,6 +305,12 @@ async function startServer() {
     max: 5,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: (req) => getClientIp(req),
+    validate: {
+      xForwardedForHeader: false,
+      forwardedHeader: false,
+      trustProxy: false,
+    },
     handler: (req, res) => {
       const ip = getClientIp(req);
       logSecurityEvent("RATE_LIMIT_TRIGGERED", ip, "Contact form spam threshold reached (5 submissions in 15min)", "error");
@@ -169,31 +320,115 @@ async function startServer() {
     },
   });
 
-  // 6. Serve specific images route first to prevent catch-all conflicts
-  app.get("/images/:filename", (req, res) => {
-    const filename = req.params.filename;
-    const filepath = path.join(__dirname, "public", "images", filename);
+  // 6. Fast In-Memory Cached Media & Image API (Protected with Helmet & CORS)
+  app.get(
+    [
+      "/api/images/:filename",
+      "/api/media/:filename",
+      "/api/profile-image",
+      "/images/:filename"
+    ],
+    (req, res) => {
+      // Extract target image identifier (defaults to profile for /api/profile-image)
+      const rawParam = req.params.filename || "profiles.jpg";
+      const filename = resolveImageFilename(rawParam);
 
-    res.set({
-      "Content-Type": filename.endsWith(".jpg") || filename.endsWith(".jpeg") ? "image/jpeg" : "image/png",
-      "Cache-Control": "public, max-age=31536000, immutable",
-      "Accept-Ranges": "none",
-    });
+      // Explicit CORS & Security headers for cross-origin browser requests
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept, If-None-Match, If-Modified-Since"
+      );
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
 
-    res.sendFile(filepath, (err) => {
-      if (err) {
-        console.error(`[ERROR] Image not found: ${filename} at ${filepath}`);
-        res.status(404).send("Image not found");
+      let entry = imageCache.get(filename);
+      let isHit = true;
+
+      if (!entry) {
+        isHit = false;
+        entry = loadAndCacheImage(filename);
       }
+
+      if (!entry) {
+        return res.status(404).json({
+          error: "Image asset not found",
+          requested: rawParam,
+          resolved: filename,
+        });
+      }
+
+      if (isHit) {
+        cacheHitCount++;
+        entry.hitCount++;
+      } else {
+        cacheMissCount++;
+      }
+
+      // Check HTTP Conditional Request Headers for instant 304 Not Modified
+      const clientEtag = req.headers["if-none-match"];
+      if (clientEtag && (clientEtag === entry.etag || clientEtag === `W/${entry.etag}`)) {
+        res.setHeader("X-Cache", "HIT-304");
+        res.setHeader("ETag", entry.etag);
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable, stale-while-revalidate=86400");
+        return res.status(304).end();
+      }
+
+      const ifModifiedSince = req.headers["if-modified-since"];
+      if (ifModifiedSince) {
+        const clientDate = new Date(ifModifiedSince);
+        if (!isNaN(clientDate.getTime()) && clientDate >= entry.lastModified) {
+          res.setHeader("X-Cache", "HIT-304");
+          res.setHeader("ETag", entry.etag);
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable, stale-while-revalidate=86400");
+          return res.status(304).end();
+        }
+      }
+
+      // Set High-Performance Caching & Content Headers
+      res.setHeader("Content-Type", entry.contentType);
+      res.setHeader("Content-Length", entry.size.toString());
+      res.setHeader("ETag", entry.etag);
+      res.setHeader("Last-Modified", entry.lastModified.toUTCString());
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable, stale-while-revalidate=86400");
+      res.setHeader("X-Cache", isHit ? "HIT" : "MISS");
+      res.setHeader("X-Cache-Hits", entry.hitCount.toString());
+
+      return res.status(200).send(entry.buffer);
+    }
+  );
+
+  // 6b. Cache Metrics & Asset Manifest API
+  app.get("/api/cache/stats", (req, res) => {
+    const items = Array.from(imageCache.entries()).map(([name, entry]) => ({
+      name,
+      sizeKb: (entry.size / 1024).toFixed(1) + " KB",
+      contentType: entry.contentType,
+      hits: entry.hitCount,
+      cachedAt: new Date(entry.cachedAt).toISOString(),
+    }));
+
+    const totalRequests = cacheHitCount + cacheMissCount;
+    const hitRatio = totalRequests > 0 ? ((cacheHitCount / totalRequests) * 100).toFixed(1) + "%" : "100%";
+
+    res.json({
+      status: "active",
+      engine: "In-Memory Buffer Cache with ETag & Conditional 304",
+      totalCachedAssets: imageCache.size,
+      totalHits: cacheHitCount,
+      totalMisses: cacheMissCount,
+      hitRatio,
+      assets: items,
     });
   });
 
   // 7. Static files from public folder
-  app.use(express.static(path.join(__dirname, "public")));
+  app.use(express.static(_publicDir));
 
   // 8. Resume & Software download endpoints
   app.get(["/api/resume/download", "/Abdul-Samad-Resume.pdf", "/resume.pdf"], (req, res) => {
-    const resumePath = path.join(__dirname, "public", "Abdul-Samad-Resume.pdf");
+    const resumePath = path.join(_publicDir, "Abdul-Samad-Resume.pdf");
     res.download(resumePath, "Abdul-Samad-Resume.pdf", (err) => {
       if (err) {
         res.sendFile(resumePath);
@@ -201,17 +436,48 @@ async function startServer() {
     });
   });
 
+  // Helper function to resolve Forge download URL from various env key formats
+  function getForgeDownloadUrl(): string | null {
+    const url =
+      process.env.FORGE_DOWNLOAD_URL ||
+      process.env.VITE_FORGE_DOWNLOAD_URL ||
+      process.env.FORGE_URL ||
+      process.env.FORGE_RELEASE_URL ||
+      process.env.FORGE_EXE_URL ||
+      process.env.FORGE_INSTALLER_URL;
+    return url && url.trim() !== "" ? url.trim() : null;
+  }
+
+  // Forge Desktop App Status & metadata endpoint (automatic detection for frontend)
+  app.get(["/api/forge/status", "/api/projects/forge/status"], (req, res) => {
+    const forgeUrl = getForgeDownloadUrl();
+    const isAvailable = Boolean(forgeUrl);
+    res.json({
+      available: isAvailable,
+      version: "3.0.2",
+      name: "Forge",
+      title: "Forge - Electron Desktop Workspace & Task Engine",
+      downloadUrl: isAvailable ? "/api/forge/download" : null,
+      directUrl: forgeUrl || null,
+      size: "74.8 MB (Windows x64 / Portable)",
+      distributionType: "Windows Installer (.exe) & Portable Executable",
+      releaseNotes: isAvailable
+        ? "Production installer build (v3.0.2) ready for direct download."
+        : "Windows installer build (v3.0.2) is in progress and will be available shortly.",
+    });
+  });
+
   // Forge Desktop App Download redirect endpoint
   app.get(["/api/forge/download", "/api/download/forge", "/forge/download"], (req, res) => {
-    const forgeUrl = process.env.FORGE_DOWNLOAD_URL || process.env.VITE_FORGE_DOWNLOAD_URL;
-    if (forgeUrl && forgeUrl.trim() !== "") {
-      return res.redirect(302, forgeUrl.trim());
+    const forgeUrl = getForgeDownloadUrl();
+    if (forgeUrl) {
+      return res.redirect(302, forgeUrl);
     }
     return res.status(200).json({
       status: "pending_link",
-      message: "Forge desktop installer build (110 MB) download link can be set via FORGE_DOWNLOAD_URL in environment settings.",
+      message: "Forge desktop installer build (74.8 MB) download link can be set via FORGE_DOWNLOAD_URL in environment settings.",
       software: "Forge - Electron Desktop Workspace",
-      version: "1.0.0",
+      version: "3.0.2",
       target: "Windows (x64) Installer & Portable"
     });
   });

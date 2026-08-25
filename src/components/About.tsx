@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { motion } from "motion/react";
 import { Server, Database, Cloud, Code2, GraduationCap, Award, CheckCircle } from "lucide-react";
 
@@ -11,6 +12,25 @@ export default function About({ onOpenResume }: AboutProps) {
   const now = new Date();
   const diffInMonths = (now.getFullYear() - startCareerDate.getFullYear()) * 12 + (now.getMonth() - startCareerDate.getMonth());
   const exactYears = Math.max(1.3, Number((diffInMonths / 12).toFixed(1)));
+
+  // Backend Cached API Endpoint with retry & re-query capability
+  const [imgSrc, setImgSrc] = useState<string>("/api/images/profile");
+  const [retryCount, setRetryCount] = useState<number>(0);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  const handleImageError = useCallback(() => {
+    if (retryCount < 3) {
+      const nextAttempt = retryCount + 1;
+      setRetryCount(nextAttempt);
+      // Re-query backend API with exponential backoff
+      setTimeout(() => {
+        setImgSrc(`/api/images/profile?retry=${nextAttempt}&t=${Date.now()}`);
+      }, nextAttempt * 400);
+    } else {
+      // Local asset fallback
+      setImgSrc("/images/profiles.jpg");
+    }
+  }, [retryCount]);
 
   return (
     <section id="about" className="py-24 relative overflow-hidden">
@@ -33,11 +53,13 @@ export default function About({ onOpenResume }: AboutProps) {
               {/* Image Frame - Clean on mobile without dark overlays or hover effects */}
               <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-transparent md:glass border border-white/10 p-2 sm:p-3 shadow-2xl relative">
                 <img 
-                  src={import.meta.env.VITE_CLOUDINARY_PROFILE_URL || "https://res.cloudinary.com/sdsa/image/upload/v1776602242/profiles_yx9geb.jpg"}
+                  src={imgSrc}
                   alt="Abdul Samad" 
-                  className="w-full h-full object-cover rounded-2xl brightness-100 contrast-100"
+                  className={`w-full h-full object-cover rounded-2xl brightness-100 contrast-100 transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-90'}`}
                   referrerPolicy="no-referrer"
-                  loading="lazy"
+                  loading="eager"
+                  onLoad={() => setIsLoaded(true)}
+                  onError={handleImageError}
                 />
                 
                 {/* Overlay Badge */}

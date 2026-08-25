@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { Lock, Mail, Trash2, LogOut, ArrowLeft, RefreshCw, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 
@@ -69,7 +69,7 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     if (!password.trim()) {
       setAuthError("Please enter your admin password");
