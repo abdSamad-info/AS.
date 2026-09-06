@@ -30,9 +30,12 @@ export function createExpressApp(): express.Express {
   app.use("/api", mediaRouter);
   app.use("/api", adminRouter);
 
-  // Top-level aliases for direct access
-  app.use(mediaRouter);
+  // Top-level aliases for direct access & Vercel serverless functions
+  app.use(healthRouter);
+  app.use(contactRouter);
   app.use(forgeRouter);
+  app.use(mediaRouter);
+  app.use(adminRouter);
 
   // Serve static assets from public directory
   app.use(express.static(publicDir));

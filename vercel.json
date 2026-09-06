@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
   "headers": [
     {
       "source": "/images/(.*)",
@@ -7,10 +9,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        },
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
         {
-          "key": "Accept-Ranges",
-          "value": "none"
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
@@ -18,14 +25,15 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.ts"
+      "destination": "/api"
     },
     {
-      "source": "/((?!api|images|assets|_next).*)",
+      "source": "/api",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!api|images|assets|_next|favicon|robots|sitemap).*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
