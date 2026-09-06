@@ -117,11 +117,7 @@ export function getDbPool(): pg.Pool | null {
   }
 
   if (pool) {
-    return isDbHealthy ? pool : null;
-  }
-
-  if (dbInitAttempted && !isDbHealthy) {
-    return null;
+    return pool;
   }
 
   try {
@@ -205,6 +201,8 @@ export async function safeDbQuery<T = any>(
 
   try {
     const result = await p.query(sql, params);
+    isDbHealthy = true;
+    dbLastError = null;
     return result.rows as T[];
   } catch (err: any) {
     isDbHealthy = false;

@@ -1,9 +1,8 @@
 import { Router } from "express";
 import { contactLimiter, getClientIp } from "../middleware/security.js";
-import { getTransporter, buildInquiryEmailHtml } from "../services/email.js";
+import { sendInquiryEmail } from "../services/email.js";
 import { logSecurityEvent } from "../services/logger.js";
 import { safeDbQuery, inMemorySubmissions, type ContactSubmission } from "../services/db.js";
-import { PERSONAL_EMAIL } from "../config/env.js";
 
 const router = Router();
 
@@ -32,46 +31,20 @@ router.post("/contact", contactLimiter, async (req, res) => {
     return res.status(400).json({ error: "Message must be at least 5 characters long." });
   }
 
-  let emailStatus: "sent" | "demo_logged" | "failed" = "demo_logged";
-  let emailError = "";
+  // Dispatch Email via Resend (with automatic Nodemailer fallback)
+  const dispatchResult = await sendInquiryEmail({
+    cleanName,
+    cleanEmail,
+    cleanMessage,
+    clientIp,
+  });
 
-  const transporter = getTransporter();
-  const recipientEmail = PERSONAL_EMAIL;
-
-  if (transporter) {
-    try {
-      const mailOptions = {
-        from: `"Portfolio Contact Form" <${process.env.EMAIL_USER || process.env.GMAIL_USER}>`,
-        to: recipientEmail,
-        replyTo: cleanEmail,
-        subject: `✨ New Inquiry: ${cleanName} via Portfolio`,
-        text: `New Portfolio Inquiry:\n\nSender: ${cleanName}\nEmail: ${cleanEmail}\nIP Address: ${clientIp}\nUser Agent: ${userAgent}\nReceived: ${new Date().toLocaleString()}\n\nMessage:\n${cleanMessage}`,
-        html: buildInquiryEmailHtml({
-          cleanName,
-          cleanEmail,
-          cleanMessage,
-          clientIp,
-          recipientEmail,
-        }),
-      };
-
-      await transporter.sendMail(mailOptions);
-      emailStatus = "sent";
-      logSecurityEvent("EMAIL_DISPATCH", clientIp, `Email delivered to ${recipientEmail} from ${cleanEmail}`, "success");
-    } catch (err: any) {
-      emailStatus = "failed";
-      emailError = err.message || "Failed to dispatch email via Nodemailer";
-      logSecurityEvent("EMAIL_DISPATCH", clientIp, `Nodemailer dispatch failed: ${emailError}`, "error");
-    }
-  } else {
-    emailStatus = "demo_logged";
-    logSecurityEvent(
-      "FORM_SUBMISSION",
-      clientIp,
-      `Message received from ${cleanName} (${cleanEmail}). Nodemailer running in demo log mode (set EMAIL_USER & EMAIL_PASS in .env for live sending).`,
-      "success"
-    );
-  }
+  const emailStatus: "sent" | "demo_logged" | "failed" = dispatchResult.delivered
+    ? "sent"
+    : dispatchResult.provider === "demo_logged"
+    ? "demo_logged"
+    : "failed";
+  const emailError = dispatchResult.error || "";
 
   const submissionRecord: ContactSubmission = {
     id: "msg-" + Date.now(),
@@ -94,18 +67,19 @@ router.post("/contact", contactLimiter, async (req, res) => {
     [cleanName, cleanEmail, cleanMessage, clientIp, userAgent, emailStatus]
   );
 
-  if (emailStatus === "sent") {
+  if (dispatchResult.delivered) {
     return res.json({
       success: true,
       message: "Thank you! Your message has been sent directly to Abdul Samad's inbox.",
       delivered: true,
+      provider: dispatchResult.provider,
     });
   } else if (emailStatus === "demo_logged") {
     return res.json({
       success: true,
       message: "Thank you! Your message and IP have been securely logged and delivered to the inbox manager.",
       delivered: false,
-      note: "Configured for Google App Passwords once EMAIL_PASS is set in environment.",
+      note: "Saved to database.",
     });
   } else {
     return res.json({
