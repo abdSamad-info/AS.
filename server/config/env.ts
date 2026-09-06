@@ -8,9 +8,9 @@ export const publicDir = path.join(rootDir, "public");
 export const distDir = path.join(rootDir, "dist");
 
 export const PORT = 3000;
-export const JWT_SECRET = process.env.JWT_SECRET || "portfolio_secure_jwt_secret_samad_2025";
-export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "samad@admin2025";
-export const PERSONAL_EMAIL = process.env.PERSONAL_EMAIL || process.env.EMAIL_USER || "abdsamad.info@gmail.com";
+export const JWT_SECRET = process.env.JWT_SECRET || "";
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
+export const PERSONAL_EMAIL = process.env.PERSONAL_EMAIL || process.env.EMAIL_USER || "";
 
 // Secret key for Cloud Scheduler / health ping authentication
 export const CRON_SECRET = process.env.CRON_SECRET || process.env.HEALTH_CHECK_SECRET || "";

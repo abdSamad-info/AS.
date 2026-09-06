@@ -3,6 +3,7 @@ import { contactLimiter, getClientIp } from "../middleware/security.js";
 import { sendInquiryEmail } from "../services/email.js";
 import { logSecurityEvent } from "../services/logger.js";
 import { safeDbQuery, inMemorySubmissions, type ContactSubmission } from "../services/db.js";
+import { validateInquiryEmail } from "../utils/emailValidator.js";
 
 const router = Router();
 
@@ -13,19 +14,30 @@ router.post("/contact", contactLimiter, async (req, res) => {
 
   // Sanitize & Validate Inputs
   const cleanName = typeof name === "string" ? name.trim().substring(0, 100) : "";
-  const cleanEmail = typeof email === "string" ? email.trim().substring(0, 120) : "";
+  const rawEmail = typeof email === "string" ? email.trim().substring(0, 120) : "";
   const cleanMessage = typeof message === "string" ? message.trim().substring(0, 3000) : "";
 
-  if (!cleanName || !cleanEmail || !cleanMessage) {
+  if (!cleanName || !rawEmail || !cleanMessage) {
     logSecurityEvent("FORM_SUBMISSION", clientIp, "Rejected empty contact submission fields", "warning");
     return res.status(400).json({ error: "Name, email, and message are all required." });
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(cleanEmail)) {
-    logSecurityEvent("FORM_SUBMISSION", clientIp, `Invalid email format submitted: ${cleanEmail}`, "warning");
-    return res.status(400).json({ error: "Please enter a valid email address." });
+  // Robust email validation & spam domain filtering (e.g. example.com, abc.com, etc.com, disposable addresses)
+  const emailValidation = validateInquiryEmail(rawEmail);
+  if (!emailValidation.isValid) {
+    logSecurityEvent(
+      "FORM_SUBMISSION",
+      clientIp,
+      `Rejected unwanted or invalid email: ${rawEmail} (${emailValidation.error})`,
+      "warning"
+    );
+    return res.status(400).json({
+      error: emailValidation.error || "Please enter a valid, legitimate email address.",
+      isUnwanted: emailValidation.isUnwanted,
+    });
   }
+
+  const cleanEmail = emailValidation.cleanEmail || rawEmail.toLowerCase();
 
   if (cleanMessage.length < 5) {
     return res.status(400).json({ error: "Message must be at least 5 characters long." });

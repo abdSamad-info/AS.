@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Mail, Phone, MapPin, Send, Github, Linkedin, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useState, FormEvent } from "react";
+import { validateClientEmail } from "../utils/emailValidator";
 
 export default function Contact() {
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
@@ -16,8 +17,9 @@ export default function Contact() {
       setAlertInfo({ type: "warning", msg: "Alert: Please enter your email address." });
       return false;
     }
-    if (!/\S+@\S+\.\S+/.test(formState.email)) {
-      setAlertInfo({ type: "warning", msg: "Alert: Please provide a valid email address." });
+    const emailCheck = validateClientEmail(formState.email);
+    if (!emailCheck.isValid) {
+      setAlertInfo({ type: "warning", msg: `Alert: ${emailCheck.error}` });
       return false;
     }
     if (!formState.message.trim()) {

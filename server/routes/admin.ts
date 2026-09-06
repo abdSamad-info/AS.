@@ -1,7 +1,7 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { authenticateAdmin } from "../middleware/auth.js";
-import { getClientIp } from "../middleware/security.js";
+import { getClientIp, getRateLimiterMetrics } from "../middleware/security.js";
 import { logSecurityEvent, inMemorySecurityLogs } from "../services/logger.js";
 import { safeDbQuery, getDatabaseStatus, inMemorySubmissions, deleteInMemorySubmission } from "../services/db.js";
 import { getTransporter, getResendClient, getResendFromAddress } from "../services/email.js";
@@ -79,8 +79,9 @@ router.get("/admin/system-status", authenticateAdmin, (req, res) => {
       type: dbStatus.type,
       status: dbStatus.status,
     },
+    rateLimiter: getRateLimiterMetrics(),
     security: {
-      rateLimiting: "Active (5 submissions / 15 min)",
+      rateLimiting: "Active (Robust Memory Store: 60 req/min API, 5 req/15min Contact)",
       cors: "Strict CORS Enabled",
       helmet: "Secure Headers Active",
       totalSubmissionsLogged: inMemorySubmissions.length,
