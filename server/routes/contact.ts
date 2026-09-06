@@ -2,7 +2,7 @@ import { Router } from "express";
 import { contactLimiter, getClientIp } from "../middleware/security.js";
 import { getTransporter, buildInquiryEmailHtml } from "../services/email.js";
 import { logSecurityEvent } from "../services/logger.js";
-import { getDbPool, inMemorySubmissions, type ContactSubmission } from "../services/db.js";
+import { safeDbQuery, inMemorySubmissions, type ContactSubmission } from "../services/db.js";
 import { PERSONAL_EMAIL } from "../config/env.js";
 
 const router = Router();
@@ -88,18 +88,11 @@ router.post("/contact", contactLimiter, async (req, res) => {
   inMemorySubmissions.unshift(submissionRecord);
   if (inMemorySubmissions.length > 100) inMemorySubmissions.pop();
 
-  // Store in PostgreSQL if pool is available
-  const pool = getDbPool();
-  if (pool) {
-    try {
-      await pool.query(
-        "INSERT INTO contacts (name, email, message, ip, user_agent, email_status) VALUES ($1, $2, $3, $4, $5, $6)",
-        [cleanName, cleanEmail, cleanMessage, clientIp, userAgent, emailStatus]
-      );
-    } catch (dbErr: any) {
-      console.error("[DATABASE] Failed to insert contact into Postgres:", dbErr.message);
-    }
-  }
+  // Store in PostgreSQL if available (with seamless in-memory fallback)
+  await safeDbQuery(
+    "INSERT INTO contacts (name, email, message, ip, user_agent, email_status) VALUES ($1, $2, $3, $4, $5, $6)",
+    [cleanName, cleanEmail, cleanMessage, clientIp, userAgent, emailStatus]
+  );
 
   if (emailStatus === "sent") {
     return res.json({

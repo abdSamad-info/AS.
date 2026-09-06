@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { authenticateAdmin } from "../middleware/auth.js";
 import { getClientIp } from "../middleware/security.js";
 import { logSecurityEvent, inMemorySecurityLogs } from "../services/logger.js";
-import { getDbPool, inMemorySubmissions, deleteInMemorySubmission } from "../services/db.js";
+import { safeDbQuery, getDatabaseStatus, inMemorySubmissions, deleteInMemorySubmission } from "../services/db.js";
 import { getTransporter } from "../services/email.js";
 import { ADMIN_PASSWORD, JWT_SECRET, PERSONAL_EMAIL } from "../config/env.js";
 
@@ -35,16 +35,11 @@ router.post("/admin/login", (req, res) => {
 
 // Admin Endpoint: View Logged Submissions & IP Addresses
 router.get("/admin/messages", authenticateAdmin, async (req, res) => {
-  const pool = getDbPool();
-  if (pool) {
-    try {
-      const result = await pool.query(
-        "SELECT id, name, email, message, ip, user_agent AS \"userAgent\", email_status AS \"emailStatus\", created_at AS \"createdAt\" FROM contacts ORDER BY id DESC LIMIT 100"
-      );
-      return res.json({ messages: result.rows });
-    } catch (err) {
-      console.error("DB Fetch Error:", err);
-    }
+  const rows = await safeDbQuery(
+    "SELECT id, name, email, message, ip, user_agent AS \"userAgent\", email_status AS \"emailStatus\", created_at AS \"createdAt\" FROM contacts ORDER BY id DESC LIMIT 100"
+  );
+  if (rows && rows.length > 0) {
+    return res.json({ messages: rows });
   }
   return res.json({ messages: inMemorySubmissions });
 });
@@ -52,13 +47,8 @@ router.get("/admin/messages", authenticateAdmin, async (req, res) => {
 // Admin Endpoint: Delete Message
 router.delete("/admin/messages/:id", authenticateAdmin, async (req, res) => {
   const id = req.params.id;
-  const pool = getDbPool();
-  if (pool && id) {
-    try {
-      await pool.query("DELETE FROM contacts WHERE id = $1", [id]);
-    } catch (err) {
-      console.error("DB Delete Error:", err);
-    }
+  if (id) {
+    await safeDbQuery("DELETE FROM contacts WHERE id = $1", [id]);
   }
   deleteInMemorySubmission(id);
   return res.json({ success: true, message: "Message deleted" });
@@ -68,7 +58,7 @@ router.delete("/admin/messages/:id", authenticateAdmin, async (req, res) => {
 router.get("/admin/system-status", authenticateAdmin, (req, res) => {
   const hasSmtpConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
   const uniqueIps = new Set(inMemorySubmissions.map((s) => s.ip)).size;
-  const pool = getDbPool();
+  const dbStatus = getDatabaseStatus();
 
   return res.json({
     status: "operational",
@@ -79,8 +69,9 @@ router.get("/admin/system-status", authenticateAdmin, (req, res) => {
       destinationEmail: PERSONAL_EMAIL,
     },
     database: {
-      connected: Boolean(pool),
-      type: pool ? "PostgreSQL" : "In-Memory Buffer",
+      connected: dbStatus.connected,
+      type: dbStatus.type,
+      status: dbStatus.status,
     },
     security: {
       rateLimiting: "Active (5 submissions / 15 min)",

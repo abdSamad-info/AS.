@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateCron } from "../middleware/auth.js";
 import { getClientIp } from "../middleware/security.js";
-import { getDbPool } from "../services/db.js";
+import { getDatabaseStatus } from "../services/db.js";
 import { imageCache, cacheHitCount, cacheMissCount } from "../services/cache.js";
 import { CRON_SECRET } from "../config/env.js";
 
@@ -66,20 +66,7 @@ router.get(["/health/ping", "/health/keep-alive", "/healthz"], authenticateCron,
  * GET /api/health
  */
 router.get("/health", authenticateCron, async (req, res) => {
-  const pool = getDbPool();
-  let dbStatus = "not_configured";
-  let dbLatencyMs: number | null = null;
-
-  if (pool) {
-    const start = Date.now();
-    try {
-      await pool.query("SELECT 1");
-      dbStatus = "connected";
-      dbLatencyMs = Date.now() - start;
-    } catch (err: any) {
-      dbStatus = "error: " + err.message;
-    }
-  }
+  const dbInfo = getDatabaseStatus();
 
   const mem = process.memoryUsage();
   const totalRequests = cacheHitCount + cacheMissCount;
@@ -101,9 +88,9 @@ router.get("/health", authenticateCron, async (req, res) => {
     },
     services: {
       database: {
-        type: pool ? "PostgreSQL" : "In-Memory Store",
-        status: dbStatus,
-        latencyMs: dbLatencyMs,
+        type: dbInfo.type,
+        status: dbInfo.status,
+        connected: dbInfo.connected,
       },
       imageBufferCache: {
         totalCachedAssets: imageCache.size,
