@@ -1,7 +1,10 @@
 import { motion, AnimatePresence } from "motion/react";
-import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock } from "lucide-react";
+import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock, Search } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
+import ProjectCardSkeleton from "./ProjectCardSkeleton";
+import ProjectAnalytics from "./ProjectAnalytics";
+import TechBadge from "./TechBadge";
 
 export interface ProjectItem {
   id: number;
@@ -26,6 +29,15 @@ export interface ProjectItem {
   distributionType?: string;
   downloadStatus?: "in_progress" | "available" | "pending";
   downloadPendingNotice?: string;
+}
+
+// Automated Read Time Estimator based on description, purpose, and architecture word count
+export function calculateProjectReadTime(project: ProjectItem): string {
+  const content = `${project.desc} ${project.purpose} ${project.longDesc || ""}`;
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  // Standard technical reading pace (~180 words per minute)
+  const minutes = Math.max(1, Math.ceil(words / 180));
+  return `${minutes} min read`;
 }
 
 const forgeDownloadUrl = import.meta.env.VITE_FORGE_DOWNLOAD_URL || "";
@@ -186,7 +198,24 @@ interface ProjectsProps {
 export default function Projects({ onModalStateChange }: ProjectsProps) {
   const [projectList, setProjectList] = useState<ProjectItem[]>(initialProjects);
   const [activeFilter, setActiveFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+
+  // Initial load simulation for custom skeleton screen with skeleton-shimmer
+  useEffect(() => {
+    let isMounted = true;
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        setIsLoading(false);
+      }
+    }, 600);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, []);
 
   // Auto-detect Forge download availability dynamically from backend environment
   useEffect(() => {
@@ -269,10 +298,31 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
 
   const categories = ["All", "Shopify", "Desktop App", "Full Stack", "Backend / API"];
 
+  // Real-time filtering by technology or title and active category
   const filteredProjects = useMemo(() => {
-    if (activeFilter === "All") return projectList;
-    return projectList.filter(p => p.category === activeFilter || p.tech.some(t => t.toLowerCase().includes(activeFilter.toLowerCase())));
-  }, [activeFilter, projectList]);
+    const query = searchQuery.trim().toLowerCase();
+
+    return projectList.filter((project) => {
+      // 1. Category Filter Check
+      const matchesCategory =
+        activeFilter === "All" ||
+        project.category === activeFilter ||
+        project.tech.some((t) => t.toLowerCase().includes(activeFilter.toLowerCase()));
+
+      if (!matchesCategory) return false;
+
+      // 2. Real-time Search Query Check (title, subtitle, purpose, and technology tags)
+      if (!query) return true;
+
+      const matchesTitle = project.title.toLowerCase().includes(query);
+      const matchesSubtitle = project.subtitle.toLowerCase().includes(query);
+      const matchesCategoryName = project.category.toLowerCase().includes(query);
+      const matchesTech = project.tech.some((t) => t.toLowerCase().includes(query));
+      const matchesPurpose = project.purpose.toLowerCase().includes(query);
+
+      return matchesTitle || matchesSubtitle || matchesTech || matchesCategoryName || matchesPurpose;
+    });
+  }, [activeFilter, projectList, searchQuery]);
 
   return (
     <section id="projects" aria-labelledby="projects-heading" className="py-24 relative">
@@ -283,7 +333,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
         >
           <div>
             <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
@@ -299,193 +349,297 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
           </p>
         </motion.div>
 
-        {/* Filter Bar */}
-        <div className="flex flex-wrap items-center gap-3 mb-12 border-b border-white/10 pb-6">
-          <div className="flex items-center gap-2 text-accent mr-3">
-            <Filter size={14} />
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Filter:</span>
-          </div>
-          <div role="tablist" aria-label="Project categories" className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                role="tab"
-                aria-selected={activeFilter === cat}
-                tabIndex={0}
-                onClick={() => handleFilterChange(cat)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleFilterChange(cat);
-                  }
-                }}
-                className={`relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent ${
-                  activeFilter === cat
-                    ? "bg-accent text-white shadow-[0_0_15px_rgba(61,90,254,0.4)]"
-                    : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Real-Time Search & Category Filter Controls */}
+        <div className="flex flex-col gap-6 mb-12 border-b border-white/10 pb-8">
+          {/* Top Row: Real-Time Search Bar & Match Counter */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="relative flex-1 max-w-xl">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Filter by technology (e.g. TypeScript, Shopify) or title..."
+                aria-label="Search projects by technology or title"
+                className="w-full pl-11 pr-24 py-3 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 focus:border-accent text-sm text-white placeholder:text-slate-500 transition-all outline-none focus:ring-2 focus:ring-accent/40"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                    title="Clear search"
+                    aria-label="Clear search"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-400">
+                  {filteredProjects.length} {filteredProjects.length === 1 ? "match" : "matches"}
+                </span>
+              </div>
+            </div>
 
-        {/* Project Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          <AnimatePresence mode="popLayout">
-            {filteredProjects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  role="button"
+            {/* Quick Tech Tag Filters */}
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-400">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">Quick:</span>
+              {["TypeScript", "React", "Shopify", "Node.js", "Electron"].map((quickTech) => {
+                const isActive = searchQuery.toLowerCase() === quickTech.toLowerCase();
+                return (
+                  <button
+                    key={quickTech}
+                    onClick={() => setSearchQuery(isActive ? "" : quickTech)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-mono border transition-all ${
+                      isActive
+                        ? "bg-accent/20 text-accent border-accent/40 shadow-sm"
+                        : "bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20 hover:text-white"
+                    }`}
+                  >
+                    {quickTech}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 text-accent mr-1">
+              <Filter size={14} />
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Category:</span>
+            </div>
+            <div role="tablist" aria-label="Project categories" className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  role="tab"
+                  aria-selected={activeFilter === cat}
                   tabIndex={0}
-                  aria-haspopup="dialog"
-                  aria-label={`View architectural details for ${project.title}: ${project.subtitle}`}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 15 }}
-                  transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
-                  onClick={() => setSelectedProject(project)}
+                  onClick={() => handleFilterChange(cat)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setSelectedProject(project);
+                      handleFilterChange(cat);
                     }
                   }}
-                  className="group glass p-6 sm:p-7 rounded-3xl border-white/10 hover:border-accent/40 hover:bg-white/[0.04] focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-lg hover:shadow-[0_10px_30px_rgba(61,90,254,0.15)]"
+                  className={`relative text-xs font-semibold px-4 py-2 rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-accent ${
+                    activeFilter === cat
+                      ? "bg-accent text-white shadow-[0_0_15px_rgba(61,90,254,0.4)]"
+                      : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5"
+                  }`}
                 >
-                  {/* Top Badge & Index */}
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest flex items-center gap-1.5">
-                        {project.category === "Desktop App" && <Laptop size={12} className="text-accent" />}
-                        0{index + 1} // {project.category}
-                      </span>
-                      {project.badge && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-mono font-medium text-accent">
-                          {project.badge}
-                        </span>
-                      )}
-                    </div>
-
-                    <h4 className="text-2xl font-bold text-white mb-1 group-hover:text-accent transition-colors">
-                      {project.title}
-                    </h4>
-                    <p className="text-xs font-mono text-slate-400 mb-4">
-                      {project.subtitle}
-                    </p>
-
-                    {/* Project Visual Preview */}
-                    {project.image && (
-                      <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
-                        <img
-                          src={project.image}
-                          alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
-                          onError={(e) => {
-                            const target = e.currentTarget;
-                            if (project.image && project.image.startsWith("/api/images/")) {
-                              const filename = project.image.replace("/api/images/", "");
-                              target.src = `/images/${filename}`;
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
-                      </div>
-                    )}
-
-                    {/* Purpose Summary Box */}
-                    <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-5 group-hover:border-accent/20 transition-colors">
-                      <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent mb-1 flex items-center gap-1.5">
-                        <Sparkles size={11} /> Purpose & Applicability
-                      </p>
-                      <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                        {project.purpose}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Tech Badges & Details Link */}
-                  <div>
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                      {project.tech.slice(0, 4).map((t) => (
-                        <span
-                          key={t}
-                          className="px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/5 text-[10px] font-mono text-slate-300"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                      {project.tech.length > 4 && (
-                        <span className="px-2.5 py-1 rounded-lg bg-white/[0.03] text-[10px] font-mono text-text-dim">
-                          +{project.tech.length - 4} more
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
-                        {project.github && (
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
-                            title="GitHub Repository"
-                            aria-label={`${project.title} GitHub Repository`}
-                          >
-                            <Github size={14} />
-                          </a>
-                        )}
-                        {project.downloadStatus === "in_progress" && !project.downloadUrl ? (
-                          <span
-                            className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-300 flex items-center gap-1.5"
-                            title="Download link is pending and will be available shortly"
-                          >
-                            <Clock size={11} className="text-amber-400" />
-                            <span>In Progress</span>
-                          </span>
-                        ) : project.downloadUrl ? (
-                          <a
-                            href={project.downloadUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center text-accent hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
-                            title="Download Desktop Software (.exe)"
-                            aria-label={`${project.title} Download Installer`}
-                          >
-                            <Download size={14} />
-                          </a>
-                        ) : project.link ? (
-                          <a
-                            href={project.link}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
-                            title="Live Demo"
-                            aria-label={`${project.title} Live Demo`}
-                          >
-                            <ExternalLink size={14} />
-                          </a>
-                        ) : null}
-                      </div>
-
-                      <button 
-                        tabIndex={-1} 
-                        className="text-xs font-bold text-accent group-hover:text-white flex items-center gap-1.5 transition-colors"
-                      >
-                        <span>View Architecture</span>
-                        <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                  {cat}
+                </button>
               ))}
-            </AnimatePresence>
+            </div>
           </div>
         </div>
+
+        {/* Project Cards Grid with Skeleton Screen Support */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <ProjectCardSkeleton key={idx} />
+            ))}
+          </div>
+        ) : filteredProjects.length === 0 ? (
+          /* Empty Search Results State */
+          <div className="py-16 px-6 rounded-3xl glass border border-white/10 text-center flex flex-col items-center justify-center max-w-lg mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 mb-4">
+              <Search size={22} />
+            </div>
+            <h4 className="text-lg font-bold text-white mb-1">No matching projects found</h4>
+            <p className="text-xs text-slate-400 mb-5 leading-relaxed">
+              No projects matched your search for <span className="text-accent font-semibold">"{searchQuery}"</span> under the {activeFilter} filter.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setActiveFilter("All");
+              }}
+              className="px-4 py-2 rounded-xl bg-accent hover:bg-accent/90 text-white text-xs font-semibold flex items-center gap-2 transition-colors"
+            >
+              <X size={14} />
+              <span>Reset Search & Filters</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <AnimatePresence mode="popLayout">
+              {filteredProjects.map((project, index) => {
+                const readTime = calculateProjectReadTime(project);
+
+                return (
+                  <motion.div
+                    key={project.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-haspopup="dialog"
+                    aria-label={`View architectural details for ${project.title}: ${project.subtitle}`}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 15 }}
+                    transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.05 }}
+                    onClick={() => setSelectedProject(project)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedProject(project);
+                      }
+                    }}
+                    className="group glass p-6 sm:p-7 rounded-3xl border-white/10 hover:border-accent/40 hover:bg-white/[0.04] focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-lg hover:shadow-[0_10px_30px_rgba(61,90,254,0.15)]"
+                  >
+                    {/* Top Badge, Category & Read Time Estimator */}
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-4">
+                        <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest flex items-center gap-1.5">
+                          {project.category === "Desktop App" && <Laptop size={12} className="text-accent" />}
+                          0{index + 1} // {project.category}
+                        </span>
+                        {project.badge && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-accent/15 border border-accent/30 text-[10px] font-mono font-medium text-accent">
+                            {project.badge}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Project Title & Automated Read Time Label */}
+                      <div className="flex items-baseline justify-between gap-2 mb-1">
+                        <h4 className="text-2xl font-bold text-white group-hover:text-accent transition-colors">
+                          {project.title}
+                        </h4>
+                        <span
+                          className="text-[11px] font-mono text-slate-400 font-normal shrink-0 flex items-center gap-1"
+                          title={`Estimated read time (${readTime}) based on description word count`}
+                        >
+                          <Clock size={11} className="text-slate-400/80" />
+                          <span>{readTime}</span>
+                        </span>
+                      </div>
+
+                      <p className="text-xs font-mono text-slate-400 mb-4">
+                        {project.subtitle}
+                      </p>
+
+                      {/* Project Visual Preview */}
+                      {project.image && (
+                        <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
+                          <img
+                            src={project.image}
+                            alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                            onError={(e) => {
+                              const target = e.currentTarget;
+                              if (project.image && project.image.startsWith("/api/images/")) {
+                                const filename = project.image.replace("/api/images/", "");
+                                target.src = `/images/${filename}`;
+                              }
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                        </div>
+                      )}
+
+                      {/* Purpose Summary Box */}
+                      <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 mb-4 group-hover:border-accent/20 transition-colors">
+                        <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent mb-1 flex items-center gap-1.5">
+                          <Sparkles size={11} /> Purpose & Applicability
+                        </p>
+                        <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                          {project.purpose}
+                        </p>
+                      </div>
+
+                      {/* Repository Analytics Glassmorphic Card */}
+                      <ProjectAnalytics
+                        projectId={project.id}
+                        projectTitle={project.title}
+                        githubUrl={project.github}
+                        isProduction={project.isProduction}
+                        category={project.category}
+                      />
+                    </div>
+
+                    {/* Dynamic Language Highlighter & Action Links */}
+                    <div>
+                      {/* Pill-shaped Color-Coded Tech Badges */}
+                      <div className="flex flex-wrap gap-1.5 mb-5">
+                        {project.tech.slice(0, 4).map((t) => (
+                          <TechBadge key={t} tag={t} />
+                        ))}
+                        {project.tech.length > 4 && (
+                          <span className="px-2.5 py-0.5 rounded-full bg-white/[0.03] border border-white/10 text-[10px] font-mono text-slate-400">
+                            +{project.tech.length - 4} more
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-2.5" onClick={(e) => e.stopPropagation()}>
+                          {project.github && (
+                            <a
+                              href={project.github}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                              title="GitHub Repository"
+                              aria-label={`${project.title} GitHub Repository`}
+                            >
+                              <Github size={14} />
+                            </a>
+                          )}
+                          {project.downloadStatus === "in_progress" && !project.downloadUrl ? (
+                            <span
+                              className="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[10px] font-mono text-amber-300 flex items-center gap-1.5"
+                              title="Download link is pending and will be available shortly"
+                            >
+                              <Clock size={11} className="text-amber-400" />
+                              <span>In Progress</span>
+                            </span>
+                          ) : project.downloadUrl ? (
+                            <a
+                              href={project.downloadUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="w-8 h-8 rounded-lg bg-accent/20 border border-accent/40 flex items-center justify-center text-accent hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                              title="Download Desktop Software (.exe)"
+                              aria-label={`${project.title} Download Installer`}
+                            >
+                              <Download size={14} />
+                            </a>
+                          ) : project.link ? (
+                            <a
+                              href={project.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:text-white hover:bg-accent hover:border-accent transition-all focus-visible:ring-2 focus-visible:ring-accent"
+                              title="Live Demo"
+                              aria-label={`${project.title} Live Demo`}
+                            >
+                              <ExternalLink size={14} />
+                            </a>
+                          ) : null}
+                        </div>
+
+                        <button 
+                          tabIndex={-1} 
+                          className="text-xs font-bold text-accent group-hover:text-white flex items-center gap-1.5 transition-colors"
+                        >
+                          <span>View Architecture</span>
+                          <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
 
       {/* Project Detail Modal - Viewport-Safe on Mobile & Desktop Rendered at Body Level */}
       {typeof document !== "undefined" &&
@@ -528,7 +682,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         {selectedProject.category === "Desktop App" ? <Laptop size={18} /> : <Layers size={18} />}
                       </div>
                       <div>
-                        <h3 id="project-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">{selectedProject.title}</h3>
+                        <div className="flex items-center gap-2.5">
+                          <h3 id="project-modal-title" className="text-base sm:text-lg font-bold text-white tracking-tight">{selectedProject.title}</h3>
+                          <span className="text-[11px] font-mono text-slate-400 font-normal flex items-center gap-1">
+                            <Clock size={11} className="text-slate-400/80" />
+                            {calculateProjectReadTime(selectedProject)}
+                          </span>
+                        </div>
                         <p className="text-[11px] sm:text-xs font-mono text-text-dim">{selectedProject.subtitle}</p>
                       </div>
                     </div>
@@ -617,6 +777,15 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                       </div>
                     )}
 
+                    {/* Repository Analytics Glassmorphic Card */}
+                    <ProjectAnalytics
+                      projectId={selectedProject.id}
+                      projectTitle={selectedProject.title}
+                      githubUrl={selectedProject.github}
+                      isProduction={selectedProject.isProduction}
+                      category={selectedProject.category}
+                    />
+
                     {/* 1. Purpose & Real-World Applicability */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5">
@@ -674,12 +843,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                       </h5>
                       <div className="flex flex-wrap gap-2">
                         {selectedProject.tech.map((t) => (
-                          <span
-                            key={t}
-                            className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono font-medium text-slate-200"
-                          >
-                            {t}
-                          </span>
+                          <TechBadge key={t} tag={t} size="md" />
                         ))}
                       </div>
                     </div>
