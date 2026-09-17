@@ -30,11 +30,11 @@ export default function Hero({ onOpenResume }: HeroProps) {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 font-medium max-w-2xl mx-auto mb-4 tracking-tight">
-            Engineering production web applications with Node.js, Express, React, TypeScript, PostgreSQL, MongoDB & Google Cloud Platform.
+            Engineering production web applications using Node.js, Express, React, TypeScript, PostgreSQL, MongoDB, Google Cloud Platform.
           </p>
 
           <p className="max-w-2xl mx-auto text-xs sm:text-sm text-text-dim mb-10 leading-relaxed font-normal px-4">
-            Actively engineering REST & GraphQL APIs on a daily basis — profiling query latency, reducing server load, handling concurrency, and developing custom Shopify merchant backends.
+            Working on REST and GraphQL APIs daily, optimizing query latency, decreasing server load, managing concurrency and developing custom Shopify merchant backends.
           </p>
 
           {/* Action Callouts */}

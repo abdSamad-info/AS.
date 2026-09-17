@@ -180,13 +180,13 @@ export default function About({ onOpenResume }: AboutProps) {
 
             <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal mb-8">
               <p>
-                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of active production experience engineering high-performance web applications and merchant backends. On a regular daily basis, my core responsibilities focus on <strong className="text-white">engineering performant REST & GraphQL APIs, profiling execution latency, cutting server load, and handling concurrent throughput spikes</strong>.
+                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of active production experience engineering high-performance web applications and merchant backends. On a daily basis, my core responsibilities focus on <strong className="text-white">engineering performant REST & GraphQL APIs, profiling execution latency, cutting server load, and handling concurrent throughput spikes</strong>.
               </p>
               <p>
-                Working at <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada · Remote"})</span>, I regularly develop and maintain production-critical systems — including Shopify embedded applications (App Bridge & GraphQL Admin APIs), custom optical pricing calculation engines, Google Cloud Storage secure file pipelines, and automated webhook lifecycle handlers.
+                At work, at the <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada (Remote)"})</span>, I regularly develop and maintain production-critical systems — including Shopify embedded applications (App Bridge & GraphQL Admin APIs), custom optical pricing calculation engines, Google Cloud Storage secure file pipelines, and automated webhook lifecycle handlers.
               </p>
               <p>
-                My day-to-day workflow revolves around active performance gains: fine-tuning database indexing, reducing memory footprint, implementing airtight session authentication (OAuth 2.0, JWT, HttpOnly cookies), and deploying production workloads with automated health monitoring.
+                As a developer, I constantly work on active performance gains: fine-tuning database indexing, reducing memory footprint, implementing airtight session authentication (OAuth 2.0, JWT, HttpOnly cookies), and production workloads with automated health monitoring.
               </p>
             </div>
 
