@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateCron } from "../middleware/auth.js";
 import { getClientIp } from "../middleware/security.js";
-import { getDatabaseStatus } from "../services/db.js";
+import { checkDatabaseHealthLive, getDatabaseStatus } from "../services/db.js";
 import { imageCache, cacheHitCount, cacheMissCount } from "../services/cache.js";
 import { CRON_SECRET } from "../config/env.js";
 
@@ -24,6 +24,9 @@ function formatUptime(seconds: number): string {
 let keepAlivePingCount = 0;
 let lastPingAt: string | null = null;
 let lastPingIp: string | null = null;
+
+let cronCheckCount = 0;
+let lastCronCheckAt: string | null = null;
 
 /**
  * 1. Cloud Scheduler Keep-Alive Endpoint
@@ -62,54 +65,71 @@ router.get(["/health/ping", "/health/keep-alive", "/healthz"], authenticateCron,
 });
 
 /**
- * 2. Full System Health & Diagnostics Endpoint
- * GET /api/health
+ * 2. Dedicated Secure Health Check for Cron (every 15 min or 1 hour)
+ * GET /api/health/cron or /api/cron/health or /api/health
+ * 
+ * Secure endpoint: Only accessible with valid secret (via 'x-cron-secret' header,
+ * 'Authorization: Bearer <secret>', or '?secret=<secret>' query param).
+ * Checks:
+ * - Live Database health (active query test with latency in ms)
+ * - Memory usage & System uptime
+ * - Active services (Resend, Cache)
+ * - Designed for easy invocation via curl and cloud cron jobs
  */
-router.get("/health", authenticateCron, async (req, res) => {
-  const dbInfo = getDatabaseStatus();
+router.get(["/health/cron", "/cron/health", "/health"], authenticateCron, async (req, res) => {
+  const clientIp = getClientIp(req);
+  cronCheckCount++;
+  lastCronCheckAt = new Date().toISOString();
+
+  // Perform live query check against the database
+  const liveDbCheck = await checkDatabaseHealthLive();
 
   const mem = process.memoryUsage();
   const totalRequests = cacheHitCount + cacheMissCount;
   const hitRatio = totalRequests > 0 ? ((cacheHitCount / totalRequests) * 100).toFixed(1) + "%" : "100%";
 
+  const overallStatus = liveDbCheck.healthy ? "healthy" : "degraded";
+
   return res.status(200).json({
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    uptime: {
-      seconds: Math.floor(process.uptime()),
-      formatted: formatUptime(process.uptime()),
+    status: overallStatus,
+    timestamp: lastCronCheckAt,
+    cronCheck: {
+      checkCount: cronCheckCount,
+      lastCheckedAt: lastCronCheckAt,
+      callerIp: clientIp,
+      recommendedSchedule: "Every 15 minutes (*/15 * * * *) or 1 hour (0 * * * *)",
+      authMethod: CRON_SECRET ? "Protected with CRON_SECRET" : "Permissive (unconfigured secret)",
+      curlUsage: "curl -s -H 'x-cron-secret: <CRON_SECRET>' https://abdsamad.online/api/health/cron",
     },
-    cloudScheduler: {
-      compatible: true,
-      pingCount: keepAlivePingCount,
-      lastPingAt,
-      lastPingIp,
-      authMode: CRON_SECRET ? "Strict (CRON_SECRET enforced)" : "Permissive (CRON_SECRET recommended for production)",
+    database: {
+      type: liveDbCheck.type,
+      status: liveDbCheck.status,
+      connected: liveDbCheck.connected,
+      healthy: liveDbCheck.healthy,
+      latencyMs: liveDbCheck.latencyMs,
+      fallbackMode: liveDbCheck.fallbackMode || null,
+      error: liveDbCheck.error || null,
+    },
+    system: {
+      uptimeSeconds: Math.floor(process.uptime()),
+      uptimeFormatted: formatUptime(process.uptime()),
+      memory: {
+        rss: (mem.rss / 1024 / 1024).toFixed(2) + " MB",
+        heapTotal: (mem.heapTotal / 1024 / 1024).toFixed(2) + " MB",
+        heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(2) + " MB",
+      },
     },
     services: {
-      database: {
-        type: dbInfo.type,
-        status: dbInfo.status,
-        connected: dbInfo.connected,
-      },
-      imageBufferCache: {
-        totalCachedAssets: imageCache.size,
-        hits: cacheHitCount,
-        misses: cacheMissCount,
-        hitRatio,
-      },
-      smtpEmail: {
-        configured: Boolean(process.env.EMAIL_USER && (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD)),
-        senderUser: process.env.EMAIL_USER || "Not configured",
-      },
       resendEmail: {
         configured: Boolean(process.env.RESEND_API_KEY),
       },
-    },
-    memory: {
-      rss: (mem.rss / 1024 / 1024).toFixed(2) + " MB",
-      heapTotal: (mem.heapTotal / 1024 / 1024).toFixed(2) + " MB",
-      heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(2) + " MB",
+      smtpEmail: {
+        configured: Boolean(process.env.EMAIL_USER && (process.env.EMAIL_PASS || process.env.EMAIL_PASSWORD)),
+      },
+      imageCache: {
+        totalCachedAssets: imageCache.size,
+        hitRatio,
+      },
     },
   });
 });

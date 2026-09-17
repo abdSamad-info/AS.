@@ -24,6 +24,11 @@ import {
   ExternalLink,
   User,
   Terminal,
+  Briefcase,
+  GraduationCap,
+  Save,
+  Edit3,
+  Layers,
 } from "lucide-react";
 
 interface AdminModalProps {
@@ -80,6 +85,27 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
 
+  // Active navigation tab inside Admin Dashboard
+  const [activeTab, setActiveTab] = useState<"inquiries" | "profile" | "system">("inquiries");
+
+  // Profile and Experience Editor State
+  const [profileData, setProfileData] = useState({
+    experienceYears: "1.5+",
+    startDate: "2025-05-01",
+    currentRole: "Full Stack Developer",
+    currentCompany: "Glacier Agency",
+    location: "Toronto, Canada (Remote)",
+    period: "May 2025 – Present",
+    bullet1: "Architect and maintain production-grade Shopify apps with Node.js, Express, React, TypeScript, and PostgreSQL.",
+    bullet2: "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments.",
+    degree: "BS in Computer Science",
+    eduPeriod: "2020 – 2023",
+    institution: "University of Sindh, Jamshoro",
+    grade: "CGPA: 3.1 / 4.0",
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSuccessMsg, setProfileSuccessMsg] = useState("");
+
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "sent" | "logged">("all");
@@ -105,13 +131,86 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose, selectedMessage]);
 
-  // Load messages and system health when authenticated
+  // Load messages, system health, and profile config when authenticated
   useEffect(() => {
     if (isOpen && token) {
       fetchMessages(token);
       fetchSystemStatus(token);
+      fetchProfileConfig();
     }
   }, [isOpen, token]);
+
+  const fetchProfileConfig = async () => {
+    try {
+      const res = await fetch("/api/profile-config");
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setProfileData({
+            experienceYears: data.experienceYears || "1.5+",
+            startDate: data.startDate || "2025-05-01",
+            currentRole: data.currentRole || "Full Stack Developer",
+            currentCompany: data.currentCompany || "Glacier Agency",
+            location: data.location || "Toronto, Canada (Remote)",
+            period: data.period || "May 2025 – Present",
+            bullet1: data.experienceBullets?.[0] || "",
+            bullet2: data.experienceBullets?.[1] || "",
+            degree: data.education?.degree || "BS in Computer Science",
+            eduPeriod: data.education?.period || "2020 – 2023",
+            institution: data.education?.institution || "University of Sindh, Jamshoro",
+            grade: data.education?.grade || "CGPA: 3.1 / 4.0",
+          });
+        }
+      }
+    } catch {}
+  };
+
+  const handleSaveProfile = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setSavingProfile(true);
+    setProfileSuccessMsg("");
+    try {
+      const payload = {
+        experienceYears: profileData.experienceYears,
+        startDate: profileData.startDate,
+        currentRole: profileData.currentRole,
+        currentCompany: profileData.currentCompany,
+        location: profileData.location,
+        period: profileData.period,
+        experienceBullets: [profileData.bullet1, profileData.bullet2].filter(Boolean),
+        education: {
+          degree: profileData.degree,
+          period: profileData.eduPeriod,
+          institution: profileData.institution,
+          grade: profileData.grade,
+        },
+      };
+
+      const res = await fetch("/api/admin/profile-config", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        localStorage.setItem("portfolio_profile_config", JSON.stringify(payload));
+        window.dispatchEvent(new CustomEvent("portfolio-profile-updated", { detail: payload }));
+        setProfileSuccessMsg("Profile & experience updated successfully! Live on portfolio.");
+        setTimeout(() => setProfileSuccessMsg(""), 5000);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setProfileSuccessMsg(err.error || "Failed to update profile config.");
+      }
+    } catch {
+      setProfileSuccessMsg("Network error saving profile.");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const fetchMessages = async (authToken: string) => {
     setLoadingMessages(true);
@@ -362,241 +461,641 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
         ) : (
           /* Enhanced Dashboard */
           <div className="w-full space-y-6 py-4">
-            {/* System Status Overview Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Resend Card */}
-              <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                  <Mail size={18} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white">Resend Dispatch</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {systemStatus?.resend?.senderFrom || "contact@abdsamad.online"}
-                  </p>
-                  <p className="text-[10px] text-emerald-400/90 font-mono mt-1">
-                    Verified Domain Active
-                  </p>
-                </div>
-              </div>
-
-              {/* Database Card */}
-              <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-                  <Database size={18} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white">Database Store</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {systemStatus?.database?.type || "PostgreSQL Pool"}
-                  </p>
-                  <p className="text-[10px] text-blue-400/90 font-mono mt-1">
-                    {systemStatus?.database?.connected ? "Online & Synced" : "Connected"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Rate Limiter Card */}
-              <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-                  <ShieldCheck size={18} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white">IP Rate Limiter</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    Robust In-Memory Store
-                  </p>
-                  <p className="text-[10px] text-purple-400/90 font-mono mt-1">
-                    Headers: X-RateLimit Active
-                  </p>
-                </div>
-              </div>
-
-              {/* Inquiries Count Card */}
-              <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
-                <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20 text-accent">
-                  <Server size={18} />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-white">Inbound Messages</span>
-                  </div>
-                  <p className="text-lg font-bold text-white font-mono leading-none mt-1">
+            {/* Top Navigation Tabs */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 p-1 rounded-2xl">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("inquiries")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    activeTab === "inquiries"
+                      ? "bg-accent text-white shadow-lg"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Mail size={14} />
+                  <span>Inbound Inquiries</span>
+                  <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold ${
+                    activeTab === "inquiries" ? "bg-white/20 text-white" : "bg-white/10 text-slate-300"
+                  }`}>
                     {messages.length}
-                  </p>
-                  <p className="text-[10px] text-slate-400 mt-1">
-                    Audit logs captured
-                  </p>
-                </div>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("profile")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    activeTab === "profile"
+                      ? "bg-accent text-white shadow-lg"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Briefcase size={14} />
+                  <span>Experience & Profile Editor</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("system")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                    activeTab === "system"
+                      ? "bg-accent text-white shadow-lg"
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <ShieldCheck size={14} />
+                  <span>System Diagnostics</span>
+                </button>
+              </div>
+
+              {/* Status Indicator */}
+              <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Console Active</span>
               </div>
             </div>
 
-            {/* Filter & Search Bar */}
-            <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-              {/* Search */}
-              <div className="relative w-full sm:w-80">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search sender, email, or message..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-accent transition-colors font-sans"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                  >
-                    <X size={12} />
-                  </button>
+            {/* TAB 1: Inbound Messages */}
+            {activeTab === "inquiries" && (
+              <div className="space-y-4">
+                {/* Search & Filter Bar */}
+                <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  {/* Search */}
+                  <div className="relative w-full sm:w-80">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Search sender, email, or message..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-accent transition-colors font-sans"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Status Filter Tabs */}
+                  <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
+                    <button
+                      onClick={() => setStatusFilter("all")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                        statusFilter === "all"
+                          ? "bg-accent text-white"
+                          : "bg-white/5 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      All ({messages.length})
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter("sent")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                        statusFilter === "sent"
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                          : "bg-white/5 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Delivered ({messages.filter((m) => m.emailStatus === "sent").length})
+                    </button>
+                    <button
+                      onClick={() => setStatusFilter("logged")}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
+                        statusFilter === "logged"
+                          ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                          : "bg-white/5 text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Logged/Pending ({messages.filter((m) => m.emailStatus !== "sent").length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Inquiries List */}
+                {loadingMessages ? (
+                  <div className="text-center py-20 bg-[#0c0e17] border border-white/10 rounded-3xl">
+                    <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-accent" />
+                    <p className="text-xs text-slate-400">Loading submitted inquiries from database...</p>
+                  </div>
+                ) : filteredMessages.length === 0 ? (
+                  <div className="text-center py-16 bg-[#0c0e17] border border-white/10 rounded-3xl p-8">
+                    <Mail size={36} className="mx-auto mb-4 text-slate-500" />
+                    <h3 className="text-base font-semibold text-white mb-1">
+                      {searchQuery || statusFilter !== "all" ? "No Matching Inquiries Found" : "No Inquiries Yet"}
+                    </h3>
+                    <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                      {searchQuery || statusFilter !== "all"
+                        ? "Try clearing your search filters to see all recorded submissions."
+                        : "Form submissions will automatically appear here with client IP traces, Resend status, and message content."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredMessages.map((item) => {
+                      const isDelivered = item.emailStatus === "sent";
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => setSelectedMessage(item)}
+                          className="p-5 bg-[#0c0e17] border border-white/10 hover:border-accent/40 rounded-2xl transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        >
+                          {/* Left Details */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                              <h4 className="font-bold text-white text-sm group-hover:text-accent transition-colors">
+                                {item.name}
+                              </h4>
+                              <span className="text-xs text-slate-400 font-mono">
+                                &lt;{item.email}&gt;
+                              </span>
+                              {/* Status Badge */}
+                              {isDelivered ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-400">
+                                  <CheckCircle2 size={10} />
+                                  Delivered via Resend
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
+                                  <Database size={10} />
+                                  Database Logged
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Snippet */}
+                            <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                              {item.message}
+                            </p>
+
+                            {/* Metadata line */}
+                            <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-500 font-mono flex-wrap">
+                              <span className="flex items-center gap-1">
+                                <Clock size={11} />
+                                {item.createdAt ? new Date(item.createdAt).toLocaleString() : "Recently"}
+                              </span>
+                              {item.ip && (
+                                <span className="flex items-center gap-1">
+                                  <Globe size={11} />
+                                  IP: {item.ip}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Right Action: Click to inspect details */}
+                          <div className="flex items-center gap-2 self-end sm:self-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedMessage(item);
+                              }}
+                              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-accent hover:text-white border border-white/10 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1"
+                            >
+                              <span>View Details</span>
+                              <ChevronRight size={14} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteMessage(item.id);
+                              }}
+                              disabled={deletingId === item.id}
+                              className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
+                              title="Delete inquiry"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
+            )}
 
-              {/* Status Filter Tabs */}
-              <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
-                <button
-                  onClick={() => setStatusFilter("all")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                    statusFilter === "all"
-                      ? "bg-accent text-white"
-                      : "bg-white/5 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  All ({messages.length})
-                </button>
-                <button
-                  onClick={() => setStatusFilter("sent")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                    statusFilter === "sent"
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      : "bg-white/5 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  Delivered ({messages.filter((m) => m.emailStatus === "sent").length})
-                </button>
-                <button
-                  onClick={() => setStatusFilter("logged")}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${
-                    statusFilter === "logged"
-                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                      : "bg-white/5 text-slate-400 hover:text-white"
-                  }`}
-                >
-                  Logged/Pending ({messages.filter((m) => m.emailStatus !== "sent").length})
-                </button>
-              </div>
-            </div>
-
-            {/* Inquiries List */}
-            {loadingMessages ? (
-              <div className="text-center py-20 bg-[#0c0e17] border border-white/10 rounded-3xl">
-                <RefreshCw size={24} className="animate-spin mx-auto mb-3 text-accent" />
-                <p className="text-xs text-slate-400">Loading submitted inquiries from database...</p>
-              </div>
-            ) : filteredMessages.length === 0 ? (
-              <div className="text-center py-16 bg-[#0c0e17] border border-white/10 rounded-3xl p-8">
-                <Mail size={36} className="mx-auto mb-4 text-slate-500" />
-                <h3 className="text-base font-semibold text-white mb-1">
-                  {searchQuery || statusFilter !== "all" ? "No Matching Inquiries Found" : "No Inquiries Yet"}
-                </h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  {searchQuery || statusFilter !== "all"
-                    ? "Try clearing your search filters to see all recorded submissions."
-                    : "Form submissions will automatically appear here with client IP traces, Resend status, and message content."}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredMessages.map((item) => {
-                  const isDelivered = item.emailStatus === "sent";
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => setSelectedMessage(item)}
-                      className="p-5 bg-[#0c0e17] border border-white/10 hover:border-accent/40 rounded-2xl transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                    >
-                      {/* Left Details */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <h4 className="font-bold text-white text-sm group-hover:text-accent transition-colors">
-                            {item.name}
-                          </h4>
-                          <span className="text-xs text-slate-400 font-mono">
-                            &lt;{item.email}&gt;
-                          </span>
-                          {/* Status Badge */}
-                          {isDelivered ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-400">
-                              <CheckCircle2 size={10} />
-                              Delivered via Resend
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-semibold text-blue-400">
-                              <Database size={10} />
-                              Database Logged
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Snippet */}
-                        <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
-                          {item.message}
-                        </p>
-
-                        {/* Metadata line */}
-                        <div className="flex items-center gap-3 mt-2 text-[11px] text-slate-500 font-mono flex-wrap">
-                          <span className="flex items-center gap-1">
-                            <Clock size={11} />
-                            {item.createdAt ? new Date(item.createdAt).toLocaleString() : "Recently"}
-                          </span>
-                          {item.ip && (
-                            <span className="flex items-center gap-1">
-                              <Globe size={11} />
-                              IP: {item.ip}
-                            </span>
-                          )}
-                        </div>
+            {/* TAB 2: Profile & Experience Editor */}
+            {activeTab === "profile" && (
+              <div className="space-y-6">
+                <div className="bg-[#0c0e17] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-6">
+                    <div>
+                      <div className="flex items-center gap-2 text-accent text-xs font-mono uppercase tracking-wider mb-1">
+                        <Edit3 size={14} />
+                        <span>Dynamic Experience & About Editor</span>
                       </div>
+                      <h3 className="text-xl font-bold text-white tracking-tight">
+                        Customize Portfolio Experience & Credentials
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Update your current experience, company, role, achievements, and education without redeploying code.
+                      </p>
+                    </div>
 
-                      {/* Right Action: Click to inspect details */}
-                      <div className="flex items-center gap-2 self-end sm:self-center">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedMessage(item);
-                          }}
-                          className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-accent hover:text-white border border-white/10 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1"
-                        >
-                          <span>View Details</span>
-                          <ChevronRight size={14} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteMessage(item.id);
-                          }}
-                          disabled={deletingId === item.id}
-                          className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-colors"
-                          title="Delete inquiry"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={fetchProfileConfig}
+                        className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 flex items-center gap-1.5"
+                      >
+                        <RefreshCw size={13} />
+                        <span>Reload</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {profileSuccessMsg && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5 mb-6"
+                    >
+                      <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                      <span>{profileSuccessMsg}</span>
+                    </motion.div>
+                  )}
+
+                  <form onSubmit={handleSaveProfile} className="space-y-6">
+                    {/* Experience Metrics Section */}
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider font-mono text-accent mb-3 flex items-center gap-2">
+                        <Briefcase size={14} />
+                        <span>Current Role & Experience Metrics</span>
+                      </h4>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Experience Years (Display Text)
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.experienceYears}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, experienceYears: e.target.value })
+                            }
+                            placeholder="e.g. 1.5+"
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-mono"
+                          />
+                          <span className="text-[10px] text-slate-400 mt-1 block">
+                            Displayed prominently in Hero & About (1.5+ Years)
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Start Date (For Dynamic Month Math)
+                          </label>
+                          <input
+                            type="date"
+                            value={profileData.startDate}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, startDate: e.target.value })
+                            }
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-mono"
+                          />
+                          <span className="text-[10px] text-slate-400 mt-1 block">
+                            Accounted from May 2025 onwards
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Current Role Title
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.currentRole}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, currentRole: e.target.value })
+                            }
+                            placeholder="Full Stack Developer"
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Company Name
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.currentCompany}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, currentCompany: e.target.value })
+                            }
+                            placeholder="Glacier Agency"
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Location & Setup
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.location}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, location: e.target.value })
+                            }
+                            placeholder="Toronto, Canada (Remote)"
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Working Period
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.period}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, period: e.target.value })
+                            }
+                            placeholder="May 2025 – Present"
+                            required
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                          />
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
+
+                    {/* Bullet Points Section */}
+                    <div className="pt-4 border-t border-white/10">
+                      <h4 className="text-xs font-bold uppercase tracking-wider font-mono text-accent mb-3 flex items-center gap-2">
+                        <Layers size={14} />
+                        <span>Experience Highlights & Bullets</span>
+                      </h4>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Bullet 1 (Primary Architecture & Tech Stack)
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.bullet1}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, bullet1: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                            placeholder="Architect and maintain production-grade Shopify apps..."
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Bullet 2 (Key Systems & Cloud Integrations)
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.bullet2}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, bullet2: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                            placeholder="Engineered Shopify OAuth 2.0, App Bridge embedded apps..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Education Section */}
+                    <div className="pt-4 border-t border-white/10">
+                      <h4 className="text-xs font-bold uppercase tracking-wider font-mono text-accent mb-3 flex items-center gap-2">
+                        <GraduationCap size={14} />
+                        <span>Education Snapshot</span>
+                      </h4>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Degree Title
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.degree}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, degree: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                            placeholder="BS in Computer Science"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Study Period
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.eduPeriod}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, eduPeriod: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                            placeholder="2020 – 2023"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            University / Institute
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.institution}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, institution: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none"
+                            placeholder="University of Sindh, Jamshoro"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-mono text-slate-400 block mb-1.5">
+                            Grade / CGPA
+                          </label>
+                          <input
+                            type="text"
+                            value={profileData.grade}
+                            onChange={(e) =>
+                              setProfileData({ ...profileData, grade: e.target.value })
+                            }
+                            className="w-full bg-white/[0.04] border border-white/10 focus:border-accent rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none font-mono"
+                            placeholder="CGPA: 3.1 / 4.0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live Preview Card */}
+                    <div className="pt-4 border-t border-white/10">
+                      <h4 className="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">
+                        Live Preview (How it renders in the About section)
+                      </h4>
+                      <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-white">{profileData.currentRole}</span>
+                            <span className="text-xs text-accent"> • {profileData.currentCompany}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded-md bg-white/5 border border-white/10">
+                            {profileData.period}
+                          </span>
+                        </div>
+                        <ul className="text-xs text-slate-300 space-y-1 list-disc list-inside">
+                          {profileData.bullet1 && <li>{profileData.bullet1}</li>}
+                          {profileData.bullet2 && <li>{profileData.bullet2}</li>}
+                        </ul>
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+                          <span>{profileData.degree} — {profileData.institution}</span>
+                          <span className="font-mono text-emerald-400">{profileData.grade}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="pt-4 flex items-center justify-end gap-3">
+                      <button
+                        type="submit"
+                        disabled={savingProfile}
+                        className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(61,90,254,0.3)] disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {savingProfile ? (
+                          <>
+                            <RefreshCw size={14} className="animate-spin" />
+                            <span>Saving Changes...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save size={14} />
+                            <span>Publish & Save Profile</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: System Diagnostics */}
+            {activeTab === "system" && (
+              <div className="space-y-6">
+                {/* System Status Overview Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Resend Card */}
+                  <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                      <Mail size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-white">Resend Dispatch</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        {systemStatus?.resend?.senderFrom || "contact@abdsamad.online"}
+                      </p>
+                      <p className="text-[10px] text-emerald-400/90 font-mono mt-1">
+                        Verified Domain Active
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Database Card */}
+                  <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                      <Database size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-white">Database Store</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        {systemStatus?.database?.type || "PostgreSQL Pool"}
+                      </p>
+                      <p className="text-[10px] text-blue-400/90 font-mono mt-1">
+                        {systemStatus?.database?.connected ? "Online & Synced" : "In-Memory Fallback Active"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Rate Limiter Card */}
+                  <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
+                      <ShieldCheck size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-white">IP Rate Limiter</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                      </div>
+                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                        Robust In-Memory Store
+                      </p>
+                      <p className="text-[10px] text-purple-400/90 font-mono mt-1">
+                        Headers: X-RateLimit Active
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Inquiries Count Card */}
+                  <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-4 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-accent/10 border border-accent/20 text-accent">
+                      <Server size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-white">Inbound Messages</span>
+                      </div>
+                      <p className="text-lg font-bold text-white font-mono leading-none mt-1">
+                        {messages.length}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-1">
+                        Audit logs captured
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detailed Diagnostics Box */}
+                <div className="bg-[#0c0e17] border border-white/10 rounded-2xl p-6 space-y-4">
+                  <h4 className="text-xs font-bold uppercase tracking-wider font-mono text-accent">
+                    Security & Health Configuration
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                      <span className="text-slate-400 block text-[10px]">RATE LIMITER POLICY</span>
+                      <p className="text-white">API: 60 req / min per IP</p>
+                      <p className="text-slate-400">Contact: 5 req / 15 min per IP</p>
+                      <p className="text-accent text-[10px] mt-1">Response Headers: X-RateLimit-Limit, X-RateLimit-Remaining</p>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                      <span className="text-slate-400 block text-[10px]">CRON HEALTH CHECK</span>
+                      <p className="text-white">Endpoint: /api/health/cron</p>
+                      <p className="text-slate-400">Auth: Bearer CRON_SECRET</p>
+                      <p className="text-emerald-400 text-[10px] mt-1">Cloud Scheduler Ready</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>

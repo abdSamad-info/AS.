@@ -77,6 +77,94 @@ export function isDatabaseConnected(): boolean {
   return Boolean(pool && isDbHealthy);
 }
 
+export async function checkDatabaseHealthLive(): Promise<{
+  connected: boolean;
+  healthy: boolean;
+  latencyMs: number;
+  type: string;
+  status: string;
+  error?: string | null;
+  fallbackMode?: string;
+}> {
+  const connStr = process.env.PG_CONNECTION_STRING;
+  if (!connStr || connStr.trim().length === 0) {
+    return {
+      connected: false,
+      healthy: true, // In-memory store is healthy & active
+      latencyMs: 0,
+      type: "In-Memory Store",
+      status: "operational (in-memory mode)",
+      fallbackMode: "In-memory database store is active and serving requests",
+      error: null,
+    };
+  }
+
+  if (!isValidPostgresConnectionString(connStr)) {
+    return {
+      connected: false,
+      healthy: false,
+      latencyMs: -1,
+      type: "In-Memory Store",
+      status: "invalid_connection_string",
+      fallbackMode: "Falling back safely to in-memory store",
+      error: "PG_CONNECTION_STRING is not in a valid PostgreSQL connection format",
+    };
+  }
+
+  const p = getDbPool();
+  if (!p) {
+    return {
+      connected: false,
+      healthy: false,
+      latencyMs: -1,
+      type: "PostgreSQL",
+      status: "pool_creation_failed",
+      fallbackMode: "In-memory store fallback active",
+      error: dbLastError || "Unable to initialize PostgreSQL pool",
+    };
+  }
+
+  const startTime = Date.now();
+  try {
+    // 3 second timeout for ping query to prevent hanging
+    const client = await Promise.race([
+      p.connect(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Database connection timed out (3000ms)")), 3000)
+      ),
+    ]);
+
+    try {
+      await client.query("SELECT 1 AS health_check");
+      const latencyMs = Date.now() - startTime;
+      isDbHealthy = true;
+      dbLastError = null;
+      return {
+        connected: true,
+        healthy: true,
+        latencyMs,
+        type: "PostgreSQL",
+        status: "connected",
+        error: null,
+      };
+    } finally {
+      client.release();
+    }
+  } catch (err: any) {
+    isDbHealthy = false;
+    dbLastError = err.message;
+    return {
+      connected: false,
+      healthy: false,
+      latencyMs: Date.now() - startTime,
+      type: "PostgreSQL",
+      status: "disconnected (in-memory fallback active)",
+      fallbackMode: "In-memory store active - site and submissions operational",
+      error: err.message,
+    };
+  }
+}
+
 export function getDatabaseStatus(): {
   type: string;
   connected: boolean;

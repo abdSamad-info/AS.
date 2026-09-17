@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock, Search } from "lucide-react";
+import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock, Search, Maximize2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 import ProjectCardSkeleton from "./ProjectCardSkeleton";
@@ -201,6 +201,14 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+  const [expandedImage, setExpandedImage] = useState<{
+    src: string;
+    alt: string;
+    title: string;
+    subtitle: string;
+    category: string;
+  } | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
 
   // Initial load simulation for custom skeleton screen with skeleton-shimmer
   useEffect(() => {
@@ -272,7 +280,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
   };
 
   useEffect(() => {
-    if (selectedProject) {
+    if (selectedProject || expandedImage) {
       document.body.style.overflow = "hidden";
       onModalStateChange?.(true);
     } else {
@@ -283,18 +291,23 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
       document.body.style.overflow = "unset";
       onModalStateChange?.(false);
     };
-  }, [selectedProject, onModalStateChange]);
+  }, [selectedProject, expandedImage, onModalStateChange]);
 
-  // Escape key handler for closing modal
+  // Escape key handler for closing modals
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selectedProject) {
-        setSelectedProject(null);
+      if (e.key === "Escape") {
+        if (expandedImage) {
+          setExpandedImage(null);
+          setZoomLevel(1);
+        } else if (selectedProject) {
+          setSelectedProject(null);
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedProject]);
+  }, [selectedProject, expandedImage]);
 
   const categories = ["All", "Shopify", "Desktop App", "Full Stack", "Backend / API"];
 
@@ -522,15 +535,45 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         {project.subtitle}
                       </p>
 
-                      {/* Project Visual Preview */}
+                      {/* Project Visual Preview with Image Enlarge Popup Modal Trigger */}
                       {project.image && (
-                        <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300">
+                        <div
+                          className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300 group/img cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedImage({
+                              src: project.image!,
+                              alt: project.imageAlt || `${project.title} - ${project.subtitle}`,
+                              title: project.title,
+                              subtitle: project.subtitle,
+                              category: project.category
+                            });
+                            setZoomLevel(1);
+                          }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Enlarge preview image for ${project.title}`}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setExpandedImage({
+                                src: project.image!,
+                                alt: project.imageAlt || `${project.title} - ${project.subtitle}`,
+                                title: project.title,
+                                subtitle: project.subtitle,
+                                category: project.category
+                              });
+                              setZoomLevel(1);
+                            }
+                          }}
+                        >
                           <img
                             src={project.image}
                             alt={project.imageAlt || `${project.title} - ${project.subtitle}`}
                             loading="lazy"
                             referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 will-change-transform"
+                            className="w-full h-full object-cover object-center group-hover/img:scale-105 transition-transform duration-500 will-change-transform"
                             onError={(e) => {
                               const target = e.currentTarget;
                               if (project.image && project.image.startsWith("/api/images/")) {
@@ -539,7 +582,13 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                               }
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/75 via-transparent to-transparent pointer-events-none" />
+
+                          {/* Enlarge Image Prompt Pill */}
+                          <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/20 text-[10px] font-mono text-white flex items-center gap-1.5 opacity-90 group-hover/img:opacity-100 group-hover/img:bg-accent group-hover/img:border-accent transition-all shadow-md">
+                            <Maximize2 size={11} />
+                            <span>Enlarge Image</span>
+                          </div>
                         </div>
                       )}
 
@@ -712,15 +761,43 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
 
                   {/* Scrollable Content Body */}
                   <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5 text-slate-300 text-xs sm:text-sm">
-                    {/* Project Preview Image */}
+                    {/* Project Preview Image (Clickable for Fullscreen View) */}
                     {selectedProject.image && (
-                      <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-white/[0.02]">
+                      <div
+                        className="relative w-full aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-white/[0.02] group/modalimg cursor-pointer"
+                        onClick={() => {
+                          setExpandedImage({
+                            src: selectedProject.image!,
+                            alt: selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`,
+                            title: selectedProject.title,
+                            subtitle: selectedProject.subtitle,
+                            category: selectedProject.category
+                          });
+                          setZoomLevel(1);
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Enlarge image full screen"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setExpandedImage({
+                              src: selectedProject.image!,
+                              alt: selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`,
+                              title: selectedProject.title,
+                              subtitle: selectedProject.subtitle,
+                              category: selectedProject.category
+                            });
+                            setZoomLevel(1);
+                          }
+                        }}
+                      >
                         <img
                           src={selectedProject.image}
                           alt={selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`}
                           loading="lazy"
                           referrerPolicy="no-referrer"
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-cover object-center group-hover/modalimg:scale-102 transition-transform duration-300"
                           onError={(e) => {
                             const target = e.currentTarget;
                             if (selectedProject.image && selectedProject.image.startsWith("/api/images/")) {
@@ -730,6 +807,12 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
+                        
+                        {/* Enlarge badge in detail modal */}
+                        <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-xs font-mono text-white flex items-center gap-1.5 group-hover/modalimg:bg-accent group-hover/modalimg:border-accent transition-all shadow-md">
+                          <Maximize2 size={13} />
+                          <span>Click to view full screen</span>
+                        </div>
                       </div>
                     )}
 
@@ -907,6 +990,140 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                     </div>
                   </div>
                 </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+
+      {/* Fullscreen Image Lightbox Modal */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {expandedImage && (
+              <div
+                className="fixed inset-0 z-[250] flex flex-col justify-between bg-black/92 backdrop-blur-xl p-3 sm:p-6 overflow-hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${expandedImage.title} Fullscreen Image`}
+              >
+                {/* Backdrop click dismiss */}
+                <div
+                  className="absolute inset-0 z-0"
+                  onClick={() => {
+                    setExpandedImage(null);
+                    setZoomLevel(1);
+                  }}
+                  aria-hidden="true"
+                />
+
+                {/* Top Control Bar */}
+                <div className="relative z-10 flex items-center justify-between gap-4 pb-3 border-b border-white/10 shrink-0">
+                  <div>
+                    <span className="text-[10px] font-mono text-accent uppercase tracking-wider block">
+                      [ {expandedImage.category} ]
+                    </span>
+                    <h3 className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-2">
+                      <span>{expandedImage.title}</span>
+                      <span className="text-xs text-slate-400 font-normal hidden sm:inline">— {expandedImage.subtitle}</span>
+                    </h3>
+                  </div>
+
+                  {/* Action Toolbar */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center bg-white/10 rounded-xl p-1 border border-white/10">
+                      <button
+                        onClick={() => setZoomLevel((z) => Math.max(0.75, Number((z - 0.25).toFixed(2))))}
+                        className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        title="Zoom Out (-)"
+                        aria-label="Zoom Out"
+                      >
+                        <ZoomOut size={16} />
+                      </button>
+                      <span className="text-[11px] font-mono font-semibold text-slate-300 px-2 min-w-[44px] text-center">
+                        {Math.round(zoomLevel * 100)}%
+                      </span>
+                      <button
+                        onClick={() => setZoomLevel((z) => Math.min(2.5, Number((z + 0.25).toFixed(2))))}
+                        className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        title="Zoom In (+)"
+                        aria-label="Zoom In"
+                      >
+                        <ZoomIn size={16} />
+                      </button>
+                      <button
+                        onClick={() => setZoomLevel(1)}
+                        className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors ml-1 border-l border-white/10"
+                        title="Reset Zoom (100%)"
+                        aria-label="Reset Zoom"
+                      >
+                        <RotateCcw size={14} />
+                      </button>
+                    </div>
+
+                    {/* Open in New Tab */}
+                    <a
+                      href={expandedImage.src}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-colors"
+                      title="Open original image in new tab"
+                      aria-label="Open original image in new tab"
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+
+                    {/* Close Button */}
+                    <button
+                      onClick={() => {
+                        setExpandedImage(null);
+                        setZoomLevel(1);
+                      }}
+                      className="w-9 h-9 rounded-xl bg-accent hover:bg-accent/90 text-white flex items-center justify-center transition-colors shadow-lg"
+                      title="Close (Esc)"
+                      aria-label="Close image popup"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Center Image Canvas */}
+                <div className="relative z-10 flex-1 flex items-center justify-center my-3 overflow-auto">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.92 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.2 }}
+                    className="relative flex items-center justify-center max-w-full max-h-full"
+                  >
+                    <img
+                      src={expandedImage.src}
+                      alt={expandedImage.alt}
+                      style={{
+                        transform: `scale(${zoomLevel})`,
+                        transition: "transform 0.2s cubic-bezier(0.2, 0, 0, 1)"
+                      }}
+                      onDoubleClick={() => setZoomLevel((z) => (z === 1 ? 1.5 : 1))}
+                      className="max-h-[75vh] max-w-[92vw] object-contain rounded-2xl shadow-2xl border border-white/15 cursor-zoom-in"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (expandedImage.src.startsWith("/api/images/")) {
+                          target.src = `/images/${expandedImage.src.replace("/api/images/", "")}`;
+                        }
+                      }}
+                    />
+                  </motion.div>
+                </div>
+
+                {/* Bottom Caption */}
+                <div className="relative z-10 text-center pt-2 border-t border-white/10 text-slate-400 text-xs font-mono shrink-0 flex items-center justify-between">
+                  <span className="hidden sm:inline">Double-click image to toggle zoom</span>
+                  <span className="mx-auto sm:mx-0 text-slate-300">
+                    {expandedImage.title} • {expandedImage.subtitle}
+                  </span>
+                  <span className="hidden sm:inline">Press Esc or click outside to close</span>
+                </div>
               </div>
             )}
           </AnimatePresence>,

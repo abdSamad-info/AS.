@@ -54,6 +54,72 @@ router.delete("/admin/messages/:id", authenticateAdmin, async (req, res) => {
   return res.json({ success: true, message: "Message deleted" });
 });
 
+export interface ProfileExperienceConfig {
+  experienceYears: string;
+  startDate: string;
+  currentRole: string;
+  currentCompany: string;
+  location: string;
+  period: string;
+  experienceBullets: string[];
+  education: {
+    degree: string;
+    period: string;
+    institution: string;
+    grade: string;
+  };
+}
+
+let currentProfileConfig: ProfileExperienceConfig = {
+  experienceYears: "1.5+",
+  startDate: "2025-05-01",
+  currentRole: "Full Stack Developer",
+  currentCompany: "Glacier Agency",
+  location: "Toronto, Canada (Remote)",
+  period: "May 2025 – Present",
+  experienceBullets: [
+    "Architect and engineer production-grade Shopify apps using Node.js, Express, React, TypeScript, and PostgreSQL.",
+    "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments.",
+  ],
+  education: {
+    degree: "BS in Computer Science",
+    period: "2020 – 2023",
+    institution: "University of Sindh, Jamshoro",
+    grade: "CGPA: 3.1 / 4.0",
+  },
+};
+
+// Public endpoint to fetch profile experience & education snapshot
+router.get("/profile-config", (req, res) => {
+  return res.json(currentProfileConfig);
+});
+
+// Admin endpoint to update profile experience & education text dynamically
+router.put("/admin/profile-config", authenticateAdmin, (req, res) => {
+  const updates = req.body;
+  if (!updates || typeof updates !== "object") {
+    return res.status(400).json({ error: "Invalid configuration payload" });
+  }
+
+  currentProfileConfig = {
+    ...currentProfileConfig,
+    ...updates,
+    education: {
+      ...currentProfileConfig.education,
+      ...(updates.education || {}),
+    },
+    experienceBullets: Array.isArray(updates.experienceBullets)
+      ? updates.experienceBullets
+      : currentProfileConfig.experienceBullets,
+  };
+
+  return res.json({
+    success: true,
+    message: "Profile and experience configuration updated successfully",
+    config: currentProfileConfig,
+  });
+});
+
 // Admin Endpoint: Security Stats & System Status
 router.get("/admin/system-status", authenticateAdmin, (req, res) => {
   const hasSmtpConfigured = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);

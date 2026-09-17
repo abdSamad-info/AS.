@@ -1,17 +1,84 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
-import { Server, Database, Cloud, Code2, GraduationCap, Award, CheckCircle } from "lucide-react";
+import { Server, Database, Briefcase, GraduationCap, CheckCircle2, ChevronRight, MapPin, Calendar } from "lucide-react";
 
 interface AboutProps {
   onOpenResume?: () => void;
 }
 
+interface ProfileConfig {
+  experienceYears?: string;
+  startDate?: string;
+  currentRole?: string;
+  currentCompany?: string;
+  location?: string;
+  period?: string;
+  experienceBullets?: string[];
+  education?: {
+    degree: string;
+    period: string;
+    institution: string;
+    grade: string;
+  };
+}
+
 export default function About({ onOpenResume }: AboutProps) {
-  // Dynamically calculate exact years of production experience from May 2025
+  // Dynamically calculate exact years of production experience counted from May 2025
   const startCareerDate = new Date(2025, 4, 1); // May 2025
   const now = new Date();
   const diffInMonths = (now.getFullYear() - startCareerDate.getFullYear()) * 12 + (now.getMonth() - startCareerDate.getMonth());
-  const exactYears = Math.max(1.3, Number((diffInMonths / 12).toFixed(1)));
+  // Counted from May 2025, guaranteed 1.5+ as requested
+  const dynamicYears = Math.max(1.5, Number((diffInMonths / 12).toFixed(1)));
+
+  // Profile configuration state (syncable from Admin Dashboard)
+  const [profile, setProfile] = useState<ProfileConfig>({
+    experienceYears: `${dynamicYears}+`,
+    currentRole: "Full Stack Developer",
+    currentCompany: "Glacier Agency",
+    location: "Toronto, Canada (Remote)",
+    period: "May 2025 – Present",
+    experienceBullets: [
+      "Architect and maintain production-grade Shopify apps with Node.js, Express, React, TypeScript, and PostgreSQL.",
+      "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments."
+    ],
+    education: {
+      degree: "BS in Computer Science",
+      period: "2020 – 2023",
+      institution: "University of Sindh, Jamshoro",
+      grade: "CGPA: 3.1 / 4.0"
+    }
+  });
+
+  // Load custom profile configuration if customized via Admin Dashboard or API
+  useEffect(() => {
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch("/api/profile-config");
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setProfile((prev) => ({
+              ...prev,
+              ...data,
+              experienceYears: data.experienceYears || `${dynamicYears}+`,
+              education: {
+                ...prev.education,
+                ...(data.education || {})
+              }
+            }));
+          }
+        }
+      } catch {
+        try {
+          const local = localStorage.getItem("portfolio_profile_config");
+          if (local) {
+            setProfile(JSON.parse(local));
+          }
+        } catch {}
+      }
+    };
+    fetchConfig();
+  }, [dynamicYears]);
 
   // Backend Cached API Endpoint with retry & re-query capability
   const [imgSrc, setImgSrc] = useState<string>("/api/images/profile");
@@ -22,15 +89,15 @@ export default function About({ onOpenResume }: AboutProps) {
     if (retryCount < 3) {
       const nextAttempt = retryCount + 1;
       setRetryCount(nextAttempt);
-      // Re-query backend API with exponential backoff
       setTimeout(() => {
         setImgSrc(`/api/images/profile?retry=${nextAttempt}&t=${Date.now()}`);
       }, nextAttempt * 400);
     } else {
-      // Local asset fallback
       setImgSrc("/images/profiles.jpg");
     }
   }, [retryCount]);
+
+  const displayYears = profile.experienceYears || `${dynamicYears}+`;
 
   return (
     <section id="about" className="py-24 relative overflow-hidden">
@@ -39,7 +106,7 @@ export default function About({ onOpenResume }: AboutProps) {
       <div className="absolute bottom-10 right-0 w-80 h-80 bg-indigo-600/5 rounded-full blur-[140px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Visual Profile Column */}
           <motion.div
@@ -47,10 +114,10 @@ export default function About({ onOpenResume }: AboutProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5 relative"
+            className="lg:col-span-5 relative lg:sticky lg:top-28"
           >
             <div className="relative mx-auto max-w-sm lg:max-w-none">
-              {/* Image Frame - Clean on mobile without dark overlays or hover effects */}
+              {/* Image Frame */}
               <div className="aspect-[4/5] rounded-3xl overflow-hidden bg-transparent md:glass border border-white/10 p-2 sm:p-3 shadow-2xl relative">
                 <img 
                   src={imgSrc}
@@ -67,7 +134,7 @@ export default function About({ onOpenResume }: AboutProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white font-bold text-sm tracking-tight">Abdul Samad</p>
-                      <p className="text-[11px] text-accent font-mono font-medium">Full Stack Engineer</p>
+                      <p className="text-[11px] text-accent font-mono font-medium">{profile.currentRole || "Full Stack Developer"}</p>
                     </div>
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
                   </div>
@@ -82,12 +149,12 @@ export default function About({ onOpenResume }: AboutProps) {
             {/* Quick Metrics */}
             <div className="grid grid-cols-3 gap-3 mt-6">
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
-                <span className="text-2xl font-black text-white block">{exactYears}+</span>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Years Prod Exp</span>
+                <span className="text-2xl font-black text-white block">{displayYears}</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Years Exp</span>
               </div>
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
                 <span className="text-2xl font-black text-accent block">3+</span>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Live Shopify Stores</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Shopify Stores</span>
               </div>
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
                 <span className="text-2xl font-black text-white block">PERN</span>
@@ -104,32 +171,99 @@ export default function About({ onOpenResume }: AboutProps) {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             className="lg:col-span-7"
           >
-            <span className="meta-label mb-4 block text-accent font-mono">0/1 Professional Profile</span>
+            <span className="meta-label mb-3 block text-accent font-mono text-xs uppercase tracking-widest">[ 01 ] Professional Profile</span>
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight uppercase tracking-tighter text-white">
               Engineering Scalable Systems <br />
               <span className="text-accent">With Backend Precision.</span>
             </h3>
 
-            <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal">
+            <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal mb-8">
               <p>
-                I am a <strong className="text-white">Full Stack Developer</strong> with {exactYears}+ years of dedicated experience building, maintaining, and deploying production-grade web applications. While proficient across the full stack, my primary engineering focus and deep passion lie in <strong className="text-white">backend architecture, RESTful & GraphQL API design, system modeling, and database optimization</strong>.
+                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of dedicated production experience building, maintaining, and deploying web applications and Shopify merchant solutions. While skilled across the entire stack, my core passion and deepest expertise center on <strong className="text-white">backend architecture, REST & GraphQL API engineering, database schema optimization, and secure session pipelines</strong>.
               </p>
               <p>
-                At <span className="text-white font-medium">Glacier Agency (Toronto, Canada)</span>, I architect and maintain mission backend modules, custom pricing logic, secure file upload pipelines via Google Cloud Storage, and Shopify App Bridge integrations supporting live merchant stores with high transaction volume.
+                At <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada · Remote"})</span>, I engineer mission-critical backend modules, custom optical lens pricing engines, Google Cloud Storage secure file pipelines, and Shopify App Bridge embedded dashboards.
               </p>
               <p>
-                I prioritize clean architecture, robust session management (OAuth 2.0, JWT, secure HttpOnly cookies), and cloud deployment workflows (GCP App Engine, Cloud SQL, Secret Manager). At the same time, I ensure frontend interfaces built with React, Vite, and Tailwind CSS provide intuitive, responsive user experiences that connect effortlessly with complex server APIs.
+                I prioritize clean modular code, rock-solid session security (OAuth 2.0, JWT, HttpOnly cookies), and resilient cloud deployments (GCP App Engine, Cloud SQL, Secret Manager).
               </p>
             </div>
 
-            {/* Core Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+            {/* Integrated Experience & Education Snapshot */}
+            <div className="mb-8 space-y-4">
+              <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-accent flex items-center gap-2">
+                <Briefcase size={14} />
+                <span>Experience &amp; Education Snapshot</span>
+              </h4>
+
+              {/* Current Role Card */}
+              <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-accent/30 transition-all duration-300">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-white/5">
+                  <div>
+                    <h5 className="text-base font-bold text-white flex items-center gap-2">
+                      <span>{profile.currentRole || "Full Stack Developer"}</span>
+                      <span className="text-accent font-medium">@ {profile.currentCompany || "Glacier Agency"}</span>
+                    </h5>
+                    <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5 font-mono">
+                      <MapPin size={11} className="text-slate-400" />
+                      <span>{profile.location || "Toronto, Canada · Remote"}</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-accent/15 border border-accent/30 text-[11px] font-mono text-accent font-semibold">
+                      <Calendar size={11} />
+                      <span>{profile.period || "May 2025 – Present"} ({displayYears} yrs)</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bullet Points */}
+                <ul className="space-y-2 text-xs text-slate-300">
+                  {(profile.experienceBullets || []).map((bullet, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                      <span className="leading-relaxed">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Education Card */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+                    <GraduationCap size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">
+                      {profile.education?.degree || "BS in Computer Science"} ({profile.education?.period || "2020 – 2023"})
+                    </p>
+                    <p className="text-xs text-slate-400 font-mono mt-0.5">
+                      {profile.education?.institution || "University of Sindh, Jamshoro"} · {profile.education?.grade || "CGPA: 3.1 / 4.0"}
+                    </p>
+                  </div>
+                </div>
+
+                {onOpenResume && (
+                  <button
+                    onClick={onOpenResume}
+                    className="px-4 py-2 rounded-full bg-white/5 hover:bg-accent hover:text-white border border-white/10 hover:border-accent text-slate-300 text-xs font-semibold uppercase tracking-wider transition-all self-start sm:self-auto flex items-center gap-1.5"
+                  >
+                    <span>View CV</span>
+                    <ChevronRight size={13} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Core Architectural Focus Pillars */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
                 <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
                   <Server size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-1">API & System Design</h4>
+                  <h4 className="text-sm font-bold text-white mb-1">API &amp; System Design</h4>
                   <p className="text-xs text-text-dim leading-relaxed">
                     Specialized in REST APIs, GraphQL Admin APIs, WebSocket concurrency, and secure OAuth flows.
                   </p>
@@ -141,34 +275,12 @@ export default function About({ onOpenResume }: AboutProps) {
                   <Database size={18} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-1">Databases & Cloud</h4>
+                  <h4 className="text-sm font-bold text-white mb-1">Databases &amp; Cloud</h4>
                   <p className="text-xs text-text-dim leading-relaxed">
                     PostgreSQL on Cloud SQL, MongoDB aggregation pipelines, Firestore, and GCP serverless hosting.
                   </p>
                 </div>
               </div>
-            </div>
-
-            {/* Education & Credentials Summary */}
-            <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-accent shrink-0">
-                  <GraduationCap size={20} />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-white">BS in Computer Science (2020 – 2023)</p>
-                  <p className="text-[11px] text-slate-400">University of Sindh Jamshoro · CGPA: 3.1 / 4.0</p>
-                </div>
-              </div>
-
-              {onOpenResume && (
-                <button
-                  onClick={onOpenResume}
-                  className="px-5 py-2.5 rounded-full bg-accent/10 border border-accent/30 text-accent hover:bg-accent hover:text-white text-xs font-bold uppercase tracking-wider transition-all self-start sm:self-auto"
-                >
-                  View Full CV
-                </button>
-              )}
             </div>
 
           </motion.div>
