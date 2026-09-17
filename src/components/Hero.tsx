@@ -30,11 +30,11 @@ export default function Hero({ onOpenResume }: HeroProps) {
           </h1>
 
           <p className="text-base sm:text-lg text-slate-300 font-medium max-w-2xl mx-auto mb-4 tracking-tight">
-            Building production web applications with Node.js, Express, React, TypeScript, PostgreSQL, MongoDB & Google Cloud Platform.
+            Engineering production web applications with Node.js, Express, React, TypeScript, PostgreSQL, MongoDB & Google Cloud Platform.
           </p>
 
           <p className="max-w-2xl mx-auto text-xs sm:text-sm text-text-dim mb-10 leading-relaxed font-normal px-4">
-            Passionate about backend architecture, REST & GraphQL API engineering, secure authentication (OAuth 2.0, Session tokens, JWT), and database optimization — paired with clean, responsive user interfaces.
+            Actively engineering REST & GraphQL APIs on a daily basis — profiling query latency, reducing server load, handling concurrency, and developing custom Shopify merchant backends.
           </p>
 
           {/* Action Callouts */}
@@ -71,17 +71,17 @@ export default function Hero({ onOpenResume }: HeroProps) {
             {
               icon: Server,
               title: "Backend & APIs",
-              desc: "Node.js, Express, TypeScript, REST APIs, GraphQL, OAuth 2.0, JWT & secure session flows."
+              desc: "Node.js, Express, TypeScript, REST & GraphQL APIs, latency profiling, concurrency, OAuth 2.0 & JWT."
             },
             {
               icon: Database,
               title: "Databases & GCP",
-              desc: "PostgreSQL on Cloud SQL, MongoDB pipelines, Firestore, Google App Engine & Secret Manager."
+              desc: "PostgreSQL, MongoDB, Firestore, query indexing & optimization, Google App Engine & Secret Manager."
             },
             {
               icon: ShoppingBag,
-              title: "Shopify & Full Stack",
-              desc: "Shopify App Bridge, Billing APIs, custom pricing engines, React, Vite & Tailwind CSS."
+              title: "Shopify & Frontend",
+              desc: "Shopify App Bridge, custom pricing engines, automated webhooks, React.js, Next.js & Tailwind CSS."
             }
           ].map((item, i) => {
             const Icon = item.icon;

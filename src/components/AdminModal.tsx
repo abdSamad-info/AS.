@@ -96,8 +96,8 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
     currentCompany: "Glacier Agency",
     location: "Toronto, Canada (Remote)",
     period: "May 2025 – Present",
-    bullet1: "Architect and maintain production-grade Shopify apps with Node.js, Express, React, TypeScript, and PostgreSQL.",
-    bullet2: "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments.",
+    bullet1: "Daily engineering, latency profiling, and throughput optimization for production REST & GraphQL APIs, reducing server overhead and managing concurrency spikes.",
+    bullet2: "Active production development of Shopify custom apps, App Bridge interfaces, complex pricing engines, and automated webhook pipelines at Glacier Agency.",
     degree: "BS in Computer Science",
     eduPeriod: "2020 – 2023",
     institution: "University of Sindh, Jamshoro",
@@ -1089,10 +1089,10 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
                       <p className="text-accent text-[10px] mt-1">Response Headers: X-RateLimit-Limit, X-RateLimit-Remaining</p>
                     </div>
                     <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
-                      <span className="text-slate-400 block text-[10px]">CRON HEALTH CHECK</span>
-                      <p className="text-white">Endpoint: /api/health/cron</p>
-                      <p className="text-slate-400">Auth: Bearer CRON_SECRET</p>
-                      <p className="text-emerald-400 text-[10px] mt-1">Cloud Scheduler Ready</p>
+                      <span className="text-slate-400 block text-[10px]">PROTECTED DB HEALTH CHECK</span>
+                      <p className="text-white">Endpoint: /api/health/db</p>
+                      <p className="text-slate-400">Schedule: 15-min cron (*/15 * * * *)</p>
+                      <p className="text-emerald-400 text-[10px] mt-1">Live DB Ping &amp; Latency Check Active</p>
                     </div>
                   </div>
                 </div>

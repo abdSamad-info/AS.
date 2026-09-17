@@ -29,13 +29,12 @@ const skillCategories: SkillCategory[] = [
       "Node.js", 
       "Express.js", 
       "TypeScript", 
-      "RESTful APIs", 
+      "RESTful API Engineering", 
       "GraphQL Admin API", 
-      "OAuth 2.0", 
+      "API Latency Profiling", 
+      "Server Load & Concurrency", 
+      "OAuth 2.0 & Session Security", 
       "JWT Authentication", 
-      "Session Security", 
-      "Socket.io", 
-      "System Design", 
       "Middleware Architecture"
     ],
   },
@@ -47,12 +46,12 @@ const skillCategories: SkillCategory[] = [
     skills: [
       "Shopify App Bridge", 
       "GraphQL Admin API", 
+      "Custom Pricing Engines", 
+      "Embedded Apps", 
       "Shopify Billing API", 
       "Storefront API", 
-      "Embedded Apps", 
       "Theme App Extensions", 
-      "Custom Pricing Engines", 
-      "OAuth & Session Tokens"
+      "Webhooks Lifecycle Pipelines"
     ],
   },
   {
@@ -63,12 +62,10 @@ const skillCategories: SkillCategory[] = [
     skills: [
       "PostgreSQL", 
       "MongoDB", 
-      "Google Cloud SQL", 
       "Firestore", 
-      "MySQL", 
-      "Mongoose", 
-      "Aggregation Pipelines", 
-      "Query Indexing & Optimization"
+      "Query Indexing & Optimization", 
+      "Connection Pooling", 
+      "Data Schema Modeling"
     ],
   },
   {
@@ -84,7 +81,8 @@ const skillCategories: SkillCategory[] = [
       "Docker", 
       "Git & GitHub", 
       "GitHub Actions (CI/CD)", 
-      "Postman"
+      "Postman", 
+      "Health & Uptime Monitoring"
     ],
   },
   {
@@ -95,9 +93,6 @@ const skillCategories: SkillCategory[] = [
     skills: [
       "TypeScript", 
       "JavaScript (ES6+)", 
-      "Python", 
-      "Java", 
-      "SQL", 
       "HTML5 & CSS3"
     ],
   },
@@ -108,12 +103,14 @@ const skillCategories: SkillCategory[] = [
     accentColor: "text-purple-400 border-purple-500/20 bg-purple-500/10",
     skills: [
       "React.js", 
-      "Vite", 
+      "Next.js", 
       "Tailwind CSS", 
-      "Redux Toolkit", 
-      "Component Architecture", 
+      "Material UI", 
       "Responsive UI", 
-      "Material UI"
+      "State Memoization (useMemo / useCallback)", 
+      "Event & Callback Handling", 
+      "Frontend System Architecture", 
+      "Vite"
     ],
   },
 ];

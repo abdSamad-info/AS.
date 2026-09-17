@@ -190,9 +190,9 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                           </h2>
                         </div>
                         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-white/[0.02] border border-white/5 p-4 rounded-xl">
-                          Full Stack Developer with dedicated professional experience building production web applications using 
-                          <strong className="text-white"> Node.js, Express.js, React, TypeScript, PostgreSQL, MongoDB, and Google Cloud Platform</strong>. 
-                          Experienced in designing scalable REST & GraphQL APIs, authentication workflows (OAuth 2.0, Session tokens, JWT), database modeling, cloud deployments (App Engine, Cloud SQL, Secret Manager), and custom Shopify integrations. Proven track record collaborating across remote international engineering teams to deliver robust software on time.
+                          Full Stack Developer actively engineering production web applications and merchant backends using 
+                          <strong className="text-white"> Node.js, Express.js, React, Next.js, TypeScript, PostgreSQL, MongoDB, Firestore, and Google Cloud Platform</strong>. 
+                          Regularly engaged in designing and profiling high-throughput REST & GraphQL APIs, reducing server latency, managing concurrency spikes, implementing secure session pipelines (OAuth 2.0, JWT), and developing custom Shopify merchant solutions at Glacier Agency.
                         </p>
                       </div>
 
@@ -207,19 +207,19 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Programming & Core:</span>
-                            <span className="text-slate-400 leading-relaxed">JavaScript (ES6+), TypeScript, Python, HTML5, CSS3, Data Structures</span>
+                            <span className="text-slate-400 leading-relaxed">TypeScript, JavaScript (ES6+), HTML5, CSS3, Data Structures & Algorithms</span>
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Backend & APIs:</span>
-                            <span className="text-slate-400 leading-relaxed">Node.js, Express.js, REST APIs, GraphQL Admin APIs, JWT, OAuth 2.0, Socket.io, Mongoose</span>
+                            <span className="text-slate-400 leading-relaxed">Node.js, Express.js, RESTful APIs, GraphQL Admin APIs, API Latency Profiling, Concurrency Handling, JWT, OAuth 2.0, Webhooks</span>
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Databases & Cloud:</span>
-                            <span className="text-slate-400 leading-relaxed">PostgreSQL, MongoDB (Aggregations), Firestore, Cloud SQL, Google Cloud Platform (App Engine, Secret Manager, Cloud Storage)</span>
+                            <span className="text-slate-400 leading-relaxed">PostgreSQL, MongoDB, Firestore, Query Indexing & Optimization, Connection Pooling, GCP (App Engine, Cloud Storage, Secret Manager)</span>
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Frontend & Tools:</span>
-                            <span className="text-slate-400 leading-relaxed">React.js, Vite, Tailwind CSS, Material UI, Redux Toolkit, Git, GitHub Actions, Vercel, Render</span>
+                            <span className="text-slate-400 leading-relaxed">React.js, Next.js, Vite, Tailwind CSS, Material UI, Responsive UI, State Memoization, Event & Callback Handling, Git & GitHub</span>
                           </div>
                         </div>
                       </div>
@@ -243,11 +243,10 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                             </span>
                           </div>
                           <ul className="list-disc list-outside ml-4 space-y-2 text-xs text-slate-300 leading-relaxed">
-                            <li>Architected, developed, and deployed full-stack web applications using <strong className="text-white">Node.js, Express.js, React, TypeScript, and PostgreSQL</strong>.</li>
-                            <li>Built scalable REST & GraphQL APIs, authentication flows, and merchant-facing features supporting live e-commerce production applications.</li>
-                            <li>Engineered custom Shopify embedded applications with App Bridge, OAuth 2.0 session tokens, and recurring subscription billing workflows.</li>
-                            <li>Set up and maintained Google Cloud Platform infrastructure including App Engine, Cloud SQL, Cloud Storage, and Secret Manager.</li>
-                            <li>Implemented performant backend logic for dynamic pricing rules, product customization schemas, file uploads, and secure merchant settings.</li>
+                            <li>Daily engineering, performance profiling, and latency optimization for production REST & GraphQL APIs, minimizing server load and handling high-concurrency traffic.</li>
+                            <li>Active development and maintenance of custom Shopify applications, App Bridge embedded dashboards, optical pricing calculation engines, and automated webhook lifecycle pipelines.</li>
+                            <li>Optimized database query indexing and connection pooling across PostgreSQL and MongoDB, guaranteeing high-performance data retrieval and zero-downtime reliability.</li>
+                            <li>Architected secure session authentication flows (OAuth 2.0, JWT, HttpOnly cookies) and deployed cloud container services on Google Cloud Platform.</li>
                             <li>Collaborated in multi-developer Git workflows including pull requests, code reviews, and production releases.</li>
                           </ul>
                         </div>

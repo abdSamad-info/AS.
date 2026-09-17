@@ -65,7 +65,51 @@ router.get(["/health/ping", "/health/keep-alive", "/healthz"], authenticateCron,
 });
 
 /**
- * 2. Dedicated Secure Health Check for Cron (every 15 min or 1 hour)
+ * 2. Dedicated Protected Database Health Check Endpoint
+ * GET /api/health/db or /api/health/db-check
+ * 
+ * Verifies live database connectivity, round-trip execution latency, and table schemas.
+ * Protected via authenticateCron (x-cron-secret header, Bearer token, or ?secret= query).
+ * Ideal target for 15-minute or 5-minute health monitoring cron jobs.
+ */
+router.get(["/health/db", "/health/db-check", "/db/health"], authenticateCron, async (req, res) => {
+  const clientIp = getClientIp(req);
+  const startTime = Date.now();
+
+  // Perform live query check against the database
+  const liveDbCheck = await checkDatabaseHealthLive();
+  const latencyMs = liveDbCheck.latencyMs >= 0 ? liveDbCheck.latencyMs : Date.now() - startTime;
+  const isHealthy = liveDbCheck.healthy;
+
+  return res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? "healthy" : "degraded",
+    service: "database_health_check",
+    healthy: isHealthy,
+    timestamp: new Date().toISOString(),
+    caller: {
+      ip: clientIp,
+    },
+    database: {
+      type: liveDbCheck.type,
+      status: liveDbCheck.status,
+      connected: liveDbCheck.connected,
+      healthy: liveDbCheck.healthy,
+      latencyMs,
+      fallbackMode: liveDbCheck.fallbackMode || null,
+      error: liveDbCheck.error || null,
+      verificationQuery: "SELECT 1 AS health_check",
+    },
+    protection: {
+      protectedUrl: "/api/health/db",
+      authMethod: CRON_SECRET ? "Protected with CRON_SECRET" : "Permissive (unconfigured secret)",
+      isSecured: Boolean(CRON_SECRET),
+      scheduleInterval: "15 minutes (*/15 * * * *)",
+    },
+  });
+});
+
+/**
+ * 3. Dedicated Secure Health Check for Cron (every 15 min or 1 hour)
  * GET /api/health/cron or /api/cron/health or /api/health
  * 
  * Secure endpoint: Only accessible with valid secret (via 'x-cron-secret' header,

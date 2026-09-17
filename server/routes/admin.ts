@@ -78,8 +78,9 @@ let currentProfileConfig: ProfileExperienceConfig = {
   location: "Toronto, Canada (Remote)",
   period: "May 2025 – Present",
   experienceBullets: [
-    "Architect and engineer production-grade Shopify apps using Node.js, Express, React, TypeScript, and PostgreSQL.",
-    "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments.",
+    "Daily engineering, latency profiling, and throughput optimization for production REST & GraphQL APIs, reducing server overhead and managing concurrency spikes.",
+    "Active production development of Shopify custom apps, App Bridge interfaces, complex pricing engines, and automated webhook pipelines at Glacier Agency.",
+    "Database query indexing and connection pool tuning across PostgreSQL & MongoDB, ensuring fast queries and zero-downtime reliability under heavy I/O.",
   ],
   education: {
     degree: "BS in Computer Science",

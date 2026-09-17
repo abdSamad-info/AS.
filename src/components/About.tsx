@@ -38,8 +38,9 @@ export default function About({ onOpenResume }: AboutProps) {
     location: "Toronto, Canada (Remote)",
     period: "May 2025 – Present",
     experienceBullets: [
-      "Architect and maintain production-grade Shopify apps with Node.js, Express, React, TypeScript, and PostgreSQL.",
-      "Engineered Shopify OAuth 2.0, App Bridge embedded apps, secure GCS file pipelines, and GCP cloud deployments."
+      "Daily engineering, latency profiling, and throughput optimization for production REST & GraphQL APIs, reducing server overhead and managing concurrency spikes.",
+      "Active production development of Shopify custom apps, App Bridge interfaces, complex pricing calculation engines, and automated webhook pipelines at Glacier Agency.",
+      "Database query indexing and connection pool tuning across PostgreSQL & MongoDB, ensuring fast queries and zero-downtime reliability under heavy I/O."
     ],
     education: {
       degree: "BS in Computer Science",
@@ -179,13 +180,13 @@ export default function About({ onOpenResume }: AboutProps) {
 
             <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal mb-8">
               <p>
-                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of dedicated production experience building, maintaining, and deploying web applications and Shopify merchant solutions. While skilled across the entire stack, my core passion and deepest expertise center on <strong className="text-white">backend architecture, REST & GraphQL API engineering, database schema optimization, and secure session pipelines</strong>.
+                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of active production experience engineering high-performance web applications and merchant backends. On a regular daily basis, my core responsibilities focus on <strong className="text-white">engineering performant REST & GraphQL APIs, profiling execution latency, cutting server load, and handling concurrent throughput spikes</strong>.
               </p>
               <p>
-                At <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada · Remote"})</span>, I engineer mission-critical backend modules, custom optical lens pricing engines, Google Cloud Storage secure file pipelines, and Shopify App Bridge embedded dashboards.
+                Working at <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada · Remote"})</span>, I regularly develop and maintain production-critical systems — including Shopify embedded applications (App Bridge & GraphQL Admin APIs), custom optical pricing calculation engines, Google Cloud Storage secure file pipelines, and automated webhook lifecycle handlers.
               </p>
               <p>
-                I prioritize clean modular code, rock-solid session security (OAuth 2.0, JWT, HttpOnly cookies), and resilient cloud deployments (GCP App Engine, Cloud SQL, Secret Manager).
+                My day-to-day workflow revolves around active performance gains: fine-tuning database indexing, reducing memory footprint, implementing airtight session authentication (OAuth 2.0, JWT, HttpOnly cookies), and deploying production workloads with automated health monitoring.
               </p>
             </div>
 
@@ -200,9 +201,10 @@ export default function About({ onOpenResume }: AboutProps) {
               <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-accent/30 transition-all duration-300">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-white/5">
                   <div>
-                    <h5 className="text-base font-bold text-white flex items-center gap-2">
+                    <h5 className="text-base font-bold text-white flex items-center gap-2 flex-wrap">
                       <span>{profile.currentRole || "Full Stack Developer"}</span>
-                      <span className="text-accent font-medium">@ {profile.currentCompany || "Glacier Agency"}</span>
+                      <span className="text-slate-400 font-normal">·</span>
+                      <span className="text-accent font-semibold">{profile.currentCompany || "Glacier Agency"}</span>
                     </h5>
                     <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5 font-mono">
                       <MapPin size={11} className="text-slate-400" />
