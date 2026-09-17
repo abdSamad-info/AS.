@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
-import { Server, Database, Briefcase, GraduationCap, CheckCircle2, ChevronRight, MapPin, Calendar } from "lucide-react";
+import { Server, Database, Briefcase, GraduationCap, ChevronRight, MapPin } from "lucide-react";
 
 interface AboutProps {
   onOpenResume?: () => void;
@@ -190,58 +190,38 @@ export default function About({ onOpenResume }: AboutProps) {
               </p>
             </div>
 
-            {/* Integrated Experience & Education Snapshot */}
-            <div className="mb-8 space-y-4">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-accent flex items-center gap-2">
-                <Briefcase size={14} />
-                <span>Experience &amp; Education Snapshot</span>
-              </h4>
-
-              {/* Current Role Card */}
-              <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-accent/30 transition-all duration-300">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-white/5">
-                  <div>
-                    <h5 className="text-base font-bold text-white flex items-center gap-2 flex-wrap">
-                      <span>{profile.currentRole || "Full Stack Developer"}</span>
-                      <span className="text-slate-400 font-normal">·</span>
-                      <span className="text-accent font-semibold">{profile.currentCompany || "Glacier Agency"}</span>
-                    </h5>
-                    <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5 font-mono">
-                      <MapPin size={11} className="text-slate-400" />
-                      <span>{profile.location || "Toronto, Canada · Remote"}</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-accent/15 border border-accent/30 text-[11px] font-mono text-accent font-semibold">
-                      <Calendar size={11} />
-                      <span>{profile.period || "May 2025 – Present"} ({displayYears} yrs)</span>
-                    </span>
-                  </div>
+            {/* Concise Work & Education Info (Clean, No Bullets) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
+              {/* Current Workplace */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+                  <Briefcase size={18} />
                 </div>
-
-                {/* Bullet Points */}
-                <ul className="space-y-2 text-xs text-slate-300">
-                  {(profile.experienceBullets || []).map((bullet, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
-                      <span className="leading-relaxed">{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Current Workplace</p>
+                  <p className="text-sm font-bold text-white truncate">
+                    {profile.currentCompany || "Glacier Agency"}
+                  </p>
+                  <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5 font-mono">
+                    <MapPin size={11} className="text-slate-400 shrink-0" />
+                    <span className="truncate">{profile.location || "Toronto, Canada (Remote)"}</span>
+                  </p>
+                </div>
               </div>
 
-              {/* Education Card */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3.5">
+              {/* Education */}
+              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3.5 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
-                    <GraduationCap size={20} />
+                    <GraduationCap size={18} />
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-white">
-                      {profile.education?.degree || "BS in Computer Science"} ({profile.education?.period || "2020 – 2023"})
+                  <div className="min-w-0">
+                    <p className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Education</p>
+                    <p className="text-sm font-bold text-white truncate">
+                      {profile.education?.degree || "BS in Computer Science"}
                     </p>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">
-                      {profile.education?.institution || "University of Sindh, Jamshoro"} · {profile.education?.grade || "CGPA: 3.1 / 4.0"}
+                    <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">
+                      {profile.education?.institution || "University of Sindh, Jamshoro"}
                     </p>
                   </div>
                 </div>
@@ -249,10 +229,11 @@ export default function About({ onOpenResume }: AboutProps) {
                 {onOpenResume && (
                   <button
                     onClick={onOpenResume}
-                    className="px-4 py-2 rounded-full bg-white/5 hover:bg-accent hover:text-white border border-white/10 hover:border-accent text-slate-300 text-xs font-semibold uppercase tracking-wider transition-all self-start sm:self-auto flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-accent hover:text-white border border-white/10 hover:border-accent text-slate-300 text-[11px] font-semibold uppercase tracking-wider transition-all shrink-0 flex items-center gap-1"
+                    title="View Full CV"
                   >
-                    <span>View CV</span>
-                    <ChevronRight size={13} />
+                    <span>CV</span>
+                    <ChevronRight size={12} />
                   </button>
                 )}
               </div>
