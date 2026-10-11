@@ -8,6 +8,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import About from "./components/About";
+import Experience from "./components/Experience";
 import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Contact from "./components/Contact";
@@ -77,21 +78,24 @@ export default function App() {
           Skip to Main Content
         </a>
 
-        {/* Dynamic 3D Curved Scroll Trail & Orbital Animations */}
-        <Scroll3DLine />
+        {/* Dynamic 3D Curved Scroll Trail - Only rendered on md+ screens to ensure ultra-smooth performance on low-RAM mobile devices */}
+        <div className="hidden md:block">
+          <Scroll3DLine />
+        </div>
 
-        {/* Background Ambient Atmospheric Glows */}
-        <div className="absolute top-[-5%] right-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] rounded-full bg-accent/10 blur-[90px] pointer-events-none z-0 will-change-transform" />
-        <div className="absolute top-[35%] right-[-8%] w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-emerald-500/[0.04] blur-[100px] pointer-events-none z-0 will-change-transform" />
-        <div className="absolute bottom-[20%] left-[-5%] w-[300px] sm:w-[380px] h-[300px] sm:h-[380px] rounded-full bg-indigo-600/10 blur-[80px] pointer-events-none z-0 will-change-transform" />
-        <div className="absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
+        {/* Background Ambient Atmospheric Glows (optimized & lightweight on mobile) */}
+        <div className="hidden sm:block absolute top-[-5%] right-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] rounded-full bg-accent/10 blur-[90px] pointer-events-none z-0 will-change-transform" />
+        <div className="hidden sm:block absolute top-[35%] right-[-8%] w-[280px] sm:w-[360px] h-[280px] sm:h-[360px] rounded-full bg-emerald-500/[0.04] blur-[100px] pointer-events-none z-0 will-change-transform" />
+        <div className="hidden sm:block absolute bottom-[20%] left-[-5%] w-[300px] sm:w-[380px] h-[300px] sm:h-[380px] rounded-full bg-indigo-600/10 blur-[80px] pointer-events-none z-0 will-change-transform" />
+        <div className="hidden sm:block absolute bottom-[5%] right-[10%] w-[260px] sm:w-[320px] h-[260px] sm:h-[320px] rounded-full bg-emerald-500/[0.03] blur-[90px] pointer-events-none z-0 will-change-transform" />
 
         <Navbar />
         <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
           <Hero onOpenResume={() => setIsResumeOpen(true)} />
           <About onOpenResume={() => setIsResumeOpen(true)} />
-          <Skills />
+          <Experience onOpenResume={() => setIsResumeOpen(true)} />
           <Projects onModalStateChange={setIsProjectModalOpen} />
+          <Skills />
           <Contact />
         </main>
         <Footer />

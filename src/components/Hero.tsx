@@ -22,19 +22,19 @@ export default function Hero({ onOpenResume }: HeroProps) {
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/10 text-accent text-xs font-mono font-medium mb-8">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span>FULL STACK DEVELOPER</span>
+            <span>SOFTWARE ENGINEER · FULL STACK</span>
           </div>
 
           <h1 className="massive-title mb-6 text-center leading-tight tracking-tighter text-white">
             Abdul <span className="text-glow text-accent">Samad</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-slate-300 font-medium max-w-2xl mx-auto mb-4 tracking-tight">
-            Engineering production web applications using Node.js, Express, React, TypeScript, PostgreSQL, MongoDB, Google Cloud Platform.
+          <p className="text-base sm:text-lg text-slate-200 font-medium max-w-2xl mx-auto mb-3 tracking-tight">
+            Software Engineer building fast, reliable APIs and Shopify apps with Node.js, TypeScript, and PostgreSQL.
           </p>
 
           <p className="max-w-2xl mx-auto text-xs sm:text-sm text-text-dim mb-10 leading-relaxed font-normal px-4">
-            Working on REST and GraphQL APIs daily, optimizing query latency, decreasing server load, managing concurrency and developing custom Shopify merchant backends.
+            I focus on API performance, system design, and secure integrations — from database indexing and query optimization to OAuth flows and webhook pipelines on Google Cloud.
           </p>
 
           {/* Action Callouts */}
@@ -71,17 +71,17 @@ export default function Hero({ onOpenResume }: HeroProps) {
             {
               icon: Server,
               title: "Backend & APIs",
-              desc: "Node.js, Express, TypeScript, REST & GraphQL APIs, latency profiling, concurrency, OAuth 2.0 & JWT."
+              desc: "Node.js, Express, TypeScript, scalable REST & GraphQL APIs, concurrency control, OAuth 2.0 & JWT."
             },
             {
               icon: Database,
               title: "Databases & GCP",
-              desc: "PostgreSQL, MongoDB, Firestore, query indexing & optimization, Google App Engine & Secret Manager."
+              desc: "PostgreSQL, MongoDB, Firestore, query indexing, Google App Engine, GCS pipelines & Secret Manager."
             },
             {
               icon: ShoppingBag,
-              title: "Shopify & Frontend",
-              desc: "Shopify App Bridge, custom pricing engines, automated webhooks, React.js, Next.js & Tailwind CSS."
+              title: "Shopify & Systems",
+              desc: "Shopify App Bridge, custom pricing engines, automated webhooks, React.js & Next.js."
             }
           ].map((item, i) => {
             const Icon = item.icon;

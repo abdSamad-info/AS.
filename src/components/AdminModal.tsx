@@ -90,9 +90,9 @@ export default function AdminModal({ isOpen, onClose }: AdminModalProps) {
 
   // Profile and Experience Editor State
   const [profileData, setProfileData] = useState({
-    experienceYears: "1.5+",
+    experienceYears: "1.6+",
     startDate: "2025-05-01",
-    currentRole: "Full Stack Developer",
+    currentRole: "Software Engineer",
     currentCompany: "Glacier Agency",
     location: "Toronto, Canada (Remote)",
     period: "May 2025 – Present",

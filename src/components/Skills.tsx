@@ -29,13 +29,13 @@ const skillCategories: SkillCategory[] = [
       "Node.js", 
       "Express.js", 
       "TypeScript", 
+      "JavaScript (ES6+)",
       "RESTful API Engineering", 
       "GraphQL Admin API", 
       "API Latency Profiling", 
-      "Server Load & Concurrency", 
+      "Server Scaling & Concurrency", 
       "OAuth 2.0 & Session Security", 
-      "JWT Authentication", 
-      "Middleware Architecture"
+      "JWT Authentication"
     ],
   },
   {
@@ -86,17 +86,6 @@ const skillCategories: SkillCategory[] = [
     ],
   },
   {
-    id: "languages",
-    title: "Programming Languages",
-    icon: Code2,
-    accentColor: "text-amber-400 border-amber-500/20 bg-amber-500/10",
-    skills: [
-      "TypeScript", 
-      "JavaScript (ES6+)", 
-      "HTML5 & CSS3"
-    ],
-  },
-  {
     id: "frontend",
     title: "Frontend Engineering",
     icon: Monitor,
@@ -104,12 +93,11 @@ const skillCategories: SkillCategory[] = [
     skills: [
       "React.js", 
       "Next.js", 
+      "TypeScript", 
       "Tailwind CSS", 
       "Material UI", 
-      "Responsive UI", 
-      "State Memoization (useMemo / useCallback)", 
-      "Event & Callback Handling", 
-      "Frontend System Architecture", 
+      "Component Architecture", 
+      "HTML5 & CSS3",
       "Vite"
     ],
   },
@@ -119,12 +107,11 @@ export default function Skills() {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
 
   const filterTabs = [
-    { id: "all", label: "All Skills" },
+    { id: "all", label: "All Tools" },
     { id: "backend", label: "Backend" },
     { id: "shopify", label: "Shopify" },
     { id: "databases", label: "Databases" },
     { id: "cloud", label: "Cloud & DevOps" },
-    { id: "languages", label: "Languages" },
     { id: "frontend", label: "Frontend" },
   ];
 
@@ -132,12 +119,10 @@ export default function Skills() {
     ? skillCategories
     : skillCategories.filter((c) => c.id === selectedFilter);
 
-  const totalSkillsCount = skillCategories.reduce((acc, c) => acc + c.skills.length, 0);
-
   return (
     <section id="skills" className="py-20 relative overflow-hidden bg-[#07070b]/60">
       {/* Background radial highlight */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[140px] -z-10 pointer-events-none" />
+      <div className="hidden sm:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[140px] -z-10 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
@@ -150,13 +135,13 @@ export default function Skills() {
         >
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-mono text-xs font-semibold mb-3">
             <Layers size={13} />
-            <span>TECHNICAL SKILLS</span>
+            <span>[ 04 ] CORE TECHNICAL TOOLS</span>
           </div>
           <h3 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
-            Core Competencies
+            Core Tools I Use in Production
           </h3>
           <p className="max-w-xl mx-auto text-slate-400 text-xs sm:text-sm mt-3 leading-relaxed">
-            A focused breakdown of languages, frameworks, cloud services, and e-commerce APIs I use to engineer robust production systems.
+            A focused breakdown of languages, frameworks, cloud services, and e-commerce APIs I engineer with daily to ship reliable, high-performance web systems.
           </p>
         </motion.div>
 
@@ -227,10 +212,10 @@ export default function Skills() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Total Summary Pill */}
+        {/* Bottom Production Toolchain Note */}
         <div className="mt-8 text-center">
           <p className="text-xs font-mono text-slate-500">
-            {totalSkillsCount}+ verified technical proficiencies &amp; production tools
+            Curated production toolchain engineered across active client and commercial systems
           </p>
         </div>
       </div>

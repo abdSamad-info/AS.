@@ -139,7 +139,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                               Abdul Samad
                             </h1>
                             <p className="text-sm sm:text-base font-semibold text-accent mt-1">
-                              Full Stack Developer · Node.js · PERN / MERN · TypeScript · GCP
+                              Software Engineer · Full Stack · Node.js · TypeScript · PERN / MERN · GCP
                             </p>
                           </div>
 
@@ -190,9 +190,9 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                           </h2>
                         </div>
                         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-white/[0.02] border border-white/5 p-4 rounded-xl">
-                          Full Stack Developer actively engineering production web applications and merchant backends using 
-                          <strong className="text-white"> Node.js, Express.js, React, Next.js, TypeScript, PostgreSQL, MongoDB, Firestore, and Google Cloud Platform</strong>. 
-                          Regularly engaged in designing and profiling high-throughput REST & GraphQL APIs, reducing server latency, managing concurrency spikes, implementing secure session pipelines (OAuth 2.0, JWT), and developing custom Shopify merchant solutions at Glacier Agency.
+                          Software Engineer with 1.6+ years of production experience building high-performance web applications and merchant backends using 
+                          <strong className="text-white"> Node.js, Express.js, React, Next.js, TypeScript, PostgreSQL, MongoDB, and Google Cloud Platform</strong>. 
+                          Designs scalable REST & GraphQL APIs, optimizes query and server latency, implements airtight session authentication pipelines (OAuth 2.0, JWT), and engineers custom Shopify merchant applications (App Bridge, pricing engines, GCS file pipelines, webhooks) at Glacier Agency.
                         </p>
                       </div>
 
@@ -211,7 +211,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Backend & APIs:</span>
-                            <span className="text-slate-400 leading-relaxed">Node.js, Express.js, RESTful APIs, GraphQL Admin APIs, API Latency Profiling, Concurrency Handling, JWT, OAuth 2.0, Webhooks</span>
+                            <span className="text-slate-400 leading-relaxed">Node.js, Express.js, RESTful APIs, GraphQL Admin APIs, Latency Profiling, Concurrency Scaling, JWT, OAuth 2.0, Webhooks</span>
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Databases & Cloud:</span>
@@ -219,7 +219,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                           </div>
                           <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                             <span className="font-bold text-white block">Frontend & Tools:</span>
-                            <span className="text-slate-400 leading-relaxed">React.js, Next.js, Vite, Tailwind CSS, Material UI, Responsive UI, State Memoization, Event & Callback Handling, Git & GitHub</span>
+                            <span className="text-slate-400 leading-relaxed">React.js, Next.js, Vite, Tailwind CSS, Material UI, Component Architecture, Git & GitHub</span>
                           </div>
                         </div>
                       </div>
@@ -235,7 +235,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
                         <div className="p-4 sm:p-5 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                             <div>
-                              <h3 className="text-sm font-bold text-white">Full Stack Developer — Glacier Agency</h3>
+                              <h3 className="text-sm font-bold text-white">Software Engineer — Glacier Agency</h3>
                               <p className="text-xs text-text-dim">Toronto, Canada (Remote)</p>
                             </div>
                             <span className="text-xs text-accent font-mono bg-accent/10 border border-accent/20 px-2.5 py-1 rounded-lg self-start sm:self-auto">

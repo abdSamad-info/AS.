@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
-import { ExternalLink, Github, Filter, X, ChevronRight, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock, Search, Maximize2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { useState, useMemo, useEffect } from "react";
+import { ExternalLink, Github, Filter, X, ChevronRight, ChevronLeft, Layers, Sparkles, Server, CheckCircle2, ShoppingBag, Download, Laptop, HardDrive, Clock, Search, Maximize2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { useState, useMemo, useEffect, type TouchEvent } from "react";
 import { createPortal } from "react-dom";
 import ProjectCardSkeleton from "./ProjectCardSkeleton";
 import ProjectAnalytics from "./ProjectAnalytics";
@@ -51,9 +51,9 @@ const initialProjects: ProjectItem[] = [
     badge: "Live on Shopify Store",
     image: "/api/images/presia.png",
     imageAlt: "Presia - Shopify Prescription Eyewear App embedded admin and storefront builder interface",
-    purpose: "Enables optical and eyewear merchants to seamlessly integrate complex prescription lenses, optical parameters (sphere, cylinder, axis, PD), and contact lens selection flows into their live Shopify storefronts.",
+    purpose: "Embedded Shopify prescription eyewear app integrating custom optical calculations and real-time storefront price recalculations.",
     applicability: "Commercial eyewear brands, optical retail merchants, and prescription lab suppliers wanting an automated, zero-friction storefront prescription builder with real-time price recalculation.",
-    desc: "Built and published a production Shopify application using PERN stack and TypeScript, deployed on Google App Engine with Cloud SQL and Google Cloud Storage.",
+    desc: "Production Shopify embedded app engineered with Node.js, Express, React, TypeScript, and PostgreSQL. Handles complex multi-tier lens pricing engines and secure GCS medical uploads.",
     longDesc: "Presia resolves the challenging problem of collecting medical prescription parameters within Shopify's default product schema. I engineered an embedded admin experience using Shopify App Bridge and OAuth 2.0 with session token authentication.\n\nThe backend features a custom pricing engine capable of handling complex lens tier calculations, progressive/bifocal add-ons, auto-discounts, and multi-currency overrides. High-resolution prescription image uploads are securely streamed to Google Cloud Storage with strict access validation.",
     tech: ["TypeScript", "Node.js", "Express.js", "React", "PostgreSQL", "Google App Engine", "Cloud SQL", "GCS", "Shopify API", "OAuth 2.0"],
     features: [
@@ -76,9 +76,9 @@ const initialProjects: ProjectItem[] = [
     version: "3.0.2",
     image: "/api/images/forge-image.png",
     imageAlt: "Forge - Modern Electron Desktop Workspace, Project Management, and Task Engine",
-    purpose: "Provide a simple, stable, and polished desktop productivity app that helps users stay organized, work efficiently, and manage their workflow with a smooth branded experience.",
+    purpose: "Electron desktop app for task, schedule, and workspace management, built with React and TypeScript. Architected with decoupled IPC bridge and offline-first JSON storage.",
     applicability: "Developers, technical leads, designers, and workflow managers needing a fast, distraction-free desktop application with offline data sovereignty and zero-cloud dependence.",
-    desc: "A modern Electron-based desktop workspace engineered for project, task, schedule, and activity management with instant feedback and file-based JSON storage.",
+    desc: "Cross-platform Electron desktop productivity suite with instant optimistic state updates, background autosave debouncing, and local JSON persistence.",
     longDesc: "Forge is a modern Electron-based desktop workspace designed to help users manage projects, tasks, schedules, activity, and settings in one place. It focuses on fast interaction, instant save feedback, and reliable local data storage.\n\nThe app uses file-based JSON storage to keep data persistent and easy to back up, while also supporting Windows installer and portable builds for simple distribution.\n\nArchitected with a decoupled Electron IPC bridge, multi-window support, background autosave debounce pipelines, and offline-first data integrity.",
     tech: ["Electron", "React", "TypeScript", "Tailwind CSS", "Node.js", "JSON Storage", "Vite", "Electron Builder", "IPC", "NSIS"],
     features: [
@@ -207,8 +207,91 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
     title: string;
     subtitle: string;
     category: string;
+    projectId: number;
   } | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
+
+  // Touch gesture state for pinch-to-zoom and swipe in mobile lightbox
+  const [touchStartDist, setTouchStartDist] = useState<number | null>(null);
+  const [initialTouchZoom, setInitialTouchZoom] = useState<number>(1);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = useState<number | null>(null);
+
+  const projectsWithImages = useMemo(() => {
+    return projectList.filter((p) => Boolean(p.image));
+  }, [projectList]);
+
+  const handleNavigateImage = (direction: "prev" | "next") => {
+    if (!expandedImage) return;
+    const currentIndex = projectsWithImages.findIndex((p) => p.id === expandedImage.projectId);
+    if (currentIndex === -1) return;
+
+    let nextIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
+    if (nextIndex < 0) nextIndex = projectsWithImages.length - 1;
+    if (nextIndex >= projectsWithImages.length) nextIndex = 0;
+
+    const nextProject = projectsWithImages[nextIndex];
+    setExpandedImage({
+      src: nextProject.image!,
+      alt: nextProject.imageAlt || `${nextProject.title} - ${nextProject.subtitle}`,
+      title: nextProject.title,
+      subtitle: nextProject.subtitle,
+      category: nextProject.category,
+      projectId: nextProject.id,
+    });
+    setZoomLevel(1);
+  };
+
+  const handleTouchStart = (e: TouchEvent) => {
+    if (e.touches.length === 2) {
+      // Pinch start
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      setTouchStartDist(dist);
+      setInitialTouchZoom(zoomLevel);
+    } else if (e.touches.length === 1) {
+      // Single finger touch - record start for swipe
+      setTouchStartX(e.touches[0].clientX);
+      setTouchStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (e.touches.length === 2 && touchStartDist !== null) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const scale = dist / touchStartDist;
+      const newZoom = Math.min(3, Math.max(0.75, Number((initialTouchZoom * scale).toFixed(2))));
+      setZoomLevel(newZoom);
+    }
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (touchStartDist !== null) {
+      setTouchStartDist(null);
+    }
+    if (touchStartX !== null && e.changedTouches.length === 1 && zoomLevel <= 1.1) {
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const diffX = touchStartX - endX;
+      const diffY = touchStartY !== null ? Math.abs(touchStartY - endY) : 0;
+
+      // If horizontal swipe is prominent (> 40px) and not mostly vertical scroll
+      if (Math.abs(diffX) > 40 && diffY < 80) {
+        if (diffX > 0) {
+          handleNavigateImage("next");
+        } else {
+          handleNavigateImage("prev");
+        }
+      }
+      setTouchStartX(null);
+      setTouchStartY(null);
+    }
+  };
 
   // Initial load simulation for custom skeleton screen with skeleton-shimmer
   useEffect(() => {
@@ -293,7 +376,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
     };
   }, [selectedProject, expandedImage, onModalStateChange]);
 
-  // Escape key handler for closing modals
+  // Keyboard navigation handler for modals (Escape, ArrowLeft, ArrowRight)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -303,11 +386,19 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
         } else if (selectedProject) {
           setSelectedProject(null);
         }
+      } else if (expandedImage) {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          handleNavigateImage("prev");
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          handleNavigateImage("next");
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedProject, expandedImage]);
+  }, [selectedProject, expandedImage, projectsWithImages]);
 
   const categories = ["All", "Shopify", "Desktop App", "Full Stack", "Backend / API"];
 
@@ -350,7 +441,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
         >
           <div>
             <h2 className="text-sm font-semibold tracking-widest uppercase text-accent mb-4 font-mono">
-              [ 04 ] Production & Engineering Work
+              [ 03 ] Production & Engineering Work
             </h2>
             <h3 id="projects-heading" className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white">
               Featured Projects
@@ -481,8 +572,6 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((project, index) => {
-                const readTime = calculateProjectReadTime(project);
-
                 return (
                   <motion.div
                     key={project.id}
@@ -503,7 +592,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                     }}
                     className="group glass p-6 sm:p-7 rounded-3xl border-white/10 hover:border-accent/40 hover:bg-white/[0.04] focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent transition-all duration-300 flex flex-col justify-between cursor-pointer relative overflow-hidden shadow-lg hover:shadow-[0_10px_30px_rgba(61,90,254,0.15)]"
                   >
-                    {/* Top Badge, Category & Read Time Estimator */}
+                    {/* Top Badge & Category */}
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-4">
                         <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-widest flex items-center gap-1.5">
@@ -517,25 +606,18 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                         )}
                       </div>
 
-                      {/* Project Title & Automated Read Time Label */}
-                      <div className="flex items-baseline justify-between gap-2 mb-1">
+                      {/* Project Title */}
+                      <div className="mb-1">
                         <h4 className="text-2xl font-bold text-white group-hover:text-accent transition-colors">
                           {project.title}
                         </h4>
-                        <span
-                          className="text-[11px] font-mono text-slate-400 font-normal shrink-0 flex items-center gap-1"
-                          title={`Estimated read time (${readTime}) based on description word count`}
-                        >
-                          <Clock size={11} className="text-slate-400/80" />
-                          <span>{readTime}</span>
-                        </span>
                       </div>
 
                       <p className="text-xs font-mono text-slate-400 mb-4">
                         {project.subtitle}
                       </p>
 
-                      {/* Project Visual Preview with Image Enlarge Popup Modal Trigger */}
+                      {/* Project Visual Preview (Click to open Lightbox directly) */}
                       {project.image && (
                         <div
                           className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-white/[0.02] border border-white/5 group-hover:border-accent/30 transition-all duration-300 group/img cursor-pointer"
@@ -546,13 +628,14 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                               alt: project.imageAlt || `${project.title} - ${project.subtitle}`,
                               title: project.title,
                               subtitle: project.subtitle,
-                              category: project.category
+                              category: project.category,
+                              projectId: project.id
                             });
                             setZoomLevel(1);
                           }}
                           role="button"
                           tabIndex={0}
-                          aria-label={`Enlarge preview image for ${project.title}`}
+                          aria-label={`View image for ${project.title}`}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
@@ -562,7 +645,8 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                                 alt: project.imageAlt || `${project.title} - ${project.subtitle}`,
                                 title: project.title,
                                 subtitle: project.subtitle,
-                                category: project.category
+                                category: project.category,
+                                projectId: project.id
                               });
                               setZoomLevel(1);
                             }
@@ -582,13 +666,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                               }
                             }}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/75 via-transparent to-transparent pointer-events-none" />
-
-                          {/* Enlarge Image Prompt Pill */}
-                          <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/20 text-[10px] font-mono text-white flex items-center gap-1.5 opacity-90 group-hover/img:opacity-100 group-hover/img:bg-accent group-hover/img:border-accent transition-all shadow-md">
-                            <Maximize2 size={11} />
-                            <span>Enlarge Image</span>
-                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/30 via-transparent to-transparent pointer-events-none" />
                         </div>
                       )}
 
@@ -771,13 +849,14 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                             alt: selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`,
                             title: selectedProject.title,
                             subtitle: selectedProject.subtitle,
-                            category: selectedProject.category
+                            category: selectedProject.category,
+                            projectId: selectedProject.id
                           });
                           setZoomLevel(1);
                         }}
                         role="button"
                         tabIndex={0}
-                        aria-label="Enlarge image full screen"
+                        aria-label="View image full screen"
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
@@ -786,7 +865,8 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                               alt: selectedProject.imageAlt || `${selectedProject.title} - ${selectedProject.subtitle}`,
                               title: selectedProject.title,
                               subtitle: selectedProject.subtitle,
-                              category: selectedProject.category
+                              category: selectedProject.category,
+                              projectId: selectedProject.id
                             });
                             setZoomLevel(1);
                           }
@@ -806,13 +886,7 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                             }
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/70 via-transparent to-transparent pointer-events-none" />
-                        
-                        {/* Enlarge badge in detail modal */}
-                        <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-md border border-white/20 text-xs font-mono text-white flex items-center gap-1.5 group-hover/modalimg:bg-accent group-hover/modalimg:border-accent transition-all shadow-md">
-                          <Maximize2 size={13} />
-                          <span>Click to view full screen</span>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d14]/30 via-transparent to-transparent pointer-events-none" />
                       </div>
                     )}
 
@@ -1031,7 +1105,30 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
 
                   {/* Action Toolbar */}
                   <div className="flex items-center gap-2">
+                    {/* Previous / Next Project Navigation Buttons */}
                     <div className="flex items-center bg-white/10 rounded-xl p-1 border border-white/10">
+                      <button
+                        onClick={() => handleNavigateImage("prev")}
+                        className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        title="Previous Project (Swipe Right or Left Arrow)"
+                        aria-label="Previous Project"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <span className="text-[10px] font-mono font-semibold text-slate-300 px-1.5 min-w-[36px] text-center">
+                        {Math.max(1, projectsWithImages.findIndex((p) => p.id === expandedImage.projectId) + 1)}/{projectsWithImages.length}
+                      </span>
+                      <button
+                        onClick={() => handleNavigateImage("next")}
+                        className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+                        title="Next Project (Swipe Left or Right Arrow)"
+                        aria-label="Next Project"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+
+                    <div className="hidden sm:flex items-center bg-white/10 rounded-xl p-1 border border-white/10">
                       <button
                         onClick={() => setZoomLevel((z) => Math.max(0.75, Number((z - 0.25).toFixed(2))))}
                         className="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
@@ -1088,12 +1185,30 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                   </div>
                 </div>
 
-                {/* Center Image Canvas */}
-                <div className="relative z-10 flex-1 flex items-center justify-center my-3 overflow-auto">
+                {/* Center Image Canvas with Floating Navigation and Touch Pinch/Swipe */}
+                <div 
+                  className="relative z-10 flex-1 flex items-center justify-center my-2 overflow-hidden select-none"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  {/* Floating Prev Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateImage("prev");
+                    }}
+                    className="hidden sm:flex absolute left-3 z-30 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 items-center justify-center text-white transition-all shadow-xl hover:scale-105 active:scale-95"
+                    aria-label="Previous Project"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.92 }}
+                    key={expandedImage.src}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                     className="relative flex items-center justify-center max-w-full max-h-full"
                   >
@@ -1102,10 +1217,10 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                       alt={expandedImage.alt}
                       style={{
                         transform: `scale(${zoomLevel})`,
-                        transition: "transform 0.2s cubic-bezier(0.2, 0, 0, 1)"
+                        transition: touchStartDist ? "none" : "transform 0.2s cubic-bezier(0.2, 0, 0, 1)"
                       }}
-                      onDoubleClick={() => setZoomLevel((z) => (z === 1 ? 1.5 : 1))}
-                      className="max-h-[75vh] max-w-[92vw] object-contain rounded-2xl shadow-2xl border border-white/15 cursor-zoom-in"
+                      onDoubleClick={() => setZoomLevel((z) => (z === 1 ? 1.6 : 1))}
+                      className="max-h-[75vh] max-w-[92vw] object-contain rounded-2xl shadow-2xl border border-white/15 cursor-zoom-in touch-none"
                       onError={(e) => {
                         const target = e.currentTarget;
                         if (expandedImage.src.startsWith("/api/images/")) {
@@ -1114,12 +1229,24 @@ export default function Projects({ onModalStateChange }: ProjectsProps) {
                       }}
                     />
                   </motion.div>
+
+                  {/* Floating Next Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNavigateImage("next");
+                    }}
+                    className="hidden sm:flex absolute right-3 z-30 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 border border-white/20 items-center justify-center text-white transition-all shadow-xl hover:scale-105 active:scale-95"
+                    aria-label="Next Project"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
                 </div>
 
                 {/* Bottom Caption */}
-                <div className="relative z-10 text-center pt-2 border-t border-white/10 text-slate-400 text-xs font-mono shrink-0 flex items-center justify-between">
-                  <span className="hidden sm:inline">Double-click image to toggle zoom</span>
-                  <span className="mx-auto sm:mx-0 text-slate-300">
+                <div className="relative z-10 text-center pt-2.5 border-t border-white/10 text-slate-400 text-xs font-mono shrink-0 flex items-center justify-between">
+                  <span className="hidden sm:inline">Swipe or ←/→ to navigate • Double-click/pinch to zoom</span>
+                  <span className="mx-auto sm:mx-0 text-slate-200 font-medium">
                     {expandedImage.title} • {expandedImage.subtitle}
                   </span>
                   <span className="hidden sm:inline">Press Esc or click outside to close</span>

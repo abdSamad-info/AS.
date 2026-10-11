@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
-import { Server, Database, Briefcase, GraduationCap, ChevronRight, MapPin } from "lucide-react";
+import { Server, Database, ChevronRight } from "lucide-react";
 
 interface AboutProps {
   onOpenResume?: () => void;
@@ -27,13 +27,13 @@ export default function About({ onOpenResume }: AboutProps) {
   const startCareerDate = new Date(2025, 4, 1); // May 2025
   const now = new Date();
   const diffInMonths = (now.getFullYear() - startCareerDate.getFullYear()) * 12 + (now.getMonth() - startCareerDate.getMonth());
-  // Counted from May 2025, guaranteed 1.5+ as requested
-  const dynamicYears = Math.max(1.5, Number((diffInMonths / 12).toFixed(1)));
+  // Counted from May 2025, guaranteed 1.6+ as requested
+  const dynamicYears = Math.max(1.6, Number((diffInMonths / 12).toFixed(1)));
 
   // Profile configuration state (syncable from Admin Dashboard)
   const [profile, setProfile] = useState<ProfileConfig>({
     experienceYears: `${dynamicYears}+`,
-    currentRole: "Full Stack Developer",
+    currentRole: "Software Engineer",
     currentCompany: "Glacier Agency",
     location: "Toronto, Canada (Remote)",
     period: "May 2025 – Present",
@@ -135,7 +135,7 @@ export default function About({ onOpenResume }: AboutProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-white font-bold text-sm tracking-tight">Abdul Samad</p>
-                      <p className="text-[11px] text-accent font-mono font-medium">{profile.currentRole || "Full Stack Developer"}</p>
+                      <p className="text-[11px] text-accent font-mono font-medium">{profile.currentRole || "Software Engineer"}</p>
                     </div>
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
                   </div>
@@ -143,8 +143,8 @@ export default function About({ onOpenResume }: AboutProps) {
               </div>
 
               {/* Background Accent Decors */}
-              <div className="absolute -bottom-6 -right-6 w-36 h-36 bg-accent/20 rounded-full blur-3xl -z-10" />
-              <div className="absolute -top-6 -left-6 w-36 h-36 bg-indigo-600/20 rounded-full blur-3xl -z-10" />
+              <div className="hidden sm:block absolute -bottom-6 -right-6 w-36 h-36 bg-accent/20 rounded-full blur-3xl -z-10" />
+              <div className="hidden sm:block absolute -top-6 -left-6 w-36 h-36 bg-indigo-600/20 rounded-full blur-3xl -z-10" />
             </div>
 
             {/* Quick Metrics */}
@@ -158,8 +158,8 @@ export default function About({ onOpenResume }: AboutProps) {
                 <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Shopify Stores</span>
               </div>
               <div className="glass p-4 rounded-2xl border-white/5 text-center">
-                <span className="text-2xl font-black text-white block">PERN</span>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Core Stack</span>
+                <span className="text-xl sm:text-2xl font-black text-white block truncate">GCP / CLOUD</span>
+                <span className="text-[10px] uppercase font-mono tracking-wider text-text-dim">Deployed Apps</span>
               </div>
             </div>
           </motion.div>
@@ -174,98 +174,61 @@ export default function About({ onOpenResume }: AboutProps) {
           >
             <span className="meta-label mb-3 block text-accent font-mono text-xs uppercase tracking-widest">[ 01 ] Professional Profile</span>
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight uppercase tracking-tighter text-white">
-              Engineering Scalable Systems <br />
-              <span className="text-accent">With Backend Precision.</span>
+              Software Engineer Building <br />
+              <span className="text-accent">Reliable Systems &amp; Shopify Apps.</span>
             </h3>
 
+            {/* 3-Paragraph Narrative */}
             <div className="space-y-4 text-slate-300 leading-relaxed text-sm font-normal mb-8">
               <p>
-                I am a <strong className="text-white">Full Stack Developer</strong> with <strong className="text-accent">{displayYears} years</strong> of active production experience engineering high-performance web applications and merchant backends. On a daily basis, my core responsibilities focus on <strong className="text-white">engineering performant REST & GraphQL APIs, profiling execution latency, cutting server load, and handling concurrent throughput spikes</strong>.
+                I'm a <strong className="text-white font-semibold">Software Engineer</strong> with <strong className="text-accent font-semibold">{displayYears} years</strong> of experience building production web applications and Shopify merchant backends. I work across the full stack, but I'm strongest in backend systems: API design, database modeling, authentication, and performance.
               </p>
               <p>
-                At work, at the <span className="text-white font-medium">{profile.currentCompany || "Glacier Agency"} ({profile.location || "Toronto, Canada (Remote)"})</span>, I regularly develop and maintain production-critical systems — including Shopify embedded applications (App Bridge & GraphQL Admin APIs), custom optical pricing calculation engines, Google Cloud Storage secure file pipelines, and automated webhook lifecycle handlers.
+                At <span className="text-white font-medium">Glacier Agency (Toronto, Remote)</span>, I build and maintain Shopify embedded apps using App Bridge and the GraphQL Admin API, custom pricing engines, secure Google Cloud Storage file pipelines, and webhook handlers. I work with PostgreSQL, MongoDB, and Firestore, and I secure apps with OAuth 2.0, JWT, and HttpOnly cookies.
               </p>
-              <p>
-                As a developer, I constantly work on active performance gains: fine-tuning database indexing, reducing memory footprint, implementing airtight session authentication (OAuth 2.0, JWT, HttpOnly cookies), and production workloads with automated health monitoring.
+              <p className="text-slate-200">
+                Before writing code, I think about data models, failure cases, and how a system behaves under load. I like clean architecture, readable code, and solutions that other developers can maintain. Outside client work, I build my own products such as Forge, a desktop workspace app, and <strong className="text-accent font-semibold">I'm open to new software engineering roles</strong>.
               </p>
             </div>
 
-            {/* Concise Work & Education Info (Clean, No Bullets) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
-              {/* Current Workplace */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
-                  <Briefcase size={18} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Current Workplace</p>
-                  <p className="text-sm font-bold text-white truncate">
-                    {profile.currentCompany || "Glacier Agency"}
-                  </p>
-                  <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5 font-mono">
-                    <MapPin size={11} className="text-slate-400 shrink-0" />
-                    <span className="truncate">{profile.location || "Toronto, Canada (Remote)"}</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Education */}
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
-                    <GraduationCap size={18} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] uppercase font-mono tracking-wider text-slate-400">Education</p>
-                    <p className="text-sm font-bold text-white truncate">
-                      {profile.education?.degree || "BS in Computer Science"}
-                    </p>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5 truncate">
-                      {profile.education?.institution || "University of Sindh, Jamshoro"}
-                    </p>
-                  </div>
-                </div>
-
-                {onOpenResume && (
-                  <button
-                    onClick={onOpenResume}
-                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-accent hover:text-white border border-white/10 hover:border-accent text-slate-300 text-[11px] font-semibold uppercase tracking-wider transition-all shrink-0 flex items-center gap-1"
-                    title="View Full CV"
-                  >
-                    <span>CV</span>
-                    <ChevronRight size={12} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Core Architectural Focus Pillars */}
+            {/* Core Architectural Focus Pillars (API & System Design + Databases & Cloud) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 mt-0.5">
                   <Server size={18} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white mb-1">API &amp; System Design</h4>
                   <p className="text-xs text-text-dim leading-relaxed">
-                    Specialized in REST APIs, GraphQL Admin APIs, WebSocket concurrency, and secure OAuth flows.
+                    Scalable REST APIs, Shopify GraphQL Admin APIs, latency profiling, and airtight OAuth 2.0 &amp; JWT authentication flows.
                   </p>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-colors flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 mt-0.5">
                   <Database size={18} />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white mb-1">Databases &amp; Cloud</h4>
                   <p className="text-xs text-text-dim leading-relaxed">
-                    PostgreSQL on Cloud SQL, MongoDB aggregation pipelines, Firestore, and GCP serverless hosting.
+                    PostgreSQL indexing, MongoDB aggregation pipelines, Firestore, and automated Google Cloud Storage pipelines.
                   </p>
                 </div>
               </div>
             </div>
 
+            {onOpenResume && (
+              <div className="mt-8 flex items-center gap-4">
+                <button
+                  onClick={onOpenResume}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-medium transition-all active:scale-95"
+                >
+                  <span>View Full CV &amp; Credentials</span>
+                  <ChevronRight size={14} className="text-accent" />
+                </button>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

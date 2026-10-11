@@ -13,10 +13,9 @@ export default function ProjectCardSkeleton() {
           <div className="h-5 w-24 rounded-full bg-white/10 skeleton-shimmer" />
         </div>
 
-        {/* Title & Read Time Skeleton */}
-        <div className="flex items-baseline justify-between gap-2 mb-2">
+        {/* Title Skeleton */}
+        <div className="mb-2">
           <div className="h-7 w-3/5 rounded-xl bg-white/15 skeleton-shimmer" />
-          <div className="h-3 w-16 rounded-md bg-white/10 skeleton-shimmer" />
         </div>
 
         {/* Subtitle Skeleton */}
